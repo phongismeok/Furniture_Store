@@ -1,0 +1,238 @@
+package com.example.asm_mvvm.screens.activity
+
+import android.content.Intent
+import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.asm_mvvm.MainActivity
+import com.example.asm_mvvm.R
+import com.example.asm_mvvm.ui.theme.MyButton
+import com.example.asm_mvvm.ui.theme.MyButtonWithImage
+
+
+class LoginActivity : AppCompatActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            var email by remember { mutableStateOf("") }
+            var password by remember { mutableStateOf("") }
+            var passwordVisible by rememberSaveable { mutableStateOf(false) }
+            var checked by remember { mutableStateOf(true) }
+            val icon1: Painter = painterResource(id = R.drawable.iceye)
+            val icon2: Painter = painterResource(id = R.drawable.iccloseye)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp)
+                    .background(Color.White),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logoapp),
+                    contentDescription = "anh nen",
+                    modifier = Modifier.size(200.dp),
+                    contentScale = ContentScale.Crop
+                )
+                Text(
+                    text = "Login Account",
+                    style = TextStyle(
+                        fontSize = 35.sp,
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Serif
+                    ),
+                    modifier = Modifier.padding(bottom = 30.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                // Username TextField
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("E-mail") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp, end = 10.dp),
+                    shape = RoundedCornerShape(10.dp),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                // Password TextField
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    singleLine = true,
+                    placeholder = { Text("Password") },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        val image = if (passwordVisible) icon1 else icon2
+                        val description =
+                            if (passwordVisible) "Hide password" else "Show password"
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(painter = image, contentDescription = description)
+                        }
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp, end = 10.dp)
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth(0.4f)
+                            .height(70.dp)
+                    ) {
+                        Checkbox(
+                            checked = checked,
+                            onCheckedChange = { checked = it }
+                        )
+                        Text(
+                            "Remember me", textAlign = TextAlign.Start, fontSize = 18.sp
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f)
+                            .height(70.dp), verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Forget Password?",
+                            textDecoration = TextDecoration.Underline,
+                            fontSize = 18.sp
+                        )
+                    }
+                }
+
+                MyButton(
+                    title = "Log in",
+                    onClick = {
+                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        this@LoginActivity.startActivity(intent)
+                    },
+                    mauChu = Color.White,
+                    mauNen = Color.Gray
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(10.dp)
+                ) {
+                    Text(text = "Don't have an account?", fontSize = 18.sp)
+                    Text(
+                        text = "Sign up",
+                        textDecoration = TextDecoration.Underline,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(start = 5.dp)
+                            .clickable {
+                                val intent = Intent(this@LoginActivity, SignUpActivity::class.java)
+                                this@LoginActivity.startActivity(intent)
+                            }
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(15.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Divider(
+                        color = Color(0xFF997777),
+                        thickness = 1.dp,
+                        modifier = Modifier.weight(0.1f)
+                    )
+
+                    Text(text = "or", fontSize = 18.sp)
+
+                    Divider(
+                        color = Color(0xFF997777),
+                        thickness = 1.dp,
+                        modifier = Modifier.weight(0.1f)
+                    )
+                }
+
+                MyButtonWithImage(
+                    title = "Log In with Google",
+                    onClick = { /*TODO*/ },
+                    mauChu = Color.Black,
+                    mauNen = Color.White,
+                    image = R.drawable.icongoogle
+                )
+
+                MyButtonWithImage(
+                    title = "Log In with Facebook",
+                    onClick = { /*TODO*/ },
+                    mauChu = Color.Black,
+                    mauNen = Color.White,
+                    image = R.drawable.iconfacebook
+                )
+                //
+            }
+        }
+    }
+}
