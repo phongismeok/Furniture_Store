@@ -17,19 +17,24 @@ router.get('/get-list-products', async (req, res) => {
     }
 })
 
-router.get('/get-products-by-id/:id', async (req, res) => {
+router.get('/get-products-by-id', async (req, res) => {
     try {
-        const { id } = req.params
-        const data = await Products.findById(id).populate('_id');
-        res.json({
-            "status": 200,
-            "messenger": "Danh sách product",
-            "data": data
-        })
+        const { _id } = req.query;
+        if (!_id) {
+            return res.status(400).send({ error: 'ID is required' });
+        }
+
+        const data = await Products.findById(_id).populate('_id');
+        if (!data) {
+            return res.status(404).send({ error: 'Product not found' });
+        }
+
+        res.status(200).send(data);
     } catch (error) {
         console.log(error);
+        res.status(500).send({ error: 'Internal Server Error' });
     }
-})
+});
 
 router.get('/get-list-products-by-type/:type', async (req, res) => {
     try {

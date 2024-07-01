@@ -1,5 +1,6 @@
 package com.example.asm_mvvm.screens.fragment
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,10 +33,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.asm_mvvm.screens.activity.DetailProductActivity
 import com.example.asm_mvvm.ui.theme.MyToolbar
 import com.example.asm_mvvm.viewmodels.ProductViewModel
 import com.example.asm_mvvm.viewmodels.TypeViewModel
@@ -67,9 +70,7 @@ fun ListType(typeViewModel: TypeViewModel, productViewModel: ProductViewModel) {
         mutableStateOf("")
     }
 
-    LazyRow(
-
-    ) {
+    LazyRow {
         items(types.size) { index ->
             Column(
                 modifier = Modifier
@@ -137,6 +138,7 @@ fun ListProductHot(productViewModel: ProductViewModel, type: Int) {
     productViewModel.getProductsByType(type)
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
+    val context = LocalContext.current
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2), // chia theo số cột
@@ -157,7 +159,12 @@ fun ListProductHot(productViewModel: ProductViewModel, type: Int) {
                         .width(200.dp)
                         .height(250.dp),
                     shape = RoundedCornerShape(15.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    onClick = {
+                        val intent = Intent(context, DetailProductActivity::class.java)
+                        intent.putExtra("ID_PRODUCT", products[index]._id)
+                        context.startActivity(intent)
+                    }
                 ) {
                     Box(
                         contentAlignment = Alignment.BottomEnd
@@ -220,6 +227,7 @@ fun ListProductType(productViewModel: ProductViewModel, type: String) {
     productViewModel.getProductsByTypeProduct(type)
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
+    val context = LocalContext.current
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2), // chia theo số cột
@@ -240,7 +248,12 @@ fun ListProductType(productViewModel: ProductViewModel, type: String) {
                         .width(200.dp)
                         .height(250.dp),
                     shape = RoundedCornerShape(15.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    onClick = {
+                        val intent = Intent(context, DetailProductActivity::class.java)
+                        intent.putExtra("ID_PRODUCT", products[index]._id)
+                        context.startActivity(intent)
+                    }
                 ) {
                     Box(
                         contentAlignment = Alignment.BottomEnd
@@ -303,6 +316,7 @@ fun ListProduct(productViewModel: ProductViewModel) {
 
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
+    val context = LocalContext.current
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2), // chia theo số cột
@@ -323,7 +337,12 @@ fun ListProduct(productViewModel: ProductViewModel) {
                         .width(200.dp)
                         .height(250.dp),
                     shape = RoundedCornerShape(15.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    onClick = {
+                        val intent = Intent(context, DetailProductActivity::class.java)
+                        intent.putExtra("ID_PRODUCT", products[index]._id)
+                        context.startActivity(intent)
+                    }
                 ) {
                     Box(
                         contentAlignment = Alignment.BottomEnd

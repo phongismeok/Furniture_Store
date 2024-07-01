@@ -11,8 +11,10 @@ import kotlinx.coroutines.launch
 
 class ProductViewModel : ViewModel() {
     private val _product = MutableLiveData<List<Product>>()
-
     val products: LiveData<List<Product>> = _product
+
+    private val _product2 = MutableLiveData<Product?>()
+    val product: LiveData<Product?> = _product2
 
     init {
         getProduct()
@@ -68,6 +70,18 @@ class ProductViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("TAG", "getProductsByTypePro: " + e.message)
                 _product.postValue(emptyList())
+            }
+        }
+    }
+
+    fun getProductById(id: String) {
+        viewModelScope.launch {
+            try {
+                val product = RetrofitBase().productService.getProductById(id)
+                _product2.postValue(product)
+            } catch (e: Exception) {
+                Log.e("TAG", "getProductById: " + e.message)
+                _product2.postValue(null)
             }
         }
     }

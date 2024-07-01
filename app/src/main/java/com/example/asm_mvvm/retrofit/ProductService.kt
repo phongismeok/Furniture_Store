@@ -4,6 +4,7 @@ import com.example.asm_mvvm.models.Product
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 
 interface ProductService {
@@ -15,4 +16,7 @@ interface ProductService {
 
     @GET("get-list-products-by-typeProduct/{typeProduct}")
     suspend fun getProductsByTypeProduct(@Path("typeProduct") typeProduct: String): Response<List<Product>>
+
+    @GET("get-products-by-id")
+    suspend fun getProductById(@Query("_id") id: String): Product
 }
