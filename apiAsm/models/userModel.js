@@ -5,8 +5,7 @@ const Users = new Scheme({
         username: {type: String, required: true},
         password: {type: String, required: true},
         avatar: {type: String, required: false},
-        name: {type: String, required: true},
-        describe: {type: String, required: false},
+        name: {type: String, required: true}
     }, {
         timestamps: false
     }

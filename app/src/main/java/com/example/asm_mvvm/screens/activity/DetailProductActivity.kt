@@ -64,15 +64,27 @@ class DetailProductActivity : AppCompatActivity() {
                                 .fillMaxHeight(0.55f)
                                 .fillMaxWidth()
                         ) {
-                            TransactionImage(image1 = it.image1, image2 = it.image2, image3 = it.image3)
+                            TransactionImage(
+                                image1 = it.image1,
+                                image2 = it.image2,
+                                image3 = it.image3
+                            )
                         }
 
                         Column( // phan content
                             modifier = Modifier
                                 .fillMaxHeight()
-                                .fillMaxWidth().padding(top = 35.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
+                                .fillMaxWidth()
+                                .padding(top = 35.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
                         ) {
-                            TransactionContent(name = it.productName, price = "$ " + it.price, content = it.describe)
+                            TransactionContent(
+                                name = it.productName,
+                                price = "$ " + it.price,
+                                content = it.describe,
+                                productViewModel,
+                                it._id,
+                                it.stateFavorites
+                            )
                         }
 
 

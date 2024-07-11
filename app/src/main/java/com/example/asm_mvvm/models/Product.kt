@@ -30,4 +30,5 @@ data class Product(
             typeProduct = this.typeProduct
         )
     }
+
 }

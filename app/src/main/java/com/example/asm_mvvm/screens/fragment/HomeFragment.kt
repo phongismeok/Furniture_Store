@@ -32,12 +32,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.asm_mvvm.R
 import com.example.asm_mvvm.screens.activity.DetailProductActivity
 import com.example.asm_mvvm.ui.theme.MyToolbar
 import com.example.asm_mvvm.viewmodels.ProductViewModel
@@ -139,6 +142,7 @@ fun ListProductHot(productViewModel: ProductViewModel, type: Int) {
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
     val context = LocalContext.current
+    val icon: Painter = painterResource(id = R.drawable.icbag)
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2), // chia theo số cột
@@ -192,7 +196,7 @@ fun ListProductHot(productViewModel: ProductViewModel, type: Int) {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
-                                    Icons.Default.ShoppingCart,
+                                    painter = icon,
                                     contentDescription = null,
                                     modifier = Modifier.size(26.dp),
                                 )
@@ -208,7 +212,7 @@ fun ListProductHot(productViewModel: ProductViewModel, type: Int) {
                     fontSize = 20.sp
                 )
                 Text(
-                    text = "" + products[index].price,
+                    text = "$ " + products[index].price,
                     modifier = Modifier
                         .align(Alignment.Start)
                         .padding(start = 10.dp),
@@ -228,6 +232,7 @@ fun ListProductType(productViewModel: ProductViewModel, type: String) {
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
     val context = LocalContext.current
+    val icon: Painter = painterResource(id = R.drawable.icbag)
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2), // chia theo số cột
@@ -281,7 +286,7 @@ fun ListProductType(productViewModel: ProductViewModel, type: String) {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
-                                    Icons.Default.ShoppingCart,
+                                    painter = icon,
                                     contentDescription = null,
                                     modifier = Modifier.size(26.dp),
                                 )
@@ -297,7 +302,7 @@ fun ListProductType(productViewModel: ProductViewModel, type: String) {
                     fontSize = 20.sp
                 )
                 Text(
-                    text = "" + products[index].price,
+                    text = "$ " + products[index].price,
                     modifier = Modifier
                         .align(Alignment.Start)
                         .padding(start = 10.dp),
@@ -317,6 +322,7 @@ fun ListProduct(productViewModel: ProductViewModel) {
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
     val context = LocalContext.current
+    val icon: Painter = painterResource(id = R.drawable.icbag)
 
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2), // chia theo số cột
@@ -370,7 +376,7 @@ fun ListProduct(productViewModel: ProductViewModel) {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
-                                    Icons.Default.ShoppingCart,
+                                    painter = icon,
                                     contentDescription = null,
                                     modifier = Modifier.size(26.dp),
                                 )
@@ -386,7 +392,7 @@ fun ListProduct(productViewModel: ProductViewModel) {
                     fontSize = 20.sp
                 )
                 Text(
-                    text = "" + products[index].price,
+                    text = "$ " + products[index].price,
                     modifier = Modifier
                         .align(Alignment.Start)
                         .padding(start = 10.dp),

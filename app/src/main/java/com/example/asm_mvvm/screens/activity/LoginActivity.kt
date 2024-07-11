@@ -2,6 +2,7 @@ package com.example.asm_mvvm.screens.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -34,8 +35,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,18 +58,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import com.example.asm_mvvm.MainActivity
 import com.example.asm_mvvm.R
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyButtonWithImage
+import com.example.asm_mvvm.viewmodels.ProductViewModel
+import com.example.asm_mvvm.viewmodels.UserViewModel
 
 
 class LoginActivity : AppCompatActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
+    private lateinit var userViewModel: UserViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            userViewModel = ViewModelProvider(this)[UserViewModel::class]
+
             var email by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
             var passwordVisible by rememberSaveable { mutableStateOf(false) }
@@ -169,8 +178,16 @@ class LoginActivity : AppCompatActivity() {
                 MyButton(
                     title = "Log in",
                     onClick = {
-                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                        this@LoginActivity.startActivity(intent)
+                        userViewModel.login(this@LoginActivity,email, password) { success ->
+                            if (success) {
+                                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                this@LoginActivity.startActivity(intent)
+                                Toast.makeText(this@LoginActivity,"Login success",Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this@LoginActivity,"Wrong email or password",Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
                     },
                     mauChu = Color.White,
                     mauNen = Color.Gray

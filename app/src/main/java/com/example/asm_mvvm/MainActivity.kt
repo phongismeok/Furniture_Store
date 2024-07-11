@@ -27,8 +27,6 @@ import com.example.asm_mvvm.screens.fragment.FavoritesFragment
 import com.example.asm_mvvm.screens.fragment.HomeFragment
 import com.example.asm_mvvm.screens.fragment.NotificationFragment
 import com.example.asm_mvvm.screens.fragment.ProfileFragment
-import com.example.asm_mvvm.viewmodels.ProductViewModel
-import com.example.asm_mvvm.viewmodels.TypeViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -37,9 +35,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navigationController = rememberNavController()
-            val productViewModel = ProductViewModel()
-
-
             val selected = remember {
                 mutableStateOf(Icons.Default.Home)
             }
@@ -119,12 +114,16 @@ class MainActivity : ComponentActivity() {
 
                     }
                 }
-            ) {paddingValues ->
-                NavHost(navController = navigationController, startDestination = Fragments.HomeFragment.frm, modifier = Modifier.padding(paddingValues)){
-                    composable(Fragments.HomeFragment.frm){ HomeFragment() }
-                    composable(Fragments.FavoritesFragment.frm){ FavoritesFragment() }
-                    composable(Fragments.NotificationFragment.frm){ NotificationFragment() }
-                    composable(Fragments.ProfileFragment.frm){ ProfileFragment() }
+            ) { paddingValues ->
+                NavHost(
+                    navController = navigationController,
+                    startDestination = Fragments.HomeFragment.frm,
+                    modifier = Modifier.padding(paddingValues),
+                ) {
+                    composable(Fragments.HomeFragment.frm) { HomeFragment() }
+                    composable(Fragments.FavoritesFragment.frm) { FavoritesFragment() }
+                    composable(Fragments.NotificationFragment.frm) { NotificationFragment() }
+                    composable(Fragments.ProfileFragment.frm) { ProfileFragment()}
                 }
 
             }

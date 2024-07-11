@@ -2,6 +2,7 @@ package com.example.asm_mvvm.screens.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -54,16 +55,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import com.example.asm_mvvm.MainActivity
 import com.example.asm_mvvm.R
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyButtonWithImage
+import com.example.asm_mvvm.viewmodels.UserViewModel
 
 class SignUpActivity : AppCompatActivity() {
-    @OptIn(ExperimentalMaterial3Api::class)
+    private lateinit var userViewModel: UserViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
+            userViewModel = ViewModelProvider(this)[UserViewModel::class]
             var username by remember { mutableStateOf("") }
             var email by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
@@ -175,7 +181,15 @@ class SignUpActivity : AppCompatActivity() {
 
                 MyButton(
                     title = "Sign Up",
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        userViewModel.signUp(email, password) { success ->
+                            if (success) {
+                                Toast.makeText(this@SignUpActivity,"Sign up success", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this@SignUpActivity,"Sign up fail", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    },
                     mauChu = Color.White,
                     mauNen = Color.Gray
                 )

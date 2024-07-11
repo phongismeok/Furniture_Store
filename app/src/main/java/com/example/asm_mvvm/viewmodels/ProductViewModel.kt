@@ -1,6 +1,8 @@
 package com.example.asm_mvvm.viewmodels
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -82,6 +84,49 @@ class ProductViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("TAG", "getProductById: " + e.message)
                 _product2.postValue(null)
+            }
+        }
+    }
+
+    fun getProductsByStateFavorites(stateFavorites: Int) {
+        viewModelScope.launch {
+            try {
+                val response =
+                    RetrofitBase().productService.getProductsByStateFavorites(stateFavorites)
+                Log.d("TAG", "getProductsByStateFavorites: $response")
+
+                if (response.isSuccessful) {
+                    _product.postValue(response.body()?.map { it.toProduct() })
+                } else {
+                    _product.postValue(emptyList())
+                }
+            } catch (e: Exception) {
+                Log.e("TAG", "getProductsByStateFavorites: " + e.message)
+                _product.postValue(emptyList())
+            }
+        }
+    }
+
+    fun updateStateFavorites(
+        productId: String,
+        stateFavorites: Int,
+        successfulNotification: String,
+        failureNotification: String,
+        context: Context
+    ) {
+        viewModelScope.launch {
+            try {
+                val response =
+                    RetrofitBase().productService.updateStateFavorites(productId, stateFavorites)
+                Log.d("TAG", "UpdateStateFavorites: $response")
+                if (response.isSuccessful) {
+                    getProductsByStateFavorites(1)
+                    Toast.makeText(context, successfulNotification, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, failureNotification, Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("TAG", "UpdateStateFavorites error: " + e.message)
             }
         }
     }

@@ -33,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.asm_mvvm.MainActivity
 import com.example.asm_mvvm.R
+import com.example.asm_mvvm.viewmodels.ProductViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -263,9 +265,12 @@ fun TransactionImage(image1: String, image2: String, image3: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransactionContent(name: String, price: String, content: String) {
+fun TransactionContent(name: String, price: String, content: String,productViewModel: ProductViewModel,id:String,state:Int) {
     val icon1: Painter = painterResource(id = R.drawable.icontru)
     val icon2: Painter = painterResource(id = R.drawable.bookmark)
+
+    val context = LocalContext.current
+
     var bienDem by rememberSaveable {
         mutableIntStateOf(1)
     }
@@ -363,11 +368,34 @@ fun TransactionContent(name: String, price: String, content: String) {
             Row(modifier = Modifier.height(80.dp).padding(top = 10.dp)) {
                 Card(
                     shape = RoundedCornerShape(10.dp),
-                    colors = CardDefaults.cardColors(Color.LightGray),
+                    colors = CardDefaults.cardColors(
+                        if(state == 0){
+                            Color.LightGray
+                        }else{
+                            Color.DarkGray
+                        }
+                    ),
                     modifier = Modifier
                         .width(70.dp)
                         .height(70.dp),
                     onClick = {
+                        if(state==0){
+                            productViewModel.updateStateFavorites(
+                                id,
+                                1,
+                                "yêu thích thành công",
+                                "yêu thích thất bại",
+                                context = context
+                            )
+                        }else{
+                            productViewModel.updateStateFavorites(
+                                id,
+                                0,
+                                "Hủy yêu thích thành công",
+                                "Hủy yêu thích thất bại",
+                                context = context
+                            )
+                        }
 
                     }
                 ) {

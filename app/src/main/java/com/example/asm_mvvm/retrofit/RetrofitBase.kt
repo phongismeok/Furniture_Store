@@ -17,4 +17,7 @@ class RetrofitBase {
     val typeService: TypeService by lazy {
         retrofit.create(TypeService::class.java)
     }
+    val userService: UserService by lazy {
+        retrofit.create(UserService::class.java)
+    }
 }
