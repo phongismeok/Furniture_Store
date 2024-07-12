@@ -1,4 +1,7 @@
 package com.example.asm_mvvm.models
 
-class Cart {
-}
+data class Cart(
+    val id: String,
+    val productId: String,
+    val quantity: Int,
+)

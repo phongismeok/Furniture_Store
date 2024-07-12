@@ -1,5 +1,7 @@
 package com.example.asm_mvvm.screens.fragment
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +39,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
 import com.example.asm_mvvm.R
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyToolbar
@@ -44,6 +48,7 @@ import com.example.asm_mvvm.viewmodels.ProductViewModel
 import com.example.asm_mvvm.viewmodels.TypeViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun FavoritesFragment() {
     val productViewModel = ProductViewModel()
@@ -59,10 +64,10 @@ fun FavoritesFragment() {
             mauNen = Color.Gray
         )
     }
-
 }
 
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun ListFavorites(productViewModel: ProductViewModel) {
     val icon: Painter = painterResource(id = R.drawable.cancel)
@@ -71,86 +76,106 @@ fun ListFavorites(productViewModel: ProductViewModel) {
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
     val context = LocalContext.current
-    LazyColumn(
-        contentPadding = PaddingValues(8.dp),
-        modifier = Modifier
-            .padding(top = 10.dp)
-    ) {
-        items(products.size) { index ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .padding(10.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor =
-                    Color.White
-                ),
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation =
-                    3.dp
-                ),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    //
-                    Row {
-                        Card(
-                            modifier = Modifier
-                                .width(140.dp)
-                                .height(140.dp),
-                            shape = RoundedCornerShape(15.dp),
-                        ) {
-                            AsyncImage(
-                                model = products[index].image1,
-                                contentDescription = null,
-                                contentScale = ContentScale.FillBounds,
-                                modifier = Modifier.fillMaxHeight()
-                            )
-                        }
-                        //
-                        Column(modifier = Modifier.padding(start = 15.dp)) {
-                            Text(text = products[index].productName, fontSize = 20.sp)
-                            Text(
-                                text = "$ " + products[index].price,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                        //
-                    }
 
-                    Column {
-                        Icon(painter = icon, contentDescription = "", modifier = Modifier
-                            .size(30.dp)
-                            .clickable {
-                                productViewModel.updateStateFavorites(
-                                    products[index]._id,
-                                    0,
-                                    "Hủy yêu thích thành công",
-                                    "Hủy yêu thích thất bại",
-                                    context = context
+    val imageRequest = ImageRequest.Builder(context)
+        .data(R.drawable.loading)
+        .decoderFactory(ImageDecoderDecoder.Factory())
+        .build()
+
+    if (products.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = imageRequest,
+                contentDescription = null,
+                modifier = Modifier.size(100.dp)
+            )
+        }
+    }else{
+        LazyColumn(
+            contentPadding = PaddingValues(8.dp),
+            modifier = Modifier
+                .padding(top = 10.dp)
+        ) {
+            items(products.size) { index ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .padding(10.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor =
+                        Color.White
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation =
+                        3.dp
+                    ),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .fillMaxSize(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        //
+                        Row {
+                            Card(
+                                modifier = Modifier
+                                    .width(140.dp)
+                                    .height(140.dp),
+                                shape = RoundedCornerShape(15.dp),
+                            ) {
+                                AsyncImage(
+                                    model = products[index].image1,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.fillMaxHeight()
                                 )
-                            })
-                        Spacer(modifier = Modifier.weight(1f))
-                        Icon(
-                            painter = icon2,
-                            contentDescription = null,
-                            modifier = Modifier
+                            }
+                            //
+                            Column(modifier = Modifier.padding(start = 15.dp)) {
+                                Text(text = products[index].productName, fontSize = 20.sp)
+                                Text(
+                                    text = "$ " + products[index].price,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                            //
+                        }
+
+                        Column {
+                            Icon(painter = icon, contentDescription = "", modifier = Modifier
                                 .size(30.dp)
                                 .clickable {
+                                    productViewModel.updateStateFavorites(
+                                        products[index]._id,
+                                        0,
+                                        "Hủy yêu thích thành công",
+                                        "Hủy yêu thích thất bại",
+                                        context = context
+                                    )
+                                })
+                            Spacer(modifier = Modifier.weight(1f))
+                            Icon(
+                                painter = icon2,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clickable {
 
-                                }
-                        )
+                                    }
+                            )
+                        }
+                        //
                     }
-                    //
                 }
-            }
 
+            }
         }
     }
+
 }

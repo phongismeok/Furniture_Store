@@ -33,10 +33,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import coil.compose.AsyncImage
+import com.example.asm_mvvm.models.Cart
 import com.example.asm_mvvm.ui.theme.ComposeScreen.TransactionContent
 import com.example.asm_mvvm.ui.theme.ComposeScreen.TransactionImage
+import com.example.asm_mvvm.viewmodels.CartViewModel
 
 import com.example.asm_mvvm.viewmodels.ProductViewModel
+import com.example.asm_mvvm.viewmodels.UserViewModel
 
 class DetailProductActivity : AppCompatActivity() {
     private lateinit var productViewModel: ProductViewModel
@@ -45,6 +48,8 @@ class DetailProductActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         productViewModel = ViewModelProvider(this)[ProductViewModel::class]
+        val cartViewModel = CartViewModel()
+
         setContent {
             val idPro = intent.getStringExtra("ID_PRODUCT")
             Column(
@@ -83,7 +88,8 @@ class DetailProductActivity : AppCompatActivity() {
                                 content = it.describe,
                                 productViewModel,
                                 it._id,
-                                it.stateFavorites
+                                it.stateFavorites,
+                                cartViewModel = cartViewModel
                             )
                         }
 

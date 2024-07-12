@@ -61,6 +61,8 @@ dependencies {
     implementation (libs.firebase.auth)
     implementation(platform(libs.firebase.bom))
     implementation (libs.androidx.datastore.preferences)
+    implementation (libs.coil.compose.v210)
+    implementation (libs.coil.kt.coil.gif)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

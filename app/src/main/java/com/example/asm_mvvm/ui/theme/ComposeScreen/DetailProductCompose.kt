@@ -54,6 +54,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.asm_mvvm.MainActivity
 import com.example.asm_mvvm.R
+import com.example.asm_mvvm.models.Cart
+import com.example.asm_mvvm.request.CartRequest
+import com.example.asm_mvvm.viewmodels.CartViewModel
 import com.example.asm_mvvm.viewmodels.ProductViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -265,10 +268,20 @@ fun TransactionImage(image1: String, image2: String, image3: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransactionContent(name: String, price: String, content: String,productViewModel: ProductViewModel,id:String,state:Int) {
+fun TransactionContent(
+    name: String,
+    price: String,
+    content: String,
+    productViewModel: ProductViewModel,
+    id: String,
+    state: Int,
+    cartViewModel: CartViewModel,
+) {
     val icon1: Painter = painterResource(id = R.drawable.icontru)
     val icon2: Painter = painterResource(id = R.drawable.bookmark)
-
+    cartViewModel.getCartsByProductId(id)
+    val cartState = cartViewModel.carts.observeAsState(initial = emptyList())
+    val cart = cartState.value
     val context = LocalContext.current
 
     var bienDem by rememberSaveable {
@@ -287,7 +300,16 @@ fun TransactionContent(name: String, price: String, content: String,productViewM
                     shape = RoundedCornerShape(10.dp),
                     colors = CardDefaults.cardColors(Color.LightGray),
                     onClick = {
-                        bienDem++
+                        if (bienDem < 100) {
+                            bienDem++
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Tối đa 99 sản phẩm 1 lần mua",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
                     },
                 ) {
                     Icon(
@@ -314,7 +336,13 @@ fun TransactionContent(name: String, price: String, content: String,productViewM
                     shape = RoundedCornerShape(10.dp),
                     colors = CardDefaults.cardColors(Color.LightGray),
                     onClick = {
-                        bienDem--
+                        if (bienDem > 1) {
+                            bienDem--
+                        } else {
+                            Toast.makeText(context, "Tối thiểu số lượng là 1", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+
                     },
                 ) {
                     Icon(
@@ -363,15 +391,23 @@ fun TransactionContent(name: String, price: String, content: String,productViewM
 
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
             Column(modifier = Modifier.fillMaxHeight(0.7f)) {
-                Text(text = content, fontSize = 20.sp,modifier = Modifier.verticalScroll(rememberScrollState()))
+                Text(
+                    text = content,
+                    fontSize = 20.sp,
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                )
             }
-            Row(modifier = Modifier.height(80.dp).padding(top = 10.dp)) {
+            Row(
+                modifier = Modifier
+                    .height(80.dp)
+                    .padding(top = 10.dp)
+            ) {
                 Card(
                     shape = RoundedCornerShape(10.dp),
                     colors = CardDefaults.cardColors(
-                        if(state == 0){
+                        if (state == 0) {
                             Color.LightGray
-                        }else{
+                        } else {
                             Color.DarkGray
                         }
                     ),
@@ -379,7 +415,7 @@ fun TransactionContent(name: String, price: String, content: String,productViewM
                         .width(70.dp)
                         .height(70.dp),
                     onClick = {
-                        if(state==0){
+                        if (state == 0) {
                             productViewModel.updateStateFavorites(
                                 id,
                                 1,
@@ -387,7 +423,7 @@ fun TransactionContent(name: String, price: String, content: String,productViewM
                                 "yêu thích thất bại",
                                 context = context
                             )
-                        }else{
+                        } else {
                             productViewModel.updateStateFavorites(
                                 id,
                                 0,
@@ -415,7 +451,40 @@ fun TransactionContent(name: String, price: String, content: String,productViewM
 
                 Button(
                     onClick = {
+                        if (cart.isEmpty()) {
+                            val cartBody = CartRequest(
+                                productId = id,
+                                quantity = bienDem
+                            )
 
+                            cartViewModel.addProductToCart(
+                                id = id,
+                                cartBody,
+                                "Thêm vào giỏ hàng thành công",
+                                "Thêm vào giỏ hàng thất bại",
+                                context
+                            )
+                        } else {
+                            val quantityBefore = cart[0].quantity
+                            val quantitySuggest = 99 - quantityBefore
+                            if (bienDem + quantityBefore < 100) {
+                                cartViewModel.updateQuantityCart(
+                                    productId = id,
+                                    bienDem + quantityBefore,
+                                    "Thêm vào giỏ hàng thành công",
+                                    "Thêm vào giỏ hàng thất bại",
+                                    context,
+                                    type = 1
+                                )
+                            } else if (bienDem + quantityBefore >= 100) {
+                                Toast.makeText(
+                                    context,
+                                    "Bạn chỉ có thể mua thêm $quantitySuggest sản phẩm này",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Black,
@@ -437,7 +506,8 @@ fun TransactionContent(name: String, price: String, content: String,productViewM
             }
         }
 
-
-        //
     }
 }
+
+
+

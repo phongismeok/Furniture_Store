@@ -1,9 +1,13 @@
+@file:Suppress("UNUSED_EXPRESSION")
+
 package com.example.asm_mvvm.ui.theme
 
+import android.content.Intent
 import androidx.compose.animation.core.Animation
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
@@ -47,6 +52,10 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 
 
 import com.example.asm_mvvm.R
+import com.example.asm_mvvm.SharedPreferencesManager
+import com.example.asm_mvvm.screens.activity.CartActivity
+import com.example.asm_mvvm.screens.activity.DetailProductActivity
+import com.example.asm_mvvm.screens.activity.LoginActivity
 
 
 @Composable
@@ -128,6 +137,7 @@ fun MyButtonWithImage(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyToolbar(title: String) {
+    val context = LocalContext.current
     TopAppBar(
         title = {
             Row(
@@ -146,7 +156,9 @@ fun MyToolbar(title: String) {
                     Icon(
                         Icons.Default.Search,
                         contentDescription = null,
-                        modifier = Modifier.size(30.dp),
+                        modifier = Modifier.size(30.dp).clickable {
+
+                        },
                     )
                 }
                 // tittle
@@ -174,7 +186,10 @@ fun MyToolbar(title: String) {
                     Icon(
                         Icons.Default.ShoppingCart,
                         contentDescription = null,
-                        modifier = Modifier.size(30.dp)
+                        modifier = Modifier.size(30.dp).clickable {
+                            val intent = Intent(context, CartActivity::class.java)
+                            context.startActivity(intent)
+                        }
                     )
                 }
             }
@@ -188,6 +203,7 @@ fun MyToolbar(title: String) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyToolbar2(title: String) {
+    val context = LocalContext.current
     TopAppBar(
         title = {
             Row(
@@ -225,7 +241,7 @@ fun MyToolbar2(title: String) {
                         )
                     }
                 }
-                //cart
+                //exit
                 Box(
                     modifier = Modifier
                         .weight(1.5f),
@@ -234,8 +250,68 @@ fun MyToolbar2(title: String) {
                     Icon(
                         Icons.Default.ExitToApp,
                         contentDescription = null,
-                        modifier = Modifier.size(30.dp)
+                        modifier = Modifier.size(30.dp).clickable {
+                            val intent = Intent(context, LoginActivity::class.java)
+                            context.startActivity(intent)
+                        }
                     )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.White // Màu nền của TopAppBar
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyToolbar3(title: String) {
+    val context = LocalContext.current
+    TopAppBar(
+        title = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 15.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // arrow
+                Box(
+                    modifier = Modifier
+                        .weight(1.5f),
+                    contentAlignment = Alignment.TopStart
+                ) {
+                    Icon(
+                        Icons.Default.KeyboardArrowLeft,
+                        contentDescription = null,
+                        modifier = Modifier.size(30.dp),
+                    )
+                }
+                // tittle
+                Box(
+                    modifier = Modifier
+                        .weight(5f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = title,
+                            color = Color.Black,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+                //exit
+                Box(
+                    modifier = Modifier
+                        .weight(1.5f),
+                    contentAlignment = Alignment.TopEnd
+                ) {
+
                 }
             }
         },

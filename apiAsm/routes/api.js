@@ -154,4 +154,85 @@ router.get('/get-user-by-username/:username', async (req, res) => {
     }
 });
 
+// cart
+router.get('/get-cart-by-productId/:productId', async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const data = await Carts.find({ productId: productId }).populate('productId');
+        res.status(200).send(data)
+        console.log(data)
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            "status": 500,
+            "message": "Đã xảy ra lỗi khi tìm kiếm user"
+        });
+    }
+});
+
+router.post('/add-product-to-cart', async (req, res) => {
+    try {
+
+        let product = req.body;
+
+        console.log(product)
+
+        let kq = await Carts.create(product);
+
+        if(kq){
+            res.status(204).send("thêm thành công");
+        }else{
+            res.status(400).send("thêm thất bại");
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+
+})
+
+router.get('/get-list-cart', async (req, res) => {
+    try {
+        const data = await Carts.find().populate();
+        res.status(200).send(data)
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+router.put('/update-quantity-cart', async (req, res) => {
+    try {
+        // Lấy id từ query
+        let id = req.query.productId;
+        console.log(id);
+
+        // Lấy giá trị mới của thuộc tính stateFavorite từ request body
+        let { quantity } = req.body;
+
+        // Cập nhật duy nhất thuộc tính quantity
+        await Carts.updateOne({ productId: id }, { $set: { quantity: quantity } });
+
+        res.status(204).send("Cập nhật thành công");
+
+    } catch (error) {
+        console.error("Lỗi khi cập nhật cart:", error);
+        res.status(500).send("Đã xảy ra lỗi khi cập nhật cart");
+    }
+});
+
+router.delete('/delete-cart/:id', async (req, res) => {
+
+    try {
+        let id = req.params.id;
+        console.log(id);
+
+        await Carts.deleteOne({ _id: id });
+        res.send('xoa thanh cong')
+    }catch (error){
+        console.error("Lỗi khi xóa cart:", error);
+        res.status(500).send("Đã xảy ra lỗi khi xóa cart");
+    }
+
+})
+
 module.exports = router;
