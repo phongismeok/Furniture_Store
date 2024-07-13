@@ -1,6 +1,7 @@
 package com.example.asm_mvvm.retrofit
 
 import com.example.asm_mvvm.models.Product
+import com.example.asm_mvvm.response.ProductResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Field
@@ -13,19 +14,19 @@ import retrofit2.http.Query
 
 interface ProductService {
     @GET("get-list-products")
-    suspend fun getListPro(): Response<List<Product>>
+    suspend fun getListPro(): Response<List<ProductResponse>>
 
     @GET("get-list-products-by-type/{type}")
-    suspend fun getProductsByType(@Path("type") type: Int): Response<List<Product>>
+    suspend fun getProductsByType(@Path("type") type: Int): Response<List<ProductResponse>>
 
     @GET("get-list-products-by-typeProduct/{typeProduct}")
-    suspend fun getProductsByTypeProduct(@Path("typeProduct") typeProduct: String): Response<List<Product>>
+    suspend fun getProductsByTypeProduct(@Path("typeProduct") typeProduct: String): Response<List<ProductResponse>>
 
     @GET("get-products-by-id")
-    suspend fun getProductById(@Query("_id") id: String): Product
+    suspend fun getProductById(@Query("_id") id: String): ProductResponse
 
     @GET("get-list-products-by-state-favorites/{stateFavorites}")
-    suspend fun getProductsByStateFavorites(@Path("stateFavorites") stateFavorites: Int): Response<List<Product>>
+    suspend fun getProductsByStateFavorites(@Path("stateFavorites") stateFavorites: Int): Response<List<ProductResponse>>
 
     @PUT("update-state-favorites-product")
     @FormUrlEncoded

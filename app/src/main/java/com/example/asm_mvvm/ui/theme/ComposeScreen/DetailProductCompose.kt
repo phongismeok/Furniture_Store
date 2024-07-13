@@ -270,8 +270,9 @@ fun TransactionImage(image1: String, image2: String, image3: String) {
 @Composable
 fun TransactionContent(
     name: String,
-    price: String,
+    price: Double,
     content: String,
+    image : String,
     productViewModel: ProductViewModel,
     id: String,
     state: Int,
@@ -294,7 +295,7 @@ fun TransactionContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = price, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+            Text(text ="$ $price" , fontSize = 30.sp, fontWeight = FontWeight.Bold)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Card(
                     shape = RoundedCornerShape(10.dp),
@@ -454,7 +455,10 @@ fun TransactionContent(
                         if (cart.isEmpty()) {
                             val cartBody = CartRequest(
                                 productId = id,
-                                quantity = bienDem
+                                productName = name ,
+                                quantity = bienDem,
+                                image = image,
+                                price = price
                             )
 
                             cartViewModel.addProductToCart(

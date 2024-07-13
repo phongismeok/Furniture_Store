@@ -100,6 +100,31 @@ fun MyButton(
 }
 
 @Composable
+fun MyButton2(
+    title: String,
+    onClick: () -> Unit,
+    mauChu: Color,
+    mauNen: Color
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = mauNen, contentColor = mauChu),
+        modifier = Modifier
+            .padding(10.dp)
+            .height(50.dp),
+        shape = RoundedCornerShape(15.dp),
+        border = BorderStroke(1.dp,Color.Black)
+    ) {
+        Text(
+            text = title,
+            color = mauChu,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
 fun MyButtonWithImage(
     title: String,
     onClick: () -> Unit,
@@ -286,7 +311,7 @@ fun MyToolbar3(title: String) {
                     Icon(
                         Icons.Default.KeyboardArrowLeft,
                         contentDescription = null,
-                        modifier = Modifier.size(30.dp),
+                        modifier = Modifier.size(35.dp),
                     )
                 }
                 // tittle

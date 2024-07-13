@@ -152,7 +152,7 @@ fun ListFavorites(productViewModel: ProductViewModel) {
                                 .size(30.dp)
                                 .clickable {
                                     productViewModel.updateStateFavorites(
-                                        products[index]._id,
+                                        products[index].id,
                                         0,
                                         "Hủy yêu thích thành công",
                                         "Hủy yêu thích thất bại",

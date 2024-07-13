@@ -31,7 +31,7 @@ class TypeViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 _type.postValue(emptyList())
-                Log.d("check", "getType: "+e)
+                Log.d("check", "getType: $e ")
             }
         }
     }

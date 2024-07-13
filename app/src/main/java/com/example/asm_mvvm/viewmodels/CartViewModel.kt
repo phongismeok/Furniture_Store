@@ -78,22 +78,6 @@ class CartViewModel : ViewModel() {
                 Toast.makeText(context, failureNotification, Toast.LENGTH_SHORT).show()
             }
         }
-//        viewModelScope.launch {
-//            try {
-//                val response = RetrofitBase().cartService.addProductToCart(cart)
-//                if (response.isSuccessful) {
-//                    getCartsByProductId(id = id)
-//                    Toast.makeText(context, successfulNotification, Toast.LENGTH_SHORT).show()
-//                    Log.d("TAG", "addProductToCart: ok")
-//                } else {
-//                    Toast.makeText(context, failureNotification, Toast.LENGTH_SHORT).show()
-//                    Log.d("TAG", "addProductToCart: loi ")
-//                }
-//            } catch (e: Exception) {
-//                // Xử lý lỗi
-//                Log.e("TAG", "AddProductToCart: " + e.message)
-//            }
-//        }
     }
 
     fun updateQuantityCart(

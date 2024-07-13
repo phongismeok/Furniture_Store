@@ -79,8 +79,8 @@ class ProductViewModel : ViewModel() {
     fun getProductById(id: String) {
         viewModelScope.launch {
             try {
-                val product = RetrofitBase().productService.getProductById(id)
-                _product2.postValue(product)
+                val res = RetrofitBase().productService.getProductById(id)
+                _product2.postValue(res.toProduct())
             } catch (e: Exception) {
                 Log.e("TAG", "getProductById: " + e.message)
                 _product2.postValue(null)
@@ -132,3 +132,4 @@ class ProductViewModel : ViewModel() {
     }
 
 }
+

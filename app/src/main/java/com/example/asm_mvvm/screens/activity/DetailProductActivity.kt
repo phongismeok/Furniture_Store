@@ -84,10 +84,11 @@ class DetailProductActivity : AppCompatActivity() {
                         ) {
                             TransactionContent(
                                 name = it.productName,
-                                price = "$ " + it.price,
+                                price = it.price,
                                 content = it.describe,
+                                image = it.image1,
                                 productViewModel,
-                                it._id,
+                                it.id,
                                 it.stateFavorites,
                                 cartViewModel = cartViewModel
                             )

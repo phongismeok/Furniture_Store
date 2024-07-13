@@ -21,13 +21,12 @@ class CartActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val cartViewModel = CartViewModel()
-        val productViewModel = ProductViewModel()
 
         enableEdgeToEdge()
         setContent {
             Column {
                 MyToolbar3(title = "My cart")
-                ListCart(cartViewModel = cartViewModel, productViewModel = productViewModel)
+                ListCart(cartViewModel = cartViewModel)
             }
         }
     }

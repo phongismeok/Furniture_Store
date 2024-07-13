@@ -2,11 +2,9 @@ package com.example.asm_mvvm.ui.theme.ComposeScreen
 
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -23,15 +21,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,10 +33,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -50,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -61,40 +53,51 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.decode.ImageDecoderDecoder
-import coil.request.ImageRequest
+import com.example.asm_mvvm.MainActivity
 import com.example.asm_mvvm.R
+import com.example.asm_mvvm.screens.activity.CheckOutActivity
 import com.example.asm_mvvm.screens.activity.DetailProductActivity
+import com.example.asm_mvvm.screens.activity.LoginActivity
+import com.example.asm_mvvm.ui.theme.Animation
 import com.example.asm_mvvm.ui.theme.MyButton
+import com.example.asm_mvvm.ui.theme.MyButton2
 import com.example.asm_mvvm.viewmodels.CartViewModel
-import com.example.asm_mvvm.viewmodels.ProductViewModel
-import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ListCart(cartViewModel: CartViewModel, productViewModel: ProductViewModel) {
+fun ListCart(cartViewModel: CartViewModel) {
     val cartState = cartViewModel.carts.observeAsState(initial = emptyList())
     val carts = cartState.value
     val context = LocalContext.current
     val icon: Painter = painterResource(id = R.drawable.cancel)
     val icon1: Painter = painterResource(id = R.drawable.icontru)
-    var priceAll = 0.0
 
-    val imageRequest = ImageRequest.Builder(context)
-        .data(R.drawable.loading)
-        .decoderFactory(ImageDecoderDecoder.Factory())
-        .build()
+    var priceAll by rememberSaveable {
+        mutableDoubleStateOf(0.0)
+    }
 
     if (carts.isEmpty()) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "Hiện tại bạn chưa thêm sản phẩm nào")
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Animation(image = R.raw.cartanimation)
+                Text(text = "Hiện tại bạn chưa thêm sản phẩm nào", fontSize = 20.sp, modifier = Modifier.padding(20.dp))
+                MyButton2(title = "Back to home", onClick = {
+                    val intent = Intent(context, MainActivity::class.java)
+                    context.startActivity(intent)
+                }, mauChu = Color.Black, mauNen = Color.White)
+            }
         }
     } else {
+        var allPrice = 0.0
         LazyColumn(
             contentPadding = PaddingValues(8.dp),
             modifier = Modifier
@@ -102,12 +105,9 @@ fun ListCart(cartViewModel: CartViewModel, productViewModel: ProductViewModel) {
                 .fillMaxHeight(0.72f)
         ) {
             items(carts.size) { index ->
-                productViewModel.getProductById(carts[index].productId)
-                val productsState = productViewModel.products.observeAsState(initial = emptyList())
-                val products = productsState.value
-                val priceProduct = products[index].price * carts[index].quantity
-                priceAll += priceProduct
-
+                val priceProduct = carts[index].price * carts[index].quantity.toDouble()
+                allPrice += priceProduct
+                priceAll = allPrice
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -136,8 +136,9 @@ fun ListCart(cartViewModel: CartViewModel, productViewModel: ProductViewModel) {
                             shape = RoundedCornerShape(15.dp),
 
                             ) {
+
                             AsyncImage(
-                                model = products[index].image1,
+                                model = carts[index].image,
                                 contentDescription = null,
                                 contentScale = ContentScale.FillBounds,
                                 modifier = Modifier.fillMaxSize()
@@ -151,7 +152,7 @@ fun ListCart(cartViewModel: CartViewModel, productViewModel: ProductViewModel) {
                             verticalArrangement = Arrangement.SpaceBetween
 
                         ) {
-                            Text(text = products[index].productName, fontSize = 20.sp)
+                            Text(text = carts[index].productName, fontSize = 20.sp)
                             Text(
                                 text = "$ $priceProduct",
                                 fontSize = 20.sp,
@@ -171,7 +172,7 @@ fun ListCart(cartViewModel: CartViewModel, productViewModel: ProductViewModel) {
                                         newQuantity = newQuantity.plus(1)
                                         if (newQuantity < 100) {
                                             cartViewModel.updateQuantityCart(
-                                                productId = products[index]._id,
+                                                productId = carts[index].productId,
                                                 newQuantity,
                                                 "",
                                                 "",
@@ -223,7 +224,7 @@ fun ListCart(cartViewModel: CartViewModel, productViewModel: ProductViewModel) {
                                         newQuantity2 = newQuantity2.minus(1)
                                         if (newQuantity2 > 0) {
                                             cartViewModel.updateQuantityCart(
-                                                productId = products[index]._id,
+                                                productId = carts[index].productId,
                                                 newQuantity2,
                                                 "b",
                                                 "",
@@ -240,10 +241,10 @@ fun ListCart(cartViewModel: CartViewModel, productViewModel: ProductViewModel) {
 
                                     }
                                 ) {
-                                    Row(
+                                    Column(
                                         modifier = Modifier.fillMaxSize(),
-                                        horizontalArrangement = Arrangement.Center,
-                                        verticalAlignment = Alignment.CenterVertically
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Icon(
                                             painter = icon1,
@@ -259,31 +260,51 @@ fun ListCart(cartViewModel: CartViewModel, productViewModel: ProductViewModel) {
                         }
                         //
                         Box(modifier = Modifier.weight(1f)) {
-                            Icon(
-                                painter = icon,
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .clickable {
-                                        cartViewModel.deleteCart(carts[index].id, context)
-                                    }
-                            )
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.SpaceAround
+                            ) {
+                                Icon(
+                                    painter = icon,
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .clickable {
+                                            val id = carts[index].id
+                                            cartViewModel.deleteCart(id, context)
+                                        }
+                                )
+
+                                Icon(
+                                    painter = painterResource(id = R.drawable.iceye),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .clickable {
+                                            val intent =
+                                                Intent(context, DetailProductActivity::class.java)
+                                            intent.putExtra("ID_PRODUCT", carts[index].productId)
+                                            context.startActivity(intent)
+                                        }
+                                )
+                            }
+
                         }
 
                     }
                 }
                 //
+
             }
         }
-
-        InputCard(price = 10.0)
+        InputCard(price = priceAll)
 
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputCard(price:Double) {
+fun InputCard(price: Double) {
     var inputcode by remember { mutableStateOf("") }
 
     Column(
@@ -301,9 +322,11 @@ fun InputCard(price:Double) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(), contentAlignment = Alignment.Center
+            ) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -320,8 +343,7 @@ fun InputCard(price:Double) {
                     BasicTextField(
                         value = inputcode,
                         onValueChange = { inputcode = it },
-                        modifier = Modifier.fillMaxWidth(0.8f)
-                            ,
+                        modifier = Modifier.fillMaxWidth(0.8f),
                         decorationBox = { innerTextField ->
                             TextFieldDefaults.OutlinedTextFieldDecorationBox(
                                 value = inputcode,
@@ -372,16 +394,34 @@ fun InputCard(price:Double) {
 fun Total(price: Double) {
     val context = LocalContext.current
     Column {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp),Arrangement.SpaceBetween) {
-            Text(text = "Total:", fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Color(
-                0xFF408143
-            ), modifier = Modifier.fillMaxWidth(0.5f))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp), Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Total:", fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Color(
+                    0xFF408143
+                ), modifier = Modifier.fillMaxWidth(0.5f)
+            )
 
 
-            Text(text = "$ $price", fontSize = 25.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth(0.5f))
+            Text(
+                text = "$ $price",
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.End
+            )
         }
-        MyButton(title = "Check out", onClick = { /*TODO*/ }, mauChu = Color.White, mauNen = Color.DarkGray)
+        MyButton(
+            title = "Check out",
+            onClick = {
+                val intent = Intent(context, CheckOutActivity::class.java)
+                context.startActivity(intent)
+            },
+            mauChu = Color.White,
+            mauNen = Color.DarkGray
+        )
     }
 }

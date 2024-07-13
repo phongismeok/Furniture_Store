@@ -2,8 +2,12 @@ package com.example.asm_mvvm.screens.fragment
 
 import android.content.Intent
 import android.os.Build
+import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,10 +27,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,12 +46,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import com.example.asm_mvvm.R
+import com.example.asm_mvvm.request.CartRequest
 import com.example.asm_mvvm.screens.activity.DetailProductActivity
+import com.example.asm_mvvm.ui.theme.MyButton2
 import com.example.asm_mvvm.ui.theme.MyToolbar
+import com.example.asm_mvvm.viewmodels.CartViewModel
 import com.example.asm_mvvm.viewmodels.ProductViewModel
 import com.example.asm_mvvm.viewmodels.TypeViewModel
 
@@ -208,7 +218,7 @@ fun ListProductHot(productViewModel: ProductViewModel, type: Int) {
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         onClick = {
                             val intent = Intent(context, DetailProductActivity::class.java)
-                            intent.putExtra("ID_PRODUCT", products[index]._id)
+                            intent.putExtra("ID_PRODUCT", products[index].id)
                             context.startActivity(intent)
                         }
                     ) {
@@ -319,7 +329,7 @@ fun ListProductType(productViewModel: ProductViewModel, type: String) {
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         onClick = {
                             val intent = Intent(context, DetailProductActivity::class.java)
-                            intent.putExtra("ID_PRODUCT", products[index]._id)
+                            intent.putExtra("ID_PRODUCT", products[index].id)
                             context.startActivity(intent)
                         }
                     ) {
@@ -385,7 +395,7 @@ fun ListProductType(productViewModel: ProductViewModel, type: String) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListProduct(productViewModel: ProductViewModel) {
-
+    val cartViewModel = CartViewModel()
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
     val context = LocalContext.current
@@ -414,6 +424,19 @@ fun ListProduct(productViewModel: ProductViewModel) {
                 .padding(top = 20.dp)
         ) {
             items(products.size) { index ->
+
+                var showDialog by remember { mutableStateOf(false) }
+                if (showDialog) {
+                    DialogAddToCart(
+                        onDismissRequest = { showDialog = false },
+                        productId = products[index].id,
+                        productName = products[index].productName,
+                        image = products[index].image1,
+                        price = products[index].price,
+                        cartViewModel = cartViewModel
+                    )
+                }
+                
                 Column(
                     modifier = Modifier
                         .background(Color.White)
@@ -429,7 +452,7 @@ fun ListProduct(productViewModel: ProductViewModel) {
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         onClick = {
                             val intent = Intent(context, DetailProductActivity::class.java)
-                            intent.putExtra("ID_PRODUCT", products[index]._id)
+                            intent.putExtra("ID_PRODUCT", products[index].id)
                             context.startActivity(intent)
                         }
                     ) {
@@ -461,7 +484,11 @@ fun ListProduct(productViewModel: ProductViewModel) {
                                     Icon(
                                         painter = icon,
                                         contentDescription = null,
-                                        modifier = Modifier.size(26.dp),
+                                        modifier = Modifier
+                                            .size(26.dp)
+                                            .clickable {
+                                                showDialog = true
+                                            },
                                     )
                                 }
                             }
@@ -484,6 +511,119 @@ fun ListProduct(productViewModel: ProductViewModel) {
                         fontWeight = FontWeight.Bold
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun DialogAddToCart(
+    onDismissRequest: () -> Unit,
+    productId: String,
+    productName: String,
+    image: String,
+    price: Double,
+    cartViewModel: CartViewModel
+) {
+    cartViewModel.getCartsByProductId(productId)
+    val cartState = cartViewModel.carts.observeAsState(initial = emptyList())
+    val cart = cartState.value
+    val context = LocalContext.current
+    var quantityInput by remember { mutableStateOf("") }
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        // Draw a rectangle shape with rounded corners inside the dialog
+        Card(
+            modifier = Modifier
+                .width(400.dp)
+                .height(330.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Card(border = BorderStroke(1.dp,Color.Black)) {
+                    AsyncImage(
+                        model = image,
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .size(100.dp)
+                    )
+                }
+
+                Text(text = productName, fontSize = 20.sp)
+                OutlinedTextField(
+                    value = quantityInput,
+                    onValueChange = { quantityInput = it },
+                    label = { Text("Số lượng") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp, end = 10.dp),
+                    shape = RoundedCornerShape(10.dp),
+                )
+                MyButton2(title = "Add to cart", onClick = {
+                    val soLuong = quantityInput.toInt()
+                    if (cart.isEmpty()) {
+                        val cartBody = CartRequest(
+                            productId = productId,
+                            productName = productName ,
+                            quantity = soLuong,
+                            image = image,
+                            price = price
+                        )
+
+                        cartViewModel.addProductToCart(
+                            id = productId,
+                            cartBody,
+                            "Thêm vào giỏ hàng thành công",
+                            "Thêm vào giỏ hàng thất bại",
+                            context
+                        )
+                    } else {
+                        val quantityBefore = cart[0].quantity
+                        val quantitySuggest = 99 - quantityBefore
+
+                        try {
+                            if(soLuong in 1..99){
+                                if (soLuong + quantityBefore < 100) {
+                                    cartViewModel.updateQuantityCart(
+                                        productId = productId,
+                                        soLuong + quantityBefore,
+                                        "Thêm vào giỏ hàng thành công",
+                                        "Thêm vào giỏ hàng thất bại",
+                                        context,
+                                        type = 1
+                                    )
+                                } else if (soLuong + quantityBefore >= 100) {
+                                    Toast.makeText(
+                                        context,
+                                        "Bạn chỉ có thể mua thêm $quantitySuggest sản phẩm này",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }else{
+                                Toast.makeText(
+                                    context,
+                                    "Chỉ được nhập từ 1 đến 99",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }catch (e:Exception){
+                            Toast.makeText(
+                                context,
+                                "Bạn phải nhập số",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+
+
+
+                    }
+                }, mauChu = Color.Black, mauNen = Color.LightGray)
             }
         }
     }
