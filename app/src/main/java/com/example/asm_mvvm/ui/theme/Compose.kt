@@ -3,6 +3,8 @@
 package com.example.asm_mvvm.ui.theme
 
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.Animation
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -45,6 +47,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
@@ -161,7 +166,7 @@ fun MyButtonWithImage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyToolbar(title: String) {
+fun MyToolbar(title: String,type:String) {
     val context = LocalContext.current
     TopAppBar(
         title = {
@@ -213,6 +218,7 @@ fun MyToolbar(title: String) {
                         contentDescription = null,
                         modifier = Modifier.size(30.dp).clickable {
                             val intent = Intent(context, CartActivity::class.java)
+                            intent.putExtra("TYPE", type)
                             context.startActivity(intent)
                         }
                     )
@@ -346,4 +352,22 @@ fun MyToolbar3(title: String) {
     )
 }
 
-
+@RequiresApi(Build.VERSION_CODES.P)
+@Composable
+fun AnimationLoading () {
+    val context = LocalContext.current
+    val imageRequest = ImageRequest.Builder(context)
+        .data(R.drawable.loading)
+        .decoderFactory(ImageDecoderDecoder.Factory())
+        .build()
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        AsyncImage(
+            model = imageRequest,
+            contentDescription = null,
+            modifier = Modifier.size(100.dp)
+        )
+    }
+}

@@ -23,7 +23,7 @@ class CartViewModel : ViewModel() {
         getCart()
     }
 
-    fun getCart() {
+    private fun getCart() {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().cartService.getListCart()
@@ -124,5 +124,7 @@ class CartViewModel : ViewModel() {
             }
         }
     }
+
+
 
 }

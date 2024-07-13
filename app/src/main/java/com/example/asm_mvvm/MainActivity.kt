@@ -1,9 +1,13 @@
 package com.example.asm_mvvm
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -23,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.asm_mvvm.screens.activity.LoginActivity
 import com.example.asm_mvvm.screens.fragment.FavoritesFragment
 import com.example.asm_mvvm.screens.fragment.HomeFragment
 import com.example.asm_mvvm.screens.fragment.NotificationFragment
@@ -30,13 +35,33 @@ import com.example.asm_mvvm.screens.fragment.ProfileFragment
 
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             val navigationController = rememberNavController()
+            val type = intent.getStringExtra("TYPE2") ?: ""
             val selected = remember {
-                mutableStateOf(Icons.Default.Home)
+                when (type) {
+                    "" -> {
+                        mutableStateOf(Icons.Default.Home)
+                    }
+                    "favorites" -> {
+                        mutableStateOf(Icons.Default.Favorite)
+                    }
+                    "home" -> {
+                        mutableStateOf(Icons.Default.Home)
+                    }
+                    else -> {
+                        mutableStateOf(Icons.Default.Notifications)
+                    }
+                }
+
+            }
+
+            BackHandler {
+                // ko the exit app
             }
 
             Scaffold(
@@ -117,13 +142,27 @@ class MainActivity : ComponentActivity() {
             ) { paddingValues ->
                 NavHost(
                     navController = navigationController,
-                    startDestination = Fragments.HomeFragment.frm,
+                    startDestination =
+                    when (type) {
+                        "" -> {
+                            Fragments.HomeFragment.frm
+                        }
+                        "favorites" -> {
+                            Fragments.FavoritesFragment.frm
+                        }
+                        "home" -> {
+                            Fragments.HomeFragment.frm
+                        }
+                        else -> {
+                            Fragments.NotificationFragment.frm
+                        }
+                    },
                     modifier = Modifier.padding(paddingValues),
                 ) {
                     composable(Fragments.HomeFragment.frm) { HomeFragment() }
                     composable(Fragments.FavoritesFragment.frm) { FavoritesFragment() }
                     composable(Fragments.NotificationFragment.frm) { NotificationFragment() }
-                    composable(Fragments.ProfileFragment.frm) { ProfileFragment()}
+                    composable(Fragments.ProfileFragment.frm) { ProfileFragment() }
                 }
 
             }

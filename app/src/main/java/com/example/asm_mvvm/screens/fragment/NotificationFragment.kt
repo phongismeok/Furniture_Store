@@ -7,6 +7,6 @@ import com.example.asm_mvvm.ui.theme.MyToolbar
 @Composable
 fun NotificationFragment(){
     Column {
-        MyToolbar(title = "Notifications")
+        MyToolbar(title = "Notifications","notification")
     }
 }

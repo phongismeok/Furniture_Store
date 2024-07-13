@@ -2,7 +2,6 @@ package com.example.asm_mvvm.screens.fragment
 
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -32,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,64 +46,45 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
-import coil.decode.ImageDecoderDecoder
-import coil.request.ImageRequest
 import com.example.asm_mvvm.R
 import com.example.asm_mvvm.request.CartRequest
 import com.example.asm_mvvm.screens.activity.DetailProductActivity
+import com.example.asm_mvvm.ui.theme.AnimationLoading
 import com.example.asm_mvvm.ui.theme.MyButton2
 import com.example.asm_mvvm.ui.theme.MyToolbar
 import com.example.asm_mvvm.viewmodels.CartViewModel
 import com.example.asm_mvvm.viewmodels.ProductViewModel
 import com.example.asm_mvvm.viewmodels.TypeViewModel
 
-
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun HomeFragment() {
-    val typeViewModel = TypeViewModel()
-    val productViewModel = ProductViewModel()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFFFEFD))
     ) {
-        MyToolbar(title = "Home")
-        ListType(typeViewModel = typeViewModel, productViewModel = productViewModel)
+        MyToolbar(title = "Home", type = "home")
+        ListType()
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListType(typeViewModel: TypeViewModel, productViewModel: ProductViewModel) {
-    val context = LocalContext.current
+fun ListType() {
+    val typeViewModel = TypeViewModel()
+
     val typesState = typeViewModel.types.observeAsState(initial = emptyList())
     val types = typesState.value
+
     var selected by remember {
         mutableStateOf("")
     }
-    var stateHot by remember {
-        mutableStateOf("")
-    }
-
-    val imageRequest = ImageRequest.Builder(context)
-        .data(R.drawable.loading)
-        .decoderFactory(ImageDecoderDecoder.Factory())
-        .build()
 
     if (types.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            AsyncImage(
-                model = imageRequest,
-                contentDescription = null,
-                modifier = Modifier.size(100.dp)
-            )
-        }
-    }else {
+        AnimationLoading()
+    } else {
         LazyRow {
             items(types.size) { index ->
                 Column(
@@ -128,11 +107,6 @@ fun ListType(typeViewModel: TypeViewModel, productViewModel: ProductViewModel) {
                         ),
                         onClick = {
                             selected = types[index].name
-                            stateHot = if (selected == "Popular") {
-                                "Hot"
-                            } else {
-                                selected
-                            }
                         }
 
                     ) {
@@ -155,47 +129,55 @@ fun ListType(typeViewModel: TypeViewModel, productViewModel: ProductViewModel) {
             }
         }
 
-        if (selected == "") {
-            ListProduct(productViewModel = productViewModel)
-        } else {
-            if (stateHot == "Hot") {
-                ListProductHot(productViewModel = productViewModel, type = 1)
-            } else {
-                ListProductType(productViewModel = productViewModel, type = stateHot)
+
+        when (selected) {
+            "" -> {
+                ListProduct(type = "")
+            }
+
+            "Popular" -> {
+                ListProduct(type = "Popular")
+            }
+
+            else -> {
+                ListProduct(type = selected)
             }
         }
     }
-
-
 }
+
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListProductHot(productViewModel: ProductViewModel, type: Int) {
-    productViewModel.getProductsByType(type)
+fun ListProduct(type: String) {
+
+    val productViewModel = ProductViewModel()
+    val context = LocalContext.current
+
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
-    val context = LocalContext.current
+
+    when (type) {
+        "" -> {
+            productViewModel.getProduct()
+        }
+
+        "Popular" -> {
+            productViewModel.getProductsByType(1)
+        }
+
+        else -> {
+            productViewModel.getProductsByTypeProduct(type)
+        }
+    }
+
+
     val icon: Painter = painterResource(id = R.drawable.icbag)
 
-    val imageRequest = ImageRequest.Builder(context)
-        .data(R.drawable.loading)
-        .decoderFactory(ImageDecoderDecoder.Factory())
-        .build()
-
     if (products.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            AsyncImage(
-                model = imageRequest,
-                contentDescription = null,
-                modifier = Modifier.size(100.dp)
-            )
-        }
-    }else {
+        AnimationLoading()
+    } else {
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Fixed(2), // chia theo số cột
             contentPadding = PaddingValues(8.dp),
@@ -203,228 +185,6 @@ fun ListProductHot(productViewModel: ProductViewModel, type: Int) {
                 .padding(top = 20.dp)
         ) {
             items(products.size) { index ->
-                Column(
-                    modifier = Modifier
-                        .background(Color.White)
-                        .padding(top = 20.dp, start = 10.dp, end = 10.dp),
-                    Arrangement.Center, Alignment.CenterHorizontally,
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .width(200.dp)
-                            .height(250.dp),
-                        shape = RoundedCornerShape(15.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
-                        onClick = {
-                            val intent = Intent(context, DetailProductActivity::class.java)
-                            intent.putExtra("ID_PRODUCT", products[index].id)
-                            context.startActivity(intent)
-                        }
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.BottomEnd
-                        ) {
-                            AsyncImage(
-                                model = products[index].image1,
-                                contentDescription = null,
-                                contentScale = ContentScale.FillBounds,
-                                modifier = Modifier.fillMaxHeight()
-                            )
-                            Card(
-                                modifier = Modifier
-                                    .padding(10.dp)
-                                    .width(40.dp)
-                                    .height(40.dp),
-                                shape = RoundedCornerShape(5.dp),
-                                onClick = {
-
-                                }
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(5.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        painter = icon,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(26.dp),
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    Text(
-                        text = products[index].productName,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(start = 10.dp),
-                        fontSize = 20.sp
-                    )
-                    Text(
-                        text = "$ " + products[index].price,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(start = 10.dp),
-                        fontSize = 20.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-    }
-
-
-}
-
-@RequiresApi(Build.VERSION_CODES.P)
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ListProductType(productViewModel: ProductViewModel, type: String) {
-    productViewModel.getProductsByTypeProduct(type)
-    val productsState = productViewModel.products.observeAsState(initial = emptyList())
-    val products = productsState.value
-    val context = LocalContext.current
-    val icon: Painter = painterResource(id = R.drawable.icbag)
-
-    val imageRequest = ImageRequest.Builder(context)
-        .data(R.drawable.loading)
-        .decoderFactory(ImageDecoderDecoder.Factory())
-        .build()
-
-    if (products.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            AsyncImage(
-                model = imageRequest,
-                contentDescription = null,
-                modifier = Modifier.size(100.dp)
-            )
-        }
-    }else {
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(2), // chia theo số cột
-            contentPadding = PaddingValues(8.dp),
-            modifier = Modifier
-                .padding(top = 20.dp)
-        ) {
-            items(products.size) { index ->
-                Column(
-                    modifier = Modifier
-                        .background(Color.White)
-                        .padding(top = 20.dp, start = 10.dp, end = 10.dp),
-                    Arrangement.Center, Alignment.CenterHorizontally,
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .padding(10.dp)
-                            .width(200.dp)
-                            .height(250.dp),
-                        shape = RoundedCornerShape(15.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
-                        onClick = {
-                            val intent = Intent(context, DetailProductActivity::class.java)
-                            intent.putExtra("ID_PRODUCT", products[index].id)
-                            context.startActivity(intent)
-                        }
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.BottomEnd
-                        ) {
-                            AsyncImage(
-                                model = products[index].image1,
-                                contentDescription = null,
-                                contentScale = ContentScale.FillBounds,
-                                modifier = Modifier.fillMaxHeight()
-                            )
-                            Card(
-                                modifier = Modifier
-                                    .padding(10.dp)
-                                    .width(40.dp)
-                                    .height(40.dp),
-                                shape = RoundedCornerShape(5.dp),
-                                onClick = {
-
-                                }
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(5.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        painter = icon,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(26.dp),
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    Text(
-                        text = products[index].productName,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(start = 10.dp),
-                        fontSize = 20.sp
-                    )
-                    Text(
-                        text = "$ " + products[index].price,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(start = 10.dp),
-                        fontSize = 20.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-    }
-
-
-}
-
-@RequiresApi(Build.VERSION_CODES.P)
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ListProduct(productViewModel: ProductViewModel) {
-    val cartViewModel = CartViewModel()
-    val productsState = productViewModel.products.observeAsState(initial = emptyList())
-    val products = productsState.value
-    val context = LocalContext.current
-    val icon: Painter = painterResource(id = R.drawable.icbag)
-    val imageRequest = ImageRequest.Builder(context)
-        .data(R.drawable.loading)
-        .decoderFactory(ImageDecoderDecoder.Factory())
-        .build()
-
-    if (products.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            AsyncImage(
-                model = imageRequest,
-                contentDescription = null,
-                modifier = Modifier.size(100.dp)
-            )
-        }
-    }else{
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(2), // chia theo số cột
-            contentPadding = PaddingValues(8.dp),
-            modifier = Modifier
-                .padding(top = 20.dp)
-        ) {
-            items(products.size) { index ->
-
                 var showDialog by remember { mutableStateOf(false) }
                 if (showDialog) {
                     DialogAddToCart(
@@ -432,11 +192,10 @@ fun ListProduct(productViewModel: ProductViewModel) {
                         productId = products[index].id,
                         productName = products[index].productName,
                         image = products[index].image1,
-                        price = products[index].price,
-                        cartViewModel = cartViewModel
+                        price = products[index].price
                     )
                 }
-                
+
                 Column(
                     modifier = Modifier
                         .background(Color.White)
@@ -453,6 +212,7 @@ fun ListProduct(productViewModel: ProductViewModel) {
                         onClick = {
                             val intent = Intent(context, DetailProductActivity::class.java)
                             intent.putExtra("ID_PRODUCT", products[index].id)
+                            intent.putExtra("SCREEN", "home")
                             context.startActivity(intent)
                         }
                     ) {
@@ -523,20 +283,30 @@ fun DialogAddToCart(
     productName: String,
     image: String,
     price: Double,
-    cartViewModel: CartViewModel
 ) {
+    val cartViewModel = CartViewModel()
+
     cartViewModel.getCartsByProductId(productId)
     val cartState = cartViewModel.carts.observeAsState(initial = emptyList())
     val cart = cartState.value
     val context = LocalContext.current
+
     var quantityInput by remember { mutableStateOf("") }
+
     Dialog(onDismissRequest = { onDismissRequest() }) {
-        // Draw a rectangle shape with rounded corners inside the dialog
         Card(
             modifier = Modifier
                 .width(400.dp)
-                .height(330.dp),
-            shape = RoundedCornerShape(16.dp)
+                .height(300.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor =
+                Color.White
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation =
+                3.dp
+            ),
         ) {
             Column(
                 modifier = Modifier
@@ -544,7 +314,7 @@ fun DialogAddToCart(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Card(border = BorderStroke(1.dp,Color.Black)) {
+                Card(border = BorderStroke(1.dp, Color.Black)) {
                     AsyncImage(
                         model = image,
                         contentDescription = null,
@@ -565,63 +335,58 @@ fun DialogAddToCart(
                     shape = RoundedCornerShape(10.dp),
                 )
                 MyButton2(title = "Add to cart", onClick = {
-                    val soLuong = quantityInput.toInt()
-                    if (cart.isEmpty()) {
-                        val cartBody = CartRequest(
-                            productId = productId,
-                            productName = productName ,
-                            quantity = soLuong,
-                            image = image,
-                            price = price
-                        )
-
-                        cartViewModel.addProductToCart(
-                            id = productId,
-                            cartBody,
-                            "Thêm vào giỏ hàng thành công",
-                            "Thêm vào giỏ hàng thất bại",
-                            context
-                        )
+                    if (quantityInput == "") {
+                        Toast.makeText(context, "Bạn chưa nhập số lượng", Toast.LENGTH_SHORT).show()
                     } else {
-                        val quantityBefore = cart[0].quantity
-                        val quantitySuggest = 99 - quantityBefore
-
                         try {
-                            if(soLuong in 1..99){
-                                if (soLuong + quantityBefore < 100) {
-                                    cartViewModel.updateQuantityCart(
+                            val quantity = quantityInput.toInt()
+                            if (quantity in 1..99) {
+                                if (cart.isEmpty()) {
+                                    val cartBody = CartRequest(
                                         productId = productId,
-                                        soLuong + quantityBefore,
+                                        productName = productName,
+                                        quantity = quantity,
+                                        image = image,
+                                        price = price
+                                    )
+                                    cartViewModel.addProductToCart(
+                                        id = productId,
+                                        cartBody,
                                         "Thêm vào giỏ hàng thành công",
                                         "Thêm vào giỏ hàng thất bại",
-                                        context,
-                                        type = 1
+                                        context
                                     )
-                                } else if (soLuong + quantityBefore >= 100) {
-                                    Toast.makeText(
-                                        context,
-                                        "Bạn chỉ có thể mua thêm $quantitySuggest sản phẩm này",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                } else {
+                                    val quantityBefore = cart[0].quantity
+                                    val quantitySuggest = 99 - quantityBefore
+
+                                    if (quantity <= quantitySuggest) {
+                                        cartViewModel.updateQuantityCart(
+                                            productId = productId,
+                                            quantity + quantityBefore,
+                                            "Thêm vào giỏ hàng thành công",
+                                            "Thêm vào giỏ hàng thất bại",
+                                            context,
+                                            type = 1
+                                        )
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Bạn chỉ có thể mua thêm $quantitySuggest sản phẩm này",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
-                            }else{
+                            } else {
                                 Toast.makeText(
                                     context,
-                                    "Chỉ được nhập từ 1 đến 99",
+                                    "Bạn không thể mua 100 sản phẩm cùng loại",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
-                        }catch (e:Exception){
-                            Toast.makeText(
-                                context,
-                                "Bạn phải nhập số",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Bạn phải nhập số", Toast.LENGTH_SHORT).show()
                         }
-
-
-
-
                     }
                 }, mauChu = Color.Black, mauNen = Color.LightGray)
             }

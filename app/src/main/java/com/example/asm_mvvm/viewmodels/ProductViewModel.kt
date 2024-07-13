@@ -19,10 +19,10 @@ class ProductViewModel : ViewModel() {
     val product: LiveData<Product?> = _product2
 
     init {
-        getProduct()
+//        getProduct()
     }
 
-    private fun getProduct() {
+    fun getProduct() {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().productService.getListPro()
