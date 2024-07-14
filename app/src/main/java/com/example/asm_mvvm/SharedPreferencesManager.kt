@@ -20,4 +20,13 @@ object SharedPreferencesManager {
     fun getEmail(): String? {
         return sharedPreferences.getString("email", null)
     }
+    fun savePassword(pass: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString("pass", pass)
+        editor.apply()
+    }
+
+    fun getPassword(): String? {
+        return sharedPreferences.getString("pass", null)
+    }
 }

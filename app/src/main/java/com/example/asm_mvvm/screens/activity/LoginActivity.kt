@@ -1,6 +1,7 @@
 package com.example.asm_mvvm.screens.activity
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -45,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -58,9 +60,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.lifecycle.ViewModelProvider
 import com.example.asm_mvvm.MainActivity
 import com.example.asm_mvvm.R
+import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyButtonWithImage
 import com.example.asm_mvvm.viewmodels.ProductViewModel
@@ -76,12 +80,18 @@ class LoginActivity : AppCompatActivity() {
         setContent {
             userViewModel = ViewModelProvider(this)[UserViewModel::class]
 
+            SharedPreferencesManager.init(applicationContext)
+
             var email by remember { mutableStateOf("") }
             var password by remember { mutableStateOf("") }
             var passwordVisible by rememberSaveable { mutableStateOf(false) }
-            var checked by remember { mutableStateOf(true) }
+            var checked by remember { mutableStateOf(false) }
             val icon1: Painter = painterResource(id = R.drawable.iceye)
             val icon2: Painter = painterResource(id = R.drawable.iccloseye)
+
+            val emailSave = userViewModel.getEmailFromSharedPreferences()
+            val passSave = userViewModel.getPassFromSharedPreferences()
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -178,16 +188,28 @@ class LoginActivity : AppCompatActivity() {
                 MyButton(
                     title = "Log in",
                     onClick = {
-                        userViewModel.login(this@LoginActivity,email, password) { success ->
+                        userViewModel.login(
+                            this@LoginActivity,
+                            email,
+                            password,
+                            checked
+                        ) { success ->
                             if (success) {
                                 val intent = Intent(this@LoginActivity, MainActivity::class.java)
                                 this@LoginActivity.startActivity(intent)
-                                Toast.makeText(this@LoginActivity,"Login success",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    "Login success",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             } else {
-                                Toast.makeText(this@LoginActivity,"Wrong email or password",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    "Wrong email or password",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
-
                     },
                     mauChu = Color.White,
                     mauNen = Color.Gray

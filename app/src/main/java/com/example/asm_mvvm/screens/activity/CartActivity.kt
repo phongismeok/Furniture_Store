@@ -459,6 +459,7 @@ fun Total(price: Double) {
             title = "Check out",
             onClick = {
                 val intent = Intent(context, CheckOutActivity::class.java)
+                intent.putExtra("PRICE",price.toString())
                 context.startActivity(intent)
             },
             mauChu = Color.White,
