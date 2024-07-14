@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Search
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -161,7 +163,7 @@ fun MyButtonWithImage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyToolbar(title: String, type: String, place: String,textState: MutableState<String>) {
+fun MyToolbar(title: String, type: String, place: String, textState: MutableState<String>) {
     val isSearchActive = remember { mutableStateOf(false) }
     val context = LocalContext.current
     if (isSearchActive.value) {
@@ -394,6 +396,15 @@ fun AnimationLoading() {
             contentDescription = null,
             modifier = Modifier.size(100.dp)
         )
+    }
+}
+
+@Composable
+fun MyFloatingButton(onClick: () -> Unit) {
+    FloatingActionButton(
+        onClick = { onClick() }
+    ) {
+        Icon(Icons.Filled.Add, "Floating action button.", modifier = Modifier.size(30.dp))
     }
 }
 

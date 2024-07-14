@@ -20,4 +20,7 @@ class RetrofitBase {
     val userService: UserService by lazy {
         retrofit.create(UserService::class.java)
     }
+    val shippingService: ShippingService by lazy {
+        retrofit.create(ShippingService::class.java)
+    }
 }

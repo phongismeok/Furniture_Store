@@ -1,12 +1,15 @@
 package com.example.asm_mvvm.screens.activity
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,20 +29,21 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.asm_mvvm.R
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyToolbar3
+import com.example.asm_mvvm.viewmodels.ShippingViewModel
 
 class CheckOutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,22 +53,24 @@ class CheckOutActivity : AppCompatActivity() {
             val priceNhan = intent.getStringExtra("PRICE")
             Column {
                 MyToolbar3(title = "Check out")
-                Title(title = "Shipping Address")
-                ContentShippingAddress(name = "Thanh Phong", address = "Nam Son, Soc Son,Ha Noi")
-                Title(title = "Payment")
+                Title(title = "Shipping Address",1)
+                ContentShippingAddress()
+                Title(title = "Payment",2)
                 ContentPayment(number = "1234 5678 9012 3456")
-                Title(title = "Delivery method")
+                Title(title = "Delivery method",3)
                 ContentDeliveryMethod(speed = "Fast (2-3days)")
                 if (priceNhan != null) {
                     ContentTotal(pricePro = priceNhan.toDouble(), priceShip = 5.0)
                 }
+                ClickBackCheckOut()
             }
         }
     }
 }
 
 @Composable
-fun Title (title:String) {
+fun Title (title:String,type:Int) {
+    val context = LocalContext.current
     Row(modifier = Modifier
         .fillMaxWidth()
         .padding(top = 5.dp), Arrangement.SpaceAround) {
@@ -73,28 +79,61 @@ fun Title (title:String) {
         Icon(
             Icons.Default.Edit , contentDescription = null, modifier = Modifier
                 .size(30.dp)
-                .fillMaxWidth(0.5f))
+                .fillMaxWidth(0.5f)
+                .clickable {
+                    when (type) {
+                        1 -> {
+                            val intent = Intent(context, ShippingActivity::class.java)
+                            context.startActivity(intent)
+                        }
+
+                        2 -> {
+                            val intent = Intent(context, PaymentActivity::class.java)
+                            context.startActivity(intent)
+                        }
+
+                        else -> {
+                            Toast
+                                .makeText(
+                                    context,
+                                    "Chức năng tạm chưa phát triển",
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
+                        }
+                    }
+                })
     }
 }
 
 @Composable
-fun ContentShippingAddress (name:String,address:String) {
-    Card(shape = RoundedCornerShape(5.dp), modifier = Modifier.padding(top = 20.dp, start = 30.dp, end = 30.dp, bottom = 20.dp),colors = CardDefaults.cardColors(
-        containerColor =
-        Color.White
-    ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation =
-            3.dp
-        )) {
-        Column {
-            Text(text = name, fontSize = 25.sp, modifier = Modifier.padding(top = 10.dp, start = 20.dp, bottom = 10.dp))
-            Divider(modifier = Modifier
-                .height(1.dp)
-                .fillMaxWidth())
-            Text(text = address, fontSize = 20.sp, modifier = Modifier.padding(top = 10.dp, start = 20.dp, bottom = 20.dp))
+fun ContentShippingAddress () {
+    val shippingViewModel = ShippingViewModel()
+    val shipState = shippingViewModel.ships.observeAsState(initial = emptyList())
+    val ships = shipState.value
+    shippingViewModel.getShipAddressBySelect(1)
+    
+    if(ships.isEmpty()){
+        Text(text = "Loading", fontSize = 20.sp)
+    }else{
+        Card(shape = RoundedCornerShape(5.dp), modifier = Modifier.padding(top = 20.dp, start = 30.dp, end = 30.dp, bottom = 20.dp),colors = CardDefaults.cardColors(
+            containerColor =
+            Color.White
+        ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation =
+                3.dp
+            )) {
+            Column {
+                Text(text = ships[0].name, fontSize = 25.sp, modifier = Modifier.padding(top = 10.dp, start = 20.dp, bottom = 10.dp))
+                Divider(modifier = Modifier
+                    .height(1.dp)
+                    .fillMaxWidth())
+                Text(text = ships[0].address, fontSize = 20.sp, modifier = Modifier.padding(top = 10.dp, start = 20.dp, bottom = 20.dp))
+            }
         }
     }
+    
 }
 
 @Composable
@@ -201,4 +240,14 @@ fun ContentTotal (pricePro:Double,priceShip:Double) {
         }
     }
     MyButton(title = "SUBMIT ORDER", onClick = { /*TODO*/ }, mauChu = Color.White, mauNen = Color.Black)
+}
+
+
+@Composable
+fun ClickBackCheckOut () {
+    val context = LocalContext.current
+    BackHandler {
+        val intent = Intent(context, CartActivity::class.java)
+        context.startActivity(intent)
+    }
 }
