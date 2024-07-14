@@ -1,19 +1,16 @@
-@file:Suppress("UNUSED_EXPRESSION")
-
 package com.example.asm_mvvm.ui.theme
 
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.Animation
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,16 +24,18 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,12 +53,8 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-
-
 import com.example.asm_mvvm.R
-import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.screens.activity.CartActivity
-import com.example.asm_mvvm.screens.activity.DetailProductActivity
 import com.example.asm_mvvm.screens.activity.LoginActivity
 
 
@@ -118,7 +113,7 @@ fun MyButton2(
             .padding(10.dp)
             .height(50.dp),
         shape = RoundedCornerShape(15.dp),
-        border = BorderStroke(1.dp,Color.Black)
+        border = BorderStroke(1.dp, Color.Black)
     ) {
         Text(
             text = title,
@@ -166,69 +161,97 @@ fun MyButtonWithImage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyToolbar(title: String,type:String) {
+fun MyToolbar(title: String, type: String, place: String,textState: MutableState<String>) {
+    val isSearchActive = remember { mutableStateOf(false) }
     val context = LocalContext.current
-    TopAppBar(
-        title = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 15.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // search
-                Box(
-                    modifier = Modifier
-                        .weight(1.5f),
-                    contentAlignment = Alignment.TopStart
-                ) {
-                    Icon(
-                        Icons.Default.Search,
-                        contentDescription = null,
-                        modifier = Modifier.size(30.dp).clickable {
+    if (isSearchActive.value) {
 
-                        },
-                    )
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+            value = textState.value,
+            onValueChange = { textState.value = it },
+            singleLine = true,
+            placeholder = { Text(place) },
+            trailingIcon = {
+                IconButton(onClick = {
+                    textState.value = ""
+                    isSearchActive.value = false
+                }) {
+                    Icon(painter = painterResource(id = R.drawable.cancel), contentDescription = "")
                 }
-                // tittle
-                Box(
+            },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 10.dp, end = 10.dp, top = 25.dp),
+        )
+    } else {
+        TopAppBar(
+            title = {
+                Row(
                     modifier = Modifier
-                        .weight(5f),
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth()
+                        .padding(end = 15.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = title,
-                            color = Color.Black,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
+                    // search
+                    Box(
+                        modifier = Modifier
+                            .weight(1.5f),
+                        contentAlignment = Alignment.TopStart
+                    ) {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    isSearchActive.value = true
+                                },
+                        )
+                    }
+                    // tittle
+                    Box(
+                        modifier = Modifier
+                            .weight(5f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = title,
+                                color = Color.Black,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                    //cart
+                    Box(
+                        modifier = Modifier
+                            .weight(1.5f),
+                        contentAlignment = Alignment.TopEnd
+                    ) {
+                        Icon(
+                            Icons.Default.ShoppingCart,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(30.dp)
+                                .clickable {
+                                    val intent = Intent(context, CartActivity::class.java)
+                                    intent.putExtra("TYPE", type)
+                                    context.startActivity(intent)
+                                }
                         )
                     }
                 }
-                //cart
-                Box(
-                    modifier = Modifier
-                        .weight(1.5f),
-                    contentAlignment = Alignment.TopEnd
-                ) {
-                    Icon(
-                        Icons.Default.ShoppingCart,
-                        contentDescription = null,
-                        modifier = Modifier.size(30.dp).clickable {
-                            val intent = Intent(context, CartActivity::class.java)
-                            intent.putExtra("TYPE", type)
-                            context.startActivity(intent)
-                        }
-                    )
-                }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White // Màu nền của TopAppBar
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.White // Màu nền của TopAppBar
+            )
         )
-    )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -281,10 +304,12 @@ fun MyToolbar2(title: String) {
                     Icon(
                         Icons.Default.ExitToApp,
                         contentDescription = null,
-                        modifier = Modifier.size(30.dp).clickable {
-                            val intent = Intent(context, LoginActivity::class.java)
-                            context.startActivity(intent)
-                        }
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clickable {
+                                val intent = Intent(context, LoginActivity::class.java)
+                                context.startActivity(intent)
+                            }
                     )
                 }
             }
@@ -336,7 +361,7 @@ fun MyToolbar3(title: String) {
                         )
                     }
                 }
-                //exit
+
                 Box(
                     modifier = Modifier
                         .weight(1.5f),
@@ -354,7 +379,7 @@ fun MyToolbar3(title: String) {
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun AnimationLoading () {
+fun AnimationLoading() {
     val context = LocalContext.current
     val imageRequest = ImageRequest.Builder(context)
         .data(R.drawable.loading)
@@ -371,3 +396,4 @@ fun AnimationLoading () {
         )
     }
 }
+

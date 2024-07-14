@@ -59,20 +59,21 @@ import com.example.asm_mvvm.viewmodels.TypeViewModel
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun HomeFragment() {
+    val textState = remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFFFEFD))
     ) {
-        MyToolbar(title = "Home", type = "home")
-        ListType()
+        MyToolbar(title = "Home", type = "home","Search product",textState)
+        ListType(textState.value)
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListType() {
+fun ListType(textSearch:String) {
     val typeViewModel = TypeViewModel()
 
     val typesState = typeViewModel.types.observeAsState(initial = emptyList())
@@ -132,15 +133,15 @@ fun ListType() {
 
         when (selected) {
             "" -> {
-                ListProduct(type = "")
+                ListProduct(type = "", dataSearch = textSearch)
             }
 
             "Popular" -> {
-                ListProduct(type = "Popular")
+                ListProduct(type = "Popular", dataSearch = textSearch)
             }
 
             else -> {
-                ListProduct(type = selected)
+                ListProduct(type = selected, dataSearch = textSearch)
             }
         }
     }
@@ -150,7 +151,7 @@ fun ListType() {
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListProduct(type: String) {
+fun ListProduct(type: String,dataSearch:String) {
 
     val productViewModel = ProductViewModel()
     val context = LocalContext.current
@@ -158,18 +159,22 @@ fun ListProduct(type: String) {
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
 
-    when (type) {
-        "" -> {
-            productViewModel.getProduct()
-        }
+    if(dataSearch == ""){
+        when (type) {
+            "" -> {
+                productViewModel.getProduct()
+            }
 
-        "Popular" -> {
-            productViewModel.getProductsByType(1)
-        }
+            "Popular" -> {
+                productViewModel.getProductsByType(1)
+            }
 
-        else -> {
-            productViewModel.getProductsByTypeProduct(type)
+            else -> {
+                productViewModel.getProductsByTypeProduct(type)
+            }
         }
+    }else{
+        productViewModel.searchProduct(dataSearch)
     }
 
 

@@ -131,5 +131,41 @@ class ProductViewModel : ViewModel() {
         }
     }
 
+    fun searchProduct(key: String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitBase().productService.searchProduct(key)
+                if (response.isSuccessful) {
+                    _product.postValue(response.body()?.map { it.toProduct() })
+                    Log.d("check", "searchPro: ok")
+                } else {
+                    _product.postValue(emptyList())
+                    Log.d("check", "searchPro: fail1")
+                }
+            } catch (e: Exception) {
+                _product.postValue(emptyList())
+                Log.d("check", "searchPro: $e")
+            }
+        }
+    }
+
+    fun searchProductFavorites(key: String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitBase().productService.searchProductFavorites(key)
+                if (response.isSuccessful) {
+                    _product.postValue(response.body()?.map { it.toProduct() })
+                    Log.d("check", "searchProFv: ok")
+                } else {
+                    _product.postValue(emptyList())
+                    Log.d("check", "searchProFv: fail1")
+                }
+            } catch (e: Exception) {
+                _product.postValue(emptyList())
+                Log.d("check", "searchProFv: $e")
+            }
+        }
+    }
+
 }
 

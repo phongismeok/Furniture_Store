@@ -86,17 +86,26 @@ router.get('/search-product', async (req, res) => {
         const data = await Products.find({ productName: { "$regex": key, "$options": "i" } })
             .sort({ price: -1 });
 
-        res.json({
-            "status": 200,
-            "messenger": "Thành công",
-            "data": data
-        });
+        res.send(data).status(200)
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            "status": 500,
-            "messenger": "Đã xảy ra lỗi khi tìm kiếm sản phẩm"
-        });
+        res.send("loi").status(500)
+    }
+});
+
+router.get('/search-product-favorites', async (req, res) => {
+    try {
+        const key = req.query.key ? req.query.key.toString() : '';
+
+        const data = await Products.find({
+            productName: { "$regex": key, "$options": "i" },
+            stateFavorites: 1
+        }).sort({ price: -1 });
+
+        res.send(data).status(200);
+    } catch (error) {
+        console.log(error);
+        res.send("loi").status(500);
     }
 });
 

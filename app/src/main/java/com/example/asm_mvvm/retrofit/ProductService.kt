@@ -28,6 +28,12 @@ interface ProductService {
     @GET("get-list-products-by-state-favorites/{stateFavorites}")
     suspend fun getProductsByStateFavorites(@Path("stateFavorites") stateFavorites: Int): Response<List<ProductResponse>>
 
+    @GET("search-product")
+    suspend fun searchProduct(@Query("key") key: String): Response<List<ProductResponse>>
+
+    @GET("search-product-favorites")
+    suspend fun searchProductFavorites(@Query("key") key: String): Response<List<ProductResponse>>
+
     @PUT("update-state-favorites-product")
     @FormUrlEncoded
     suspend fun updateStateFavorites(

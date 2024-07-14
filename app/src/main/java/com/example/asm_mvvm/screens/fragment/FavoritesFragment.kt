@@ -69,16 +69,17 @@ import com.example.asm_mvvm.viewmodels.TypeViewModel
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun FavoritesFragment() {
+    val textState = remember { mutableStateOf("") }
     Column(modifier = Modifier.fillMaxSize()) {
-        MyToolbar(title = "Favorites", type = "favorites")
-        ListFavorites()
+        MyToolbar(title = "Favorites", type = "favorites","Search favorites",textState)
+        ListFavorites(textState.value)
     }
 }
 
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ListFavorites() {
+fun ListFavorites(dataSearch:String) {
     val productViewModel = ProductViewModel()
 
     val icon: Painter = painterResource(id = R.drawable.cancel)
@@ -86,7 +87,11 @@ fun ListFavorites() {
 
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
-    productViewModel.getProductsByStateFavorites(1)
+    if(dataSearch == ""){
+        productViewModel.getProductsByStateFavorites(1)
+    }else{
+        productViewModel.searchProductFavorites(dataSearch)
+    }
 
     var showDialog by remember { mutableStateOf(false) }
 
