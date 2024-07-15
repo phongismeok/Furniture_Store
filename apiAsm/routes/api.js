@@ -1,13 +1,12 @@
-var express = require('express');
-var router = express.Router();
+let express = require('express');
+let router = express.Router();
 
 const Products = require('../models/productModel')
 const Carts = require('../models/cartModel')
 const Types = require('../models/typeModel')
 const Users = require('../models/userModel')
 const Ships = require('../models/shippingModel')
-const Upload = require('../config/common/upload');
-const mongoose = require("mongoose");
+const Favorites = require('../models/favoritesModel')
 
 // product
 router.get('/get-list-products', async (req, res) => {
@@ -52,19 +51,6 @@ router.get('/get-list-products-by-type/:type', async (req, res) => {
     }
 });
 
-router.get('/get-list-products-by-state-favorites/:stateFavorites', async (req, res) => {
-    try {
-        const { stateFavorites } = req.params;
-        const data = await Products.find({ stateFavorites: stateFavorites }).populate('stateFavorites');
-        res.status(200).send(data)
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            "status": 500,
-            "message": "Đã xảy ra lỗi khi tìm kiếm sản phẩm"
-        });
-    }
-});
 
 router.get('/get-list-products-by-typeProduct/:typeProduct', async (req, res) => {
     try {
@@ -94,41 +80,6 @@ router.get('/search-product', async (req, res) => {
     }
 });
 
-router.get('/search-product-favorites', async (req, res) => {
-    try {
-        const key = req.query.key ? req.query.key.toString() : '';
-
-        const data = await Products.find({
-            productName: { "$regex": key, "$options": "i" },
-            stateFavorites: 1
-        }).sort({ price: -1 });
-
-        res.send(data).status(200);
-    } catch (error) {
-        console.log(error);
-        res.send("loi").status(500);
-    }
-});
-
-router.put('/update-state-favorites-product', async (req, res) => {
-    try {
-        // Lấy id từ query
-        let id = req.query._id;
-        console.log(id);
-
-        // Lấy giá trị mới của thuộc tính stateFavorite từ request body
-        let { stateFavorites } = req.body;
-
-        // Cập nhật duy nhất thuộc tính stateFavorite
-        await Products.updateOne({ _id: id }, { $set: { stateFavorites: stateFavorites } });
-
-        res.status(204).send("Cập nhật thành công");
-
-    } catch (error) {
-        console.error("Lỗi khi cập nhật product:", error);
-        res.status(500).send("Đã xảy ra lỗi khi cập nhật product");
-    }
-});
 
 // type
 router.get('/get-list-types', async (req, res) => {
@@ -267,14 +218,15 @@ router.get('/get-list-ship-by-account/:account', async (req, res) => {
     }
 });
 
-router.get('/get-list-ship-by-select/:select', async (req, res) => {
+
+router.get('/get-list-ship-by-select/:select/:account', async (req, res) => {
     try {
-        const { select } = req.params;
-        const data = await Ships.find({ select: select }).populate('select');
-        res.status(200).send(data)
+        const { select, account } = req.params;
+        const data = await Ships.find({ select: select, account: account }).populate('select').populate('account');
+        res.status(200).send(data);
     } catch (error) {
         console.log(error);
-        res.status(500).send("loi")
+        res.status(500).send("loi");
     }
 });
 
@@ -349,6 +301,101 @@ router.put('/update-shipping', async (req, res) => {
     } catch (error) {
         console.error("Lỗi khi cập nhật Ships:", error);
         res.status(500).send("Đã xảy ra lỗi khi cập nhật Ships");
+    }
+});
+
+// favorites
+router.get('/get-list-favorites-by-account/:account', async (req, res) => {
+    try {
+        const { account } = req.params;
+        const data = await Favorites.find({ account: account }).populate('account');
+        res.status(200).send(data)
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("loi")
+    }
+});
+
+router.get('/get-favorites-by-account-id', async (req, res) => {
+    try {
+        const { account, id } = req.query;
+        const data = await Favorites.find({ account: account, _id: id }).populate('account');
+        res.status(200).send(data);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("loi");
+    }
+});
+
+router.get('/get-favorite-by-productId/:account/:productId', async (req, res) => {
+    try {
+        const { account, productId } = req.params;
+        const data = await Favorites.findOne({ account: account, productId: productId }).populate('account');
+
+        if (data) {
+            res.status(200).send(data);
+        } else {
+            res.status(404).send("Không tìm thấy dữ liệu");
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Lỗi");
+    }
+});
+
+router.post('/add-favorite', async (req, res) => {
+    try {
+        let fvBody = req.body;
+
+        console.log(fvBody)
+
+        let kq = await Favorites.create(fvBody);
+
+        if(kq){
+            res.status(204).send("thêm thành công");
+        }else{
+            res.status(400).send("thêm thất bại");
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+router.delete('/delete-favorite/:id', async (req, res) => {
+    try {
+        let id = req.params.id;
+        console.log(id);
+
+        await Favorites.deleteOne({ _id: id });
+        res.send('xoa thanh cong')
+    }catch (error){
+        console.error("Lỗi khi xóa cart:", error);
+        res.status(500).send("Đã xảy ra lỗi khi xóa cart");
+    }
+
+})
+
+router.get('/search-favorites', async (req, res) => {
+    try {
+        const key = req.query.key ? req.query.key.toString() : '';
+        const account = req.query.account ? req.query.account.toString() : '';
+
+        const query = {
+            productName: { "$regex": key, "$options": "i" }
+        };
+
+        if (account) {
+            query.account = { "$regex": account, "$options": "i" };
+        }
+
+        const data = await Favorites.find(query)
+            .sort({ price: -1 });
+
+        res.send(data).status(200);
+    } catch (error) {
+        console.log(error);
+        res.send("loi").status(500);
     }
 });
 

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,16 +42,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.asm_mvvm.R
+import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyToolbar3
 import com.example.asm_mvvm.viewmodels.ShippingViewModel
+import com.example.asm_mvvm.viewmodels.UserViewModel
 
 class CheckOutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        SharedPreferencesManager.init(applicationContext)
+        val priceNhan = intent.getStringExtra("PRICE")
         setContent {
-            val priceNhan = intent.getStringExtra("PRICE")
+
             Column {
                 MyToolbar3(title = "Check out")
                 Title(title = "Shipping Address",1)
@@ -70,6 +75,12 @@ class CheckOutActivity : AppCompatActivity() {
 
 @Composable
 fun Title (title:String,type:Int) {
+    val shippingViewModel = ShippingViewModel()
+    val userViewModel = UserViewModel()
+    val account = userViewModel.getEmailFromSharedPreferences() ?: ""
+    val shipState = shippingViewModel.ships.observeAsState(initial = emptyList())
+    val ships = shipState.value
+    shippingViewModel.getShipAddressBySelect(1, account = account)
     val context = LocalContext.current
     Row(modifier = Modifier
         .fillMaxWidth()
@@ -84,7 +95,14 @@ fun Title (title:String,type:Int) {
                     when (type) {
                         1 -> {
                             val intent = Intent(context, ShippingActivity::class.java)
-                            context.startActivity(intent)
+                            val id = ships[0].id
+                            if(id != ""){
+                                intent.putExtra("CLICK",id)
+                                context.startActivity(intent)
+                            }else{
+                                intent.putExtra("CLICK","")
+                                context.startActivity(intent)
+                            }
                         }
 
                         2 -> {
@@ -109,12 +127,17 @@ fun Title (title:String,type:Int) {
 @Composable
 fun ContentShippingAddress () {
     val shippingViewModel = ShippingViewModel()
+    val userViewModel = UserViewModel()
+
+    val account = userViewModel.getEmailFromSharedPreferences() ?: ""
     val shipState = shippingViewModel.ships.observeAsState(initial = emptyList())
     val ships = shipState.value
-    shippingViewModel.getShipAddressBySelect(1)
+    shippingViewModel.getShipAddressBySelect(1,account)
     
     if(ships.isEmpty()){
-        Text(text = "Loading", fontSize = 20.sp)
+        Column (modifier = Modifier.fillMaxWidth().height(100.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text(text = "Bạn chưa chọn địa chỉ ship", fontSize = 20.sp)
+        }
     }else{
         Card(shape = RoundedCornerShape(5.dp), modifier = Modifier.padding(top = 20.dp, start = 30.dp, end = 30.dp, bottom = 20.dp),colors = CardDefaults.cardColors(
             containerColor =

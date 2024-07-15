@@ -74,12 +74,10 @@ class CartActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val type = intent.getStringExtra("TYPE")
+            val type = intent.getStringExtra("TYPE") ?: "home"
             Column {
                 MyToolbar3(title = "My cart")
-                if (type != null) {
-                    ListCart(screen = type)
-                }
+                ListCart(screen = type)
             }
         }
     }
@@ -459,7 +457,7 @@ fun Total(price: Double) {
             title = "Check out",
             onClick = {
                 val intent = Intent(context, CheckOutActivity::class.java)
-                intent.putExtra("PRICE",price.toString())
+                intent.putExtra("PRICE", price.toString())
                 context.startActivity(intent)
             },
             mauChu = Color.White,

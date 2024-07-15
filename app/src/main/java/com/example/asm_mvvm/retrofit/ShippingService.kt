@@ -22,8 +22,11 @@ interface ShippingService {
     @GET("get-list-ship-by-account/{account}")
     suspend fun getShippingByAccount(@Path("account") account: String): Response<List<ShippingResponse>>
 
-    @GET("get-list-ship-by-select/{select}")
-    suspend fun getShippingBySelect(@Path("select") select: Int): Response<List<ShippingResponse>>
+    @GET("get-list-ship-by-select/{select}/{account}")
+    suspend fun getShippingBySelect(
+        @Path("select") select: Int,
+        @Path("account") account: String
+    ): Response<List<ShippingResponse>>
 
     @PUT("update-select-shipping")
     @FormUrlEncoded

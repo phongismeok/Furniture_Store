@@ -58,9 +58,13 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.asm_mvvm.MainActivity
 import com.example.asm_mvvm.R
+import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.request.CartRequest
+import com.example.asm_mvvm.request.FavoritesRequest
 import com.example.asm_mvvm.viewmodels.CartViewModel
+import com.example.asm_mvvm.viewmodels.FavoritesViewModel
 import com.example.asm_mvvm.viewmodels.ProductViewModel
+import com.example.asm_mvvm.viewmodels.UserViewModel
 
 class DetailProductActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,9 +114,7 @@ class DetailProductActivity : AppCompatActivity() {
                                 price = it.price,
                                 content = it.describe,
                                 image = it.image1,
-                                productViewModel,
                                 it.id,
-                                it.stateFavorites,
                                 cartViewModel = cartViewModel
                             )
                         }
@@ -133,17 +135,17 @@ class DetailProductActivity : AppCompatActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransactionImage(image1: String, image2: String, image3: String,screen:String) {
+fun TransactionImage(image1: String, image2: String, image3: String, screen: String) {
     val context = LocalContext.current
     var selected by remember {
         mutableStateOf("image1")
     }
 
     BackHandler {
-        if(screen=="home"){
+        if (screen == "home") {
             val intent = Intent(context, MainActivity::class.java)
             context.startActivity(intent)
-        }else{
+        } else {
             val intent = Intent(context, CartActivity::class.java)
             intent.putExtra("TYPE", "")
             context.startActivity(intent)
@@ -357,17 +359,27 @@ fun TransactionContent(
     price: Double,
     content: String,
     image: String,
-    productViewModel: ProductViewModel,
     id: String,
-    state: Int,
     cartViewModel: CartViewModel,
 ) {
     val icon1: Painter = painterResource(id = R.drawable.icontru)
     val icon2: Painter = painterResource(id = R.drawable.bookmark)
+
     cartViewModel.getCartsByProductId(id)
     val cartState = cartViewModel.carts.observeAsState(initial = emptyList())
     val cart = cartState.value
     val context = LocalContext.current
+
+    val favoritesViewModel = FavoritesViewModel()
+    val favoriteState = favoritesViewModel.favorite2.observeAsState()
+    val favorites = favoriteState.value
+
+    val userViewModel = UserViewModel()
+
+    SharedPreferencesManager.init(context)
+    val account = userViewModel.getEmailFromSharedPreferences() ?: ""
+
+    favoritesViewModel.getFavoritesByProductId(account, id)
 
     var bienDem by rememberSaveable {
         mutableIntStateOf(1)
@@ -487,91 +499,117 @@ fun TransactionContent(
                     .height(80.dp)
                     .padding(top = 10.dp)
             ) {
-                Card(
-                    shape = RoundedCornerShape(10.dp),
-                    colors = CardDefaults.cardColors(
-                        if (state == 0) {
-                            Color.LightGray
-                        } else {
+                if (favorites != null) {
+                    Card(
+                        shape = RoundedCornerShape(10.dp),
+                        colors = CardDefaults.cardColors(
                             Color.DarkGray
+                        ),
+                        modifier = Modifier
+                            .width(70.dp)
+                            .height(70.dp),
+                        onClick = {
+                            val idFv = favorites.id
+                            favoritesViewModel.deleteFavorites(idFv, account, context)
                         }
-                    ),
-                    modifier = Modifier
-                        .width(70.dp)
-                        .height(70.dp),
-                    onClick = {
-                        if (state == 0) {
-                            productViewModel.updateStateFavorites(
-                                id,
-                                1,
-                                "yêu thích thành công",
-                                "yêu thích thất bại",
-                                context = context
-                            )
-                        } else {
-                            productViewModel.updateStateFavorites(
-                                id,
-                                0,
-                                "Hủy yêu thích thành công",
-                                "Hủy yêu thích thất bại",
-                                context = context
-                            )
-                        }
-
-                    }
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxSize()
                     ) {
-                        Icon(
-                            painter = icon2,
-                            contentDescription = "",
-                            modifier = Modifier
-                                .size(45.dp)
-                                .padding(5.dp)
-                        )
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Icon(
+                                painter = icon2,
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .padding(5.dp)
+                            )
+                        }
+                    }
+                } else {
+                    Card(
+                        shape = RoundedCornerShape(10.dp),
+                        colors = CardDefaults.cardColors(
+                            Color.LightGray
+                        ),
+                        modifier = Modifier
+                            .width(70.dp)
+                            .height(70.dp),
+                        onClick = {
+                            favoritesViewModel.getFavoritesByProductId(account,id)
+                            val fvBody = FavoritesRequest(
+                                productId = id,
+                                productName = name,
+                                image = image,
+                                price = price,
+                                account = account
+                            )
+                            // phuong thuc add to favorites
+                            favoritesViewModel.addProductToFavorites(
+                                account,
+                                fvBody,
+                                "Thêm vào danh sách yêu thịch thành công",
+                                "Thêm vào danh sách thất bại",
+                                context
+                            )
+                        }
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Icon(
+                                painter = icon2,
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .padding(5.dp)
+                            )
+                        }
                     }
                 }
 
+
                 Button(
                     onClick = {
-                        if (cart.isEmpty()) {
-                            val cartBody = CartRequest(
-                                productId = id,
-                                productName = name,
-                                quantity = bienDem,
-                                image = image,
-                                price = price
-                            )
-
-                            cartViewModel.addProductToCart(
-                                id = id,
-                                cartBody,
-                                "Thêm vào giỏ hàng thành công",
-                                "Thêm vào giỏ hàng thất bại",
-                                context
-                            )
-                        } else {
-                            val quantityBefore = cart[0].quantity
-                            val quantitySuggest = 99 - quantityBefore
-                            if (bienDem + quantityBefore < 100) {
-                                cartViewModel.updateQuantityCart(
+                        if (favorites != null) {
+                            if (favorites.id.isEmpty()) {
+                                val cartBody = CartRequest(
                                     productId = id,
-                                    bienDem + quantityBefore,
+                                    productName = name,
+                                    quantity = bienDem,
+                                    image = image,
+                                    price = price
+                                )
+
+                                cartViewModel.addProductToCart(
+                                    id = id,
+                                    cartBody,
                                     "Thêm vào giỏ hàng thành công",
                                     "Thêm vào giỏ hàng thất bại",
-                                    context,
-                                    type = 1
+                                    context
                                 )
-                            } else if (bienDem + quantityBefore >= 100) {
-                                Toast.makeText(
-                                    context,
-                                    "Bạn chỉ có thể mua thêm $quantitySuggest sản phẩm này",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                            } else {
+                                val quantityBefore = cart[0].quantity
+                                val quantitySuggest = 99 - quantityBefore
+                                if (bienDem + quantityBefore < 100) {
+                                    cartViewModel.updateQuantityCart(
+                                        productId = id,
+                                        bienDem + quantityBefore,
+                                        "Thêm vào giỏ hàng thành công",
+                                        "Thêm vào giỏ hàng thất bại",
+                                        context,
+                                        type = 1
+                                    )
+                                } else if (bienDem + quantityBefore >= 100) {
+                                    Toast.makeText(
+                                        context,
+                                        "Bạn chỉ có thể mua thêm $quantitySuggest sản phẩm này",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
 
+                            }
                         }
                     },
                     colors = ButtonDefaults.buttonColors(

@@ -88,49 +88,6 @@ class ProductViewModel : ViewModel() {
         }
     }
 
-    fun getProductsByStateFavorites(stateFavorites: Int) {
-        viewModelScope.launch {
-            try {
-                val response =
-                    RetrofitBase().productService.getProductsByStateFavorites(stateFavorites)
-                Log.d("TAG", "getProductsByStateFavorites: $response")
-
-                if (response.isSuccessful) {
-                    _product.postValue(response.body()?.map { it.toProduct() })
-                } else {
-                    _product.postValue(emptyList())
-                }
-            } catch (e: Exception) {
-                Log.e("TAG", "getProductsByStateFavorites: " + e.message)
-                _product.postValue(emptyList())
-            }
-        }
-    }
-
-    fun updateStateFavorites(
-        productId: String,
-        stateFavorites: Int,
-        successfulNotification: String,
-        failureNotification: String,
-        context: Context
-    ) {
-        viewModelScope.launch {
-            try {
-                val response =
-                    RetrofitBase().productService.updateStateFavorites(productId, stateFavorites)
-                Log.d("TAG", "UpdateStateFavorites: $response")
-                if (response.isSuccessful) {
-                    getProductsByStateFavorites(1)
-                    Toast.makeText(context, successfulNotification, Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, failureNotification, Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Log.e("TAG", "UpdateStateFavorites error: " + e.message)
-            }
-        }
-    }
-
     fun searchProduct(key: String) {
         viewModelScope.launch {
             try {
@@ -145,24 +102,6 @@ class ProductViewModel : ViewModel() {
             } catch (e: Exception) {
                 _product.postValue(emptyList())
                 Log.d("check", "searchPro: $e")
-            }
-        }
-    }
-
-    fun searchProductFavorites(key: String) {
-        viewModelScope.launch {
-            try {
-                val response = RetrofitBase().productService.searchProductFavorites(key)
-                if (response.isSuccessful) {
-                    _product.postValue(response.body()?.map { it.toProduct() })
-                    Log.d("check", "searchProFv: ok")
-                } else {
-                    _product.postValue(emptyList())
-                    Log.d("check", "searchProFv: fail1")
-                }
-            } catch (e: Exception) {
-                _product.postValue(emptyList())
-                Log.d("check", "searchProFv: $e")
             }
         }
     }

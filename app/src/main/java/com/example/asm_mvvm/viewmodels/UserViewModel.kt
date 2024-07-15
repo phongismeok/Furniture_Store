@@ -19,17 +19,15 @@ class UserViewModel() : ViewModel() {
     private val _user = MutableLiveData<List<User>>()
     val user: LiveData<List<User>> = _user
 
-    fun login(context: Context, email: String, password: String,save:Boolean, onResult: (Boolean) -> Unit) {
+    fun login(context: Context, email: String, password: String, onResult: (Boolean) -> Unit) {
         SharedPreferencesManager.init(context)
         viewModelScope.launch {
             try {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            if (save){
                                 SharedPreferencesManager.saveEmail(email)
                                 SharedPreferencesManager.savePassword(password)
-                            }
                             onResult(true)
                         } else {
                             onResult(false)

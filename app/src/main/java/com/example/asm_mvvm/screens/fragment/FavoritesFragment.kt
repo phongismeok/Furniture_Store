@@ -54,6 +54,7 @@ import coil.compose.AsyncImage
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import com.example.asm_mvvm.R
+import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.request.CartRequest
 import com.example.asm_mvvm.screens.activity.DetailProductActivity
 import com.example.asm_mvvm.screens.activity.LoginActivity
@@ -62,8 +63,10 @@ import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyButton2
 import com.example.asm_mvvm.ui.theme.MyToolbar
 import com.example.asm_mvvm.viewmodels.CartViewModel
+import com.example.asm_mvvm.viewmodels.FavoritesViewModel
 import com.example.asm_mvvm.viewmodels.ProductViewModel
 import com.example.asm_mvvm.viewmodels.TypeViewModel
+import com.example.asm_mvvm.viewmodels.UserViewModel
 
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -80,24 +83,33 @@ fun FavoritesFragment() {
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun ListFavorites(dataSearch:String) {
-    val productViewModel = ProductViewModel()
+    val context = LocalContext.current
+    SharedPreferencesManager.init(context)
+    val favoritesViewModel = FavoritesViewModel()
+    val userViewModel = UserViewModel()
 
     val icon: Painter = painterResource(id = R.drawable.cancel)
     val icon2: Painter = painterResource(id = R.drawable.icbag)
 
-    val productsState = productViewModel.products.observeAsState(initial = emptyList())
-    val products = productsState.value
+    val favoriteState = favoritesViewModel.favorites.observeAsState(initial = emptyList())
+    val favorites = favoriteState.value
+    val account = userViewModel.getEmailFromSharedPreferences()
+
     if(dataSearch == ""){
-        productViewModel.getProductsByStateFavorites(1)
+        // goi phuong thuc call data binh thuong
+        if (account != null) {
+            favoritesViewModel.getFavoritesByAccount(account)
+        }
     }else{
-        productViewModel.searchProductFavorites(dataSearch)
+        // goi phuong thuc search
+        if (account != null) {
+            favoritesViewModel.searchFavorites(dataSearch,account)
+        }
     }
 
     var showDialog by remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
-
-    if (products.isEmpty()) {
+    if (favorites.isEmpty()) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -128,17 +140,16 @@ fun ListFavorites(dataSearch:String) {
                 .padding(top = 10.dp)
                 .fillMaxHeight()
         ) {
-            items(products.size) { index ->
+            items(favorites.size) { index ->
                 if (showDialog) {
                     DialogAddToCartFv(
                         onDismissRequest = { showDialog = false },
-                        productId = products[index].id,
-                        productName = products[index].productName,
-                        image = products[index].image1,
-                        price = products[index].price
+                        productId = favorites[index].id,
+                        productName = favorites[index].productName,
+                        image = favorites[index].image,
+                        price = favorites[index].price
                     )
                 }
-
 
                 Card(
                     modifier = Modifier
@@ -169,7 +180,7 @@ fun ListFavorites(dataSearch:String) {
                                 shape = RoundedCornerShape(15.dp),
                             ) {
                                 AsyncImage(
-                                    model = products[index].image1,
+                                    model = favorites[index].image,
                                     contentDescription = null,
                                     contentScale = ContentScale.FillBounds,
                                     modifier = Modifier.fillMaxHeight()
@@ -177,9 +188,9 @@ fun ListFavorites(dataSearch:String) {
                             }
                             //
                             Column(modifier = Modifier.padding(start = 15.dp)) {
-                                Text(text = products[index].productName, fontSize = 20.sp)
+                                Text(text = favorites[index].productName, fontSize = 20.sp)
                                 Text(
-                                    text = "$ " + products[index].price,
+                                    text = "$ " + favorites[index].price,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -191,13 +202,10 @@ fun ListFavorites(dataSearch:String) {
                             Icon(painter = icon, contentDescription = "", modifier = Modifier
                                 .size(30.dp)
                                 .clickable {
-                                    productViewModel.updateStateFavorites(
-                                        products[index].id,
-                                        0,
-                                        "Hủy yêu thích thành công",
-                                        "Hủy yêu thích thất bại",
-                                        context = context
-                                    )
+                                    // goi phuong thuc xoa favorites
+                                    if (account != null) {
+                                        favoritesViewModel.deleteFavorites(favorites[index].id,account,context)
+                                    }
                                 })
                             Spacer(modifier = Modifier.weight(1f))
                             Icon(

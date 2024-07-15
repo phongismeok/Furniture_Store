@@ -3,6 +3,7 @@ package com.example.asm_mvvm.screens.activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -41,22 +42,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.asm_mvvm.MainActivity
+import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.ui.theme.AnimationLoading
 import com.example.asm_mvvm.ui.theme.MyFloatingButton
 import com.example.asm_mvvm.ui.theme.MyToolbar3
 import com.example.asm_mvvm.viewmodels.ShippingViewModel
+import com.example.asm_mvvm.viewmodels.UserViewModel
 
 class ShippingActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        SharedPreferencesManager.init(applicationContext)
         val priceNhan = intent.getStringExtra("PRICE")
+        val getId = intent.getStringExtra("CLICK") ?: ""
+
         setContent {
             Column(modifier = Modifier.fillMaxSize()) {
                 MyToolbar3(title = "Shipping address")
                 Box(modifier = Modifier.fillMaxSize()) {
-                    ListShip()
+                    ListShip(id = getId)
                     Box(
                         contentAlignment = Alignment.BottomEnd, modifier = Modifier
                             .padding(end = 20.dp, bottom = 70.dp)
@@ -79,16 +85,21 @@ class ShippingActivity : AppCompatActivity() {
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ListShip() {
+fun ListShip(id: String) {
     val shippingViewModel = ShippingViewModel()
+    val userViewModel = UserViewModel()
+
+    val account = userViewModel.getEmailFromSharedPreferences() ?: ""
 
     val shipState = shippingViewModel.ships.observeAsState(initial = emptyList())
     val ships = shipState.value
     val context = LocalContext.current
 
-    shippingViewModel.getShipping()
+    shippingViewModel.getShipAddressByAccount(account)
 
     var dataClick by remember { mutableStateOf("") }
+    var dataOld by remember { mutableStateOf(id) }
+    var isChecked by remember { mutableStateOf(false) }
 
     if (ships.isEmpty()) {
         AnimationLoading()
@@ -96,24 +107,14 @@ fun ListShip() {
         LazyColumn {
             items(ships.size) { index ->
 
-                if (dataClick == ships[index].id) {
-                    shippingViewModel.updateSelectShipping(
-                        ships[index].id,
-                        1,
-                        "Thay đổi địa chỉ thành công",
-                        "Thay đổi địa chỉ thất bại",
-                        context,
-                        1
-                    )
+                if (id == ships[index].id && dataClick == "") {
+                    isChecked = true
                 } else {
-                    shippingViewModel.updateSelectShipping(
-                        ships[index].id,
-                        0,
-                        "Thay đổi địa chỉ thành công",
-                        "Thay đổi địa chỉ thất bại",
-                        context,
-                        0
-                    )
+                    if (dataClick == ships[index].id) {
+                        isChecked = true
+                    } else {
+                        isChecked = false
+                    }
                 }
 
                 Column(
@@ -130,9 +131,29 @@ fun ListShip() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
-                            checked = dataClick == ships[index].id,
+                            checked = isChecked,
                             onCheckedChange = {
                                 dataClick = ships[index].id
+                                shippingViewModel.updateSelectShipping(
+                                    ships[index].id,
+                                    1,
+                                    "Thay đổi địa chỉ thành công",
+                                    "Thay đổi địa chỉ thất bại",
+                                    context,
+                                    1
+                                )
+
+                                shippingViewModel.updateSelectShipping(
+                                    dataOld,
+                                    0,
+                                    "Thay đổi địa chỉ thành công",
+                                    "Thay đổi địa chỉ thất bại",
+                                    context,
+                                    0
+                                )
+
+                                dataOld = ships[index].id
+
                             }
                         )
                         Text(
@@ -204,7 +225,7 @@ fun TitleShip(tittle: String) {
 }
 
 @Composable
-fun ClickBackShip (price:String) {
+fun ClickBackShip(price: String) {
     val context = LocalContext.current
     BackHandler {
         val intent = Intent(context, CheckOutActivity::class.java)

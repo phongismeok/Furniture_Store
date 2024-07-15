@@ -52,10 +52,10 @@ class ShippingViewModel : ViewModel() {
         }
     }
 
-    fun getShipAddressBySelect(select: Int) {
+    fun getShipAddressBySelect(select: Int,account:String) {
         viewModelScope.launch {
             try {
-                val response = RetrofitBase().shippingService.getShippingBySelect(select)
+                val response = RetrofitBase().shippingService.getShippingBySelect(select,account)
                 Log.d("TAG", "getShipSl: $response")
 
                 if (response.isSuccessful) {
@@ -96,7 +96,6 @@ class ShippingViewModel : ViewModel() {
             }
         }
     }
-
 
 
 }
