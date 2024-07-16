@@ -1,6 +1,7 @@
 package com.example.asm_mvvm.viewmodels
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
@@ -9,7 +10,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.asm_mvvm.models.Product
 import com.example.asm_mvvm.models.Shipping
+import com.example.asm_mvvm.request.FavoritesRequest
+import com.example.asm_mvvm.request.ShippingRequest
 import com.example.asm_mvvm.retrofit.RetrofitBase
+import com.example.asm_mvvm.screens.activity.ShippingActivity
+import com.example.asm_mvvm.screens.activity.SignUpActivity
 import kotlinx.coroutines.launch
 
 class ShippingViewModel : ViewModel() {
@@ -97,5 +102,24 @@ class ShippingViewModel : ViewModel() {
         }
     }
 
+    fun addProductToShipping(
+        shippingRequest: ShippingRequest,
+        successfulNotification: String,
+        failureNotification: String,
+        context: Context
+    ) {
+        viewModelScope.launch {
+            shippingRequest.id =null
+
+            val response = RetrofitBase().shippingService.addShipping(shippingRequest)
+            if (response.isSuccessful) {
+                Toast.makeText(context, successfulNotification, Toast.LENGTH_SHORT).show()
+                val intent = Intent(context, ShippingActivity::class.java)
+                context.startActivity(intent)
+            }else{
+                Toast.makeText(context, failureNotification, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
 }

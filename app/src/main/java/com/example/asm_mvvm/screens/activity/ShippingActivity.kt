@@ -166,7 +166,7 @@ fun ListShip(id: String) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp)
+                            .height(220.dp)
                             .padding(10.dp),
                         shape = RoundedCornerShape(15.dp),
                         colors = CardDefaults.cardColors(
@@ -187,6 +187,16 @@ fun ListShip(id: String) {
                         Text(
                             text = ships[index].address,
                             fontSize = 20.sp,
+                            modifier = Modifier.padding(15.dp)
+                        )
+                        Divider(
+                            modifier = Modifier
+                                .height(1.dp)
+                                .fillMaxWidth()
+                        )
+                        Text(
+                            text = ships[index].addressDetail,
+                            fontSize = 18.sp,
                             modifier = Modifier.padding(15.dp)
                         )
                     }

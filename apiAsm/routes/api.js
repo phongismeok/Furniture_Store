@@ -7,6 +7,10 @@ const userController = require('../controller/userController');
 const cartController = require('../controller/cartController');
 const shipController = require('../controller/shipController');
 const favoritesController = require('../controller/favoritesController');
+const paymentController = require('../controller/paymentController');
+const orderController = require('../controller/orderController');
+const notificationController = require('../controller/notificationController');
+const commentController = require('../controller/commentController');
 
 // product
 router.get('/get-list-products', productController.getAllProduct);
@@ -45,5 +49,14 @@ router.get('/get-favorite-by-productId/:account/:productId',favoritesController.
 router.post('/add-favorite',favoritesController.addFavorites)
 router.delete('/delete-favorite/:id',favoritesController.deleteFavorites)
 router.get('/search-favorites',favoritesController.searchFavorites);
+
+// payment
+router.get('/get-list-payments',paymentController.getAllPayment)
+router.get('/get-list-payment-by-account/:account',paymentController.getAllPaymentByAccount);
+router.get('/get-list-payment-by-select/:select/:account',paymentController.getAllPaymentBySelectAndAccount);
+router.delete('/delete-payment/:id',paymentController.deletePayment)
+router.post('/add-payment',paymentController.addPayment)
+router.put('/update-select-payment',paymentController.updateSelectPayment);
+router.put('/update-payment',paymentController.updatePayment);
 
 module.exports = router;

@@ -4,6 +4,7 @@ data class Shipping (
     val id: String,
     val name: String,
     val address: String,
+    val addressDetail: String,
     val account: String,
     val select: Int
 )

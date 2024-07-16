@@ -4,10 +4,13 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitBase {
+    private val baseUrl = "http://192.168.0.105:3000/api/"
+
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.0.105:3000/api/")
+        .baseUrl(baseUrl)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
+
     val productService: ProductService by lazy {
         retrofit.create(ProductService::class.java)
     }

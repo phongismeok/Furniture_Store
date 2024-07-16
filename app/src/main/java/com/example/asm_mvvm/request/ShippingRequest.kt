@@ -6,6 +6,7 @@ data class ShippingRequest (
     @SerializedName("_id") var id: String? = null,
     val name: String,
     val address: String,
+    val addressDetail: String,
     val account: String,
     val select: Int
 )
