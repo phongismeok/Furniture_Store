@@ -19,49 +19,45 @@ class CartViewModel : ViewModel() {
     private val _cart = MutableLiveData<List<Cart>>()
     val carts: LiveData<List<Cart>> = _cart
 
-    init {
-        getCart()
-    }
+    private val _cart2 = MutableLiveData<CartResponse>()
+    val carts2: LiveData<CartResponse> = _cart2
 
-    private fun getCart() {
+
+    fun getCartByAccount(account: String) {
         viewModelScope.launch {
             try {
-                val response = RetrofitBase().cartService.getListCart()
+                val response = RetrofitBase().cartService.getCartByAccount(account)
+                Log.d("TAG", "getCart: $response")
+
                 if (response.isSuccessful) {
                     _cart.postValue(response.body()?.map { it.toCart() })
-                    Log.d("check", "getCart: ok")
                 } else {
                     _cart.postValue(emptyList())
-                    Log.d("check", "getCart: fail1")
                 }
             } catch (e: Exception) {
+                Log.e("TAG", "getCart: " + e.message)
                 _cart.postValue(emptyList())
-                Log.d("check", "getCart: $e")
             }
-
         }
     }
 
-    fun getCartsByProductId(id: String) {
+    fun getCartsByProductId(account: String,id: String) {
         viewModelScope.launch {
             try {
-                val response = RetrofitBase().cartService.getCartByProductId(id)
-                Log.d("TAG", "getCartByPrdId: $response")
-
-                if (response.isSuccessful) {
-                    _cart.postValue(response.body()?.map { it.toCart() })
+                val response = RetrofitBase().cartService.getCartByProductId(account,id)
+                if (response.isSuccessful && response.body() != null) {
+                    _cart2.value = response.body()
                 } else {
-                    _cart.postValue(emptyList())
+                    Log.d("check", "getFvByIdPro: fail1")
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "getCartByPrdId: " + e.message)
-                _cart.postValue(emptyList())
+//                Log.e("TAG", "getCartByPrdId: " + e.message)
             }
         }
     }
 
     fun addProductToCart(
-        id: String,
+        account: String,
         cartRequest: CartRequest,
         successfulNotification: String,
         failureNotification: String,
@@ -69,10 +65,9 @@ class CartViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             cartRequest.id =null
-
             val response = RetrofitBase().cartService.addProductToCart(cartRequest)
             if (response.isSuccessful) {
-                getCartsByProductId(id = id)
+                getCartByAccount(account)
                 Toast.makeText(context, successfulNotification, Toast.LENGTH_SHORT).show()
             }else{
                 Toast.makeText(context, failureNotification, Toast.LENGTH_SHORT).show()
@@ -81,8 +76,9 @@ class CartViewModel : ViewModel() {
     }
 
     fun updateQuantityCart(
-        productId: String,
+        id: String,
         quantity: Int,
+        account: String,
         successfulNotification: String,
         failureNotification: String,
         context: Context,
@@ -91,10 +87,10 @@ class CartViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response =
-                    RetrofitBase().cartService.updateQuantityCart(productId, quantity)
+                    RetrofitBase().cartService.updateQuantityCart(id, quantity)
                 Log.d("TAG", "UpdateQuantity: $response")
                 if (response.isSuccessful) {
-                    getCart()
+                    getCartByAccount(account)
                     if(type==1){
                         Toast.makeText(context, successfulNotification, Toast.LENGTH_SHORT).show()
                     }
@@ -109,12 +105,12 @@ class CartViewModel : ViewModel() {
         }
     }
 
-    fun deleteCart(id: String,context: Context) {
+    fun deleteCart(id: String,account: String,context: Context) {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().cartService.deleteCart(id)
                 if (response.isSuccessful) {
-                    getCart()
+                    getCartByAccount(account)
                     Toast.makeText(context, "Xoá thành công", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(context, "Xóa thất bại", Toast.LENGTH_SHORT).show()

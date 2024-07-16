@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.example.asm_mvvm.R
+import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.request.CartRequest
 import com.example.asm_mvvm.screens.activity.DetailProductActivity
 import com.example.asm_mvvm.ui.theme.AnimationLoading
@@ -55,6 +56,7 @@ import com.example.asm_mvvm.ui.theme.MyToolbar
 import com.example.asm_mvvm.viewmodels.CartViewModel
 import com.example.asm_mvvm.viewmodels.ProductViewModel
 import com.example.asm_mvvm.viewmodels.TypeViewModel
+import com.example.asm_mvvm.viewmodels.UserViewModel
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
@@ -65,7 +67,7 @@ fun HomeFragment() {
             .fillMaxSize()
             .background(Color(0xFFFFFEFD))
     ) {
-        MyToolbar(title = "Home", type = "home","Search product",textState)
+        MyToolbar(title = "Home", type = "home", "Search product", textState)
         ListType(textState.value)
     }
 }
@@ -73,7 +75,7 @@ fun HomeFragment() {
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListType(textSearch:String) {
+fun ListType(textSearch: String) {
     val typeViewModel = TypeViewModel()
 
     val typesState = typeViewModel.types.observeAsState(initial = emptyList())
@@ -151,7 +153,7 @@ fun ListType(textSearch:String) {
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListProduct(type: String,dataSearch:String) {
+fun ListProduct(type: String, dataSearch: String) {
 
     val productViewModel = ProductViewModel()
     val context = LocalContext.current
@@ -159,7 +161,7 @@ fun ListProduct(type: String,dataSearch:String) {
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
 
-    if(dataSearch == ""){
+    if (dataSearch == "") {
         when (type) {
             "" -> {
                 productViewModel.getProduct()
@@ -173,7 +175,7 @@ fun ListProduct(type: String,dataSearch:String) {
                 productViewModel.getProductsByTypeProduct(type)
             }
         }
-    }else{
+    } else {
         productViewModel.searchProduct(dataSearch)
     }
 
@@ -290,11 +292,16 @@ fun DialogAddToCart(
     price: Double,
 ) {
     val cartViewModel = CartViewModel()
+    val userViewModel = UserViewModel()
 
-    cartViewModel.getCartsByProductId(productId)
-    val cartState = cartViewModel.carts.observeAsState(initial = emptyList())
+
+    val cartState = cartViewModel.carts2.observeAsState()
     val cart = cartState.value
     val context = LocalContext.current
+    SharedPreferencesManager.init(context)
+
+    val account = userViewModel.getEmailFromSharedPreferences() ?: ""
+    cartViewModel.getCartsByProductId(account, productId)
 
     var quantityInput by remember { mutableStateOf("") }
 
@@ -346,29 +353,15 @@ fun DialogAddToCart(
                         try {
                             val quantity = quantityInput.toInt()
                             if (quantity in 1..99) {
-                                if (cart.isEmpty()) {
-                                    val cartBody = CartRequest(
-                                        productId = productId,
-                                        productName = productName,
-                                        quantity = quantity,
-                                        image = image,
-                                        price = price
-                                    )
-                                    cartViewModel.addProductToCart(
-                                        id = productId,
-                                        cartBody,
-                                        "Thêm vào giỏ hàng thành công",
-                                        "Thêm vào giỏ hàng thất bại",
-                                        context
-                                    )
-                                } else {
-                                    val quantityBefore = cart[0].quantity
+                                if (cart != null) {
+                                    val quantityBefore = cart.quantity
                                     val quantitySuggest = 99 - quantityBefore
 
                                     if (quantity <= quantitySuggest) {
                                         cartViewModel.updateQuantityCart(
-                                            productId = productId,
+                                            id = cart.id,
                                             quantity + quantityBefore,
+                                            account = account,
                                             "Thêm vào giỏ hàng thành công",
                                             "Thêm vào giỏ hàng thất bại",
                                             context,
@@ -381,6 +374,23 @@ fun DialogAddToCart(
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
+
+                                } else {
+                                    val cartBody = CartRequest(
+                                        productId = productId,
+                                        productName = productName,
+                                        quantity = quantity,
+                                        image = image,
+                                        price = price,
+                                        account = account
+                                    )
+                                    cartViewModel.addProductToCart(
+                                        account,
+                                        cartBody,
+                                        "Thêm vào giỏ hàng thành công",
+                                        "Thêm vào giỏ hàng thất bại",
+                                        context
+                                    )
                                 }
                             } else {
                                 Toast.makeText(

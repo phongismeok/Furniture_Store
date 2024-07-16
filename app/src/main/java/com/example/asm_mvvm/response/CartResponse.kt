@@ -10,6 +10,7 @@ data class CartResponse (
     @SerializedName("quantity") val quantity: Int,
     @SerializedName("image") val image: String,
     @SerializedName("price") val price: Double,
+    @SerializedName("account") val account:String
 ){
     fun toCart(): Cart {
         return Cart(
@@ -18,7 +19,8 @@ data class CartResponse (
             productName = this.productName,
             quantity = this.quantity,
             image = this.image,
-            price = this.price
+            price = this.price,
+            account = this.account
         )
     }
 

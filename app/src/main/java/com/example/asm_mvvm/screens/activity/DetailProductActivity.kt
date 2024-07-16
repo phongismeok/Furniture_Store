@@ -70,7 +70,6 @@ class DetailProductActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val cartViewModel = CartViewModel()
         val productViewModel = ProductViewModel()
         val idPro = intent.getStringExtra("ID_PRODUCT")
         val screen = intent.getStringExtra("SCREEN")
@@ -114,8 +113,7 @@ class DetailProductActivity : AppCompatActivity() {
                                 price = it.price,
                                 content = it.describe,
                                 image = it.image1,
-                                it.id,
-                                cartViewModel = cartViewModel
+                                it.id
                             )
                         }
                     } ?: run {
@@ -360,13 +358,13 @@ fun TransactionContent(
     content: String,
     image: String,
     id: String,
-    cartViewModel: CartViewModel,
 ) {
     val icon1: Painter = painterResource(id = R.drawable.icontru)
     val icon2: Painter = painterResource(id = R.drawable.bookmark)
 
-    cartViewModel.getCartsByProductId(id)
-    val cartState = cartViewModel.carts.observeAsState(initial = emptyList())
+    val cartViewModel = CartViewModel()
+
+    val cartState = cartViewModel.carts2.observeAsState()
     val cart = cartState.value
     val context = LocalContext.current
 
@@ -379,6 +377,7 @@ fun TransactionContent(
     SharedPreferencesManager.init(context)
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
 
+    cartViewModel.getCartsByProductId(account,id)
     favoritesViewModel.getFavoritesByProductId(account, id)
 
     var bienDem by rememberSaveable {
@@ -572,30 +571,15 @@ fun TransactionContent(
 
                 Button(
                     onClick = {
-                        if (favorites != null) {
-                            if (favorites.id.isEmpty()) {
-                                val cartBody = CartRequest(
-                                    productId = id,
-                                    productName = name,
-                                    quantity = bienDem,
-                                    image = image,
-                                    price = price
-                                )
 
-                                cartViewModel.addProductToCart(
-                                    id = id,
-                                    cartBody,
-                                    "Thêm vào giỏ hàng thành công",
-                                    "Thêm vào giỏ hàng thất bại",
-                                    context
-                                )
-                            } else {
-                                val quantityBefore = cart[0].quantity
+                        if (cart != null) {
+                                val quantityBefore = cart.quantity
                                 val quantitySuggest = 99 - quantityBefore
                                 if (bienDem + quantityBefore < 100) {
                                     cartViewModel.updateQuantityCart(
-                                        productId = id,
+                                        cart.id,
                                         bienDem + quantityBefore,
+                                        account = account,
                                         "Thêm vào giỏ hàng thành công",
                                         "Thêm vào giỏ hàng thất bại",
                                         context,
@@ -608,9 +592,24 @@ fun TransactionContent(
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
-
-                            }
+                        }else{
+                            val cartBody = CartRequest(
+                                productId = id,
+                                productName = name,
+                                quantity = bienDem,
+                                image = image,
+                                price = price,
+                                account = account
+                            )
+                            cartViewModel.addProductToCart(
+                                account,
+                                cartBody,
+                                "Thêm vào giỏ hàng thành công",
+                                "Thêm vào giỏ hàng thất bại",
+                                context
+                            )
                         }
+
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.Black,

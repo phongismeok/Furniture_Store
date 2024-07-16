@@ -3,7 +3,6 @@ package com.example.asm_mvvm.screens.activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -41,7 +40,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,11 +60,12 @@ import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import com.example.asm_mvvm.MainActivity
 import com.example.asm_mvvm.R
-import com.example.asm_mvvm.ui.theme.Animation
+import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyButton2
 import com.example.asm_mvvm.ui.theme.MyToolbar3
 import com.example.asm_mvvm.viewmodels.CartViewModel
+import com.example.asm_mvvm.viewmodels.UserViewModel
 
 class CartActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
@@ -88,7 +87,7 @@ class CartActivity : AppCompatActivity() {
 @Composable
 fun ListCart(screen: String) {
     val context = LocalContext.current
-
+    SharedPreferencesManager.init(context)
     BackHandler {
         val intent = Intent(context, MainActivity::class.java)
         intent.putExtra("TYPE2", screen)
@@ -96,15 +95,18 @@ fun ListCart(screen: String) {
     }
 
     val cartViewModel = CartViewModel()
+    val userViewModel = UserViewModel()
 
     val cartState = cartViewModel.carts.observeAsState(initial = emptyList())
     val carts = cartState.value
+
 
     val icon: Painter = painterResource(id = R.drawable.cancel)
     val icon1: Painter = painterResource(id = R.drawable.icontru)
 
     val totalPrice = carts.sumOf { it.price * it.quantity.toDouble() }
-
+    val account = userViewModel.getEmailFromSharedPreferences() ?: ""
+    cartViewModel.getCartByAccount(account)
     if (carts.isEmpty()) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -211,8 +213,9 @@ fun ListCart(screen: String) {
                                         newQuantity = newQuantity.plus(1)
                                         if (newQuantity < 100) {
                                             cartViewModel.updateQuantityCart(
-                                                productId = carts[index].productId,
+                                                id = carts[index].id,
                                                 newQuantity,
+                                                account,
                                                 "",
                                                 "",
                                                 context,
@@ -262,14 +265,17 @@ fun ListCart(screen: String) {
                                         var newQuantity2 = carts[index].quantity
                                         newQuantity2 = newQuantity2.minus(1)
                                         if (newQuantity2 > 0) {
-                                            cartViewModel.updateQuantityCart(
-                                                productId = carts[index].productId,
-                                                newQuantity2,
-                                                "b",
-                                                "",
-                                                context,
-                                                type = 0
-                                            )
+                                            if (account != null) {
+                                                cartViewModel.updateQuantityCart(
+                                                    id = carts[index].id,
+                                                    newQuantity2,
+                                                    account,
+                                                    "b",
+                                                    "",
+                                                    context,
+                                                    type = 0
+                                                )
+                                            }
                                         } else {
                                             Toast.makeText(
                                                 context,
@@ -310,7 +316,9 @@ fun ListCart(screen: String) {
                                         .size(30.dp)
                                         .clickable {
                                             val id = carts[index].id
-                                            cartViewModel.deleteCart(id, context)
+                                            if (account != null) {
+                                                cartViewModel.deleteCart(id, account, context)
+                                            }
                                         }
                                 )
 

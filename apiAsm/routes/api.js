@@ -116,20 +116,33 @@ router.get('/get-user-by-username/:username', async (req, res) => {
 });
 
 // cart
-router.get('/get-cart-by-productId/:productId', async (req, res) => {
+router.get('/get-list-cart-by-account/:account', async (req, res) => {
     try {
-        const { productId } = req.params;
-        const data = await Carts.find({ productId: productId }).populate('productId');
-        res.status(200).send(data)
-        console.log(data)
+        const { account } = req.params;
+        const data = await Carts.find({ account: account }).populate('account');
+        res.send(data).status(200)
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            "status": 500,
-            "message": "Đã xảy ra lỗi khi tìm kiếm user"
-        });
+        res.send("loi").status(500)
     }
 });
+
+router.get('/get-cart-by-productId/:account/:productId', async (req, res) => {
+    try {
+        const { account, productId } = req.params;
+        const data = await Carts.findOne({ account: account, productId: productId }).populate('account');
+        console.log(data)
+        if (data) {
+            res.send(data).status(200);
+        } else {
+            res.send("Không tìm thấy dữ liệu").status(404);
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send("Lỗi");
+    }
+});
+
 
 router.post('/add-product-to-cart', async (req, res) => {
     try {
@@ -141,9 +154,9 @@ router.post('/add-product-to-cart', async (req, res) => {
         let kq = await Carts.create(product);
 
         if(kq){
-            res.status(204).send("thêm thành công");
+            res.send("thêm thành công").status(204);
         }else{
-            res.status(400).send("thêm thất bại");
+            res.send("thêm thất bại").status(400);
         }
 
     } catch (error) {
@@ -152,28 +165,20 @@ router.post('/add-product-to-cart', async (req, res) => {
 
 })
 
-router.get('/get-list-cart', async (req, res) => {
-    try {
-        const data = await Carts.find().populate();
-        res.status(200).send(data)
-    } catch (error) {
-        console.log(error);
-    }
-})
-
 router.put('/update-quantity-cart', async (req, res) => {
     try {
         // Lấy id từ query
-        let id = req.query.productId;
+        let id = req.query.id;
         console.log(id);
 
         // Lấy giá trị mới của thuộc tính stateFavorite từ request body
         let { quantity } = req.body;
+        console.log({quantity})
 
         // Cập nhật duy nhất thuộc tính quantity
-        await Carts.updateOne({ productId: id }, { $set: { quantity: quantity } });
+        await Carts.updateOne({ _id: id }, { $set: { quantity: quantity } });
 
-        res.status(204).send("Cập nhật thành công");
+        res.send("Cập nhật thành công").status(204);
 
     } catch (error) {
         console.error("Lỗi khi cập nhật cart:", error);

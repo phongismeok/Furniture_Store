@@ -8,5 +8,6 @@ data class CartRequest (
     val productName: String,
     val quantity: Int,
     val image: String,
-    val price: Double
+    val price: Double,
+    val account:String
 )

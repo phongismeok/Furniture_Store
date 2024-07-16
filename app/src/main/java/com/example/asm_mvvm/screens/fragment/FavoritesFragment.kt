@@ -74,7 +74,7 @@ import com.example.asm_mvvm.viewmodels.UserViewModel
 fun FavoritesFragment() {
     val textState = remember { mutableStateOf("") }
     Column(modifier = Modifier.fillMaxSize()) {
-        MyToolbar(title = "Favorites", type = "favorites","Search favorites",textState)
+        MyToolbar(title = "Favorites", type = "favorites", "Search favorites", textState)
         ListFavorites(textState.value)
     }
 }
@@ -82,7 +82,7 @@ fun FavoritesFragment() {
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ListFavorites(dataSearch:String) {
+fun ListFavorites(dataSearch: String) {
     val context = LocalContext.current
     SharedPreferencesManager.init(context)
     val favoritesViewModel = FavoritesViewModel()
@@ -95,15 +95,15 @@ fun ListFavorites(dataSearch:String) {
     val favorites = favoriteState.value
     val account = userViewModel.getEmailFromSharedPreferences()
 
-    if(dataSearch == ""){
+    if (dataSearch == "") {
         // goi phuong thuc call data binh thuong
         if (account != null) {
             favoritesViewModel.getFavoritesByAccount(account)
         }
-    }else{
+    } else {
         // goi phuong thuc search
         if (account != null) {
-            favoritesViewModel.searchFavorites(dataSearch,account)
+            favoritesViewModel.searchFavorites(dataSearch, account)
         }
     }
 
@@ -204,7 +204,11 @@ fun ListFavorites(dataSearch:String) {
                                 .clickable {
                                     // goi phuong thuc xoa favorites
                                     if (account != null) {
-                                        favoritesViewModel.deleteFavorites(favorites[index].id,account,context)
+                                        favoritesViewModel.deleteFavorites(
+                                            favorites[index].id,
+                                            account,
+                                            context
+                                        )
                                     }
                                 })
                             Spacer(modifier = Modifier.weight(1f))
@@ -238,11 +242,16 @@ fun DialogAddToCartFv(
 ) {
 
     val cartViewModel = CartViewModel()
+    val userViewModel = UserViewModel()
 
-    cartViewModel.getCartsByProductId(productId)
-    val cartState = cartViewModel.carts.observeAsState(initial = emptyList())
+
+    val cartState = cartViewModel.carts2.observeAsState()
     val cart = cartState.value
     val context = LocalContext.current
+    SharedPreferencesManager.init(context)
+
+    val account = userViewModel.getEmailFromSharedPreferences() ?: ""
+    cartViewModel.getCartsByProductId(account, productId)
 
     var quantityInput by remember { mutableStateOf("") }
 
@@ -283,29 +292,16 @@ fun DialogAddToCartFv(
                         try {
                             val quantity = quantityInput.toInt()
                             if (quantity in 1..99) {
-                                if (cart.isEmpty()) {
-                                    val cartBody = CartRequest(
-                                        productId = productId,
-                                        productName = productName,
-                                        quantity = quantity,
-                                        image = image,
-                                        price = price
-                                    )
-                                    cartViewModel.addProductToCart(
-                                        id = productId,
-                                        cartBody,
-                                        "Thêm vào giỏ hàng thành công",
-                                        "Thêm vào giỏ hàng thất bại",
-                                        context
-                                    )
-                                } else {
-                                    val quantityBefore = cart[0].quantity
+                                if (cart != null) {
+
+                                    val quantityBefore = cart.quantity
                                     val quantitySuggest = 99 - quantityBefore
 
                                     if (quantity <= quantitySuggest) {
                                         cartViewModel.updateQuantityCart(
-                                            productId = productId,
+                                            id = cart.id,
                                             quantity + quantityBefore,
+                                            account = account,
                                             "Thêm vào giỏ hàng thành công",
                                             "Thêm vào giỏ hàng thất bại",
                                             context,
@@ -318,6 +314,23 @@ fun DialogAddToCartFv(
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
+
+                                } else {
+                                    val cartBody = CartRequest(
+                                        productId = productId,
+                                        productName = productName,
+                                        quantity = quantity,
+                                        image = image,
+                                        price = price,
+                                        account = account
+                                    )
+                                    cartViewModel.addProductToCart(
+                                        account,
+                                        cartBody,
+                                        "Thêm vào giỏ hàng thành công",
+                                        "Thêm vào giỏ hàng thất bại",
+                                        context
+                                    )
                                 }
                             } else {
                                 Toast.makeText(

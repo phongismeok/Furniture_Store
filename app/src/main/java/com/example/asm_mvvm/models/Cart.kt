@@ -7,4 +7,5 @@ data class Cart(
     val quantity: Int,
     val image: String,
     val price: Double,
+    val account:String
 )

@@ -39,24 +39,6 @@ class FavoritesViewModel : ViewModel() {
         }
     }
 
-    fun getFavoritesById(account:String,id: String,) {
-        viewModelScope.launch {
-            try {
-                val response = RetrofitBase().favoritesService.getFavoritesByAccountAndId(account,id)
-                if (response.isSuccessful) {
-                    _favorites.postValue(response.body()?.map { it.toFavorites() })
-                    Log.d("check", "getFvById: ok")
-                } else {
-                    _favorites.postValue(emptyList())
-                    Log.d("check", "getFvById: fail1")
-                }
-            } catch (e: Exception) {
-                _favorites.postValue(emptyList())
-                Log.d("check", "getFvById: $e")
-            }
-        }
-    }
-
     fun getFavoritesByProductId(account:String,productId: String) {
         viewModelScope.launch {
             try {
