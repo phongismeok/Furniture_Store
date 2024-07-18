@@ -59,4 +59,11 @@ router.post('/add-payment',paymentController.addPayment)
 router.put('/update-select-payment',paymentController.updateSelectPayment);
 router.put('/update-payment',paymentController.updatePayment);
 
+// notification
+router.get('/get-list-notification-by-account/:account',notificationController.getAllNotificationByAccount);
+router.get('/search-notification/:account',notificationController.searchNotification);
+router.post('/add-notification',notificationController.addNotification)
+router.put('/update-state-notification',notificationController.updateState);
+router.delete('/delete-notification/:id',notificationController.deleteNotification)
+
 module.exports = router;

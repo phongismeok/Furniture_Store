@@ -168,7 +168,7 @@ class LoginActivity : AppCompatActivity() {
                             onCheckedChange = { checked = it }
                         )
                         Text(
-                            "Remember me", textAlign = TextAlign.Start, fontSize = 18.sp
+                            "Remember me", textAlign = TextAlign.Start, fontSize = 15.sp
                         )
                     }
 
@@ -180,7 +180,7 @@ class LoginActivity : AppCompatActivity() {
                         Text(
                             text = "Forget Password?",
                             textDecoration = TextDecoration.Underline,
-                            fontSize = 18.sp
+                            fontSize = 15.sp
                         )
                     }
                 }

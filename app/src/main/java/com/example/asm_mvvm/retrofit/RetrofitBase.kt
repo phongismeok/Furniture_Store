@@ -29,4 +29,7 @@ class RetrofitBase {
     val favoritesService: FavoritesService by lazy {
         retrofit.create(FavoritesService::class.java)
     }
+    val notificationService: NotificationService by lazy {
+        retrofit.create(NotificationService::class.java)
+    }
 }

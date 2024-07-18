@@ -96,7 +96,7 @@ fun MyButton(
             text = title,
             color = mauChu,
             fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight(500)
         )
     }
 }
@@ -121,7 +121,33 @@ fun MyButton2(
             text = title,
             color = mauChu,
             fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight(500)
+        )
+    }
+}
+
+@Composable
+fun MyButton3(
+    title: String,
+    onClick: () -> Unit,
+    mauChu: Color,
+    mauNen: Color
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = mauNen, contentColor = mauChu),
+        modifier = Modifier
+            .padding(10.dp)
+            .height(70.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(15.dp),
+        border = BorderStroke(1.dp, Color.Black)
+    ) {
+        Text(
+            text = title,
+            color = mauChu,
+            fontSize = 22.sp,
+            fontWeight = FontWeight(500)
         )
     }
 }
@@ -155,7 +181,7 @@ fun MyButtonWithImage(
             text = title,
             color = mauChu,
             fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight(500),
             modifier = Modifier.padding(start = 10.dp)
         )
     }

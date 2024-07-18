@@ -105,6 +105,7 @@ fun ListCart(screen: String) {
     val icon1: Painter = painterResource(id = R.drawable.icontru)
 
     val totalPrice = carts.sumOf { it.price * it.quantity.toDouble() }
+
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
     cartViewModel.getCartByAccount(account)
     if (carts.isEmpty()) {
@@ -316,9 +317,7 @@ fun ListCart(screen: String) {
                                         .size(30.dp)
                                         .clickable {
                                             val id = carts[index].id
-                                            if (account != null) {
-                                                cartViewModel.deleteCart(id, account, context)
-                                            }
+                                            cartViewModel.deleteCart(id, account, context)
                                         }
                                 )
 
@@ -351,7 +350,7 @@ fun ListCart(screen: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputCard(price: Double) {
+fun InputCard(price: Double,quantitySend:Int,productIdSend:String) {
     var inputcode by remember { mutableStateOf("") }
 
     Column(
@@ -438,7 +437,7 @@ fun InputCard(price: Double) {
 }
 
 @Composable
-fun Total(price: Double) {
+fun Total(price: Double,quantitySend:Int,productIdSend:String) {
     val context = LocalContext.current
     Column {
         Row(
