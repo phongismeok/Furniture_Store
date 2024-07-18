@@ -40,9 +40,6 @@ class NotificationViewModel : ViewModel(){
     fun addNotification(
         account: String,
         notificationRequest: NotificationRequest,
-        successfulNotification: String,
-        failureNotification: String,
-        context: Context
     ) {
         viewModelScope.launch {
             notificationRequest.id =null
@@ -50,9 +47,26 @@ class NotificationViewModel : ViewModel(){
             val response = RetrofitBase().notificationService.addNotification(notificationRequest)
             if (response.isSuccessful) {
                 getNotificationByAccount(account)
-                Toast.makeText(context, successfulNotification, Toast.LENGTH_SHORT).show()
             }else{
-                Toast.makeText(context, failureNotification, Toast.LENGTH_SHORT).show()
+                Log.d("fixloi1", "addNotification: loi")
+            }
+        }
+    }
+
+    fun searchNotification(key: String,account:String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitBase().notificationService.searchNotification(key,account)
+                if (response.isSuccessful) {
+                    _notification.postValue(response.body()?.map { it.toNotification() })
+                    Log.d("check", "searchNoti: ok")
+                } else {
+                    _notification.postValue(emptyList())
+                    Log.d("check", "searchNoti: fail1")
+                }
+            } catch (e: Exception) {
+                _notification.postValue(emptyList())
+                Log.d("check", "searchNoti: $e")
             }
         }
     }

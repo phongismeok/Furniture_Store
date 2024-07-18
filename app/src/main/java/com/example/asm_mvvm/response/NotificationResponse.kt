@@ -1,6 +1,5 @@
 package com.example.asm_mvvm.response
 
-import com.example.asm_mvvm.models.Favorites
 import com.example.asm_mvvm.models.Notification
 import com.google.gson.annotations.SerializedName
 

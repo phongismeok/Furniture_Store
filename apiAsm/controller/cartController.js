@@ -1,6 +1,6 @@
 const Carts = require('../models/cartModel')
 
-exports.getAllUserByAccount = async (req, res) => {
+exports.getAllCartByAccount = async (req, res) => {
     try {
         const { account } = req.params;
         const data = await Carts.find({ account: account }).populate('account');

@@ -105,15 +105,19 @@ class CartViewModel : ViewModel() {
         }
     }
 
-    fun deleteCart(id: String,account: String,context: Context) {
+    fun deleteCart(id: String,account: String,context: Context,type: Int) {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().cartService.deleteCart(id)
                 if (response.isSuccessful) {
                     getCartByAccount(account)
-                    Toast.makeText(context, "Xoá thành công", Toast.LENGTH_SHORT).show()
+                    if (type == 1){
+                        Toast.makeText(context, "Xoá thành công", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    Toast.makeText(context, "Xóa thất bại", Toast.LENGTH_SHORT).show()
+                    if (type==1){
+                        Toast.makeText(context, "Xóa thất bại", Toast.LENGTH_SHORT).show()
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("TAG", "DeleteCart error: " + e.message)

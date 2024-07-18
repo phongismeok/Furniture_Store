@@ -317,7 +317,7 @@ fun ListCart(screen: String) {
                                         .size(30.dp)
                                         .clickable {
                                             val id = carts[index].id
-                                            cartViewModel.deleteCart(id, account, context)
+                                            cartViewModel.deleteCart(id, account, context,1)
                                         }
                                 )
 
@@ -350,7 +350,7 @@ fun ListCart(screen: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputCard(price: Double,quantitySend:Int,productIdSend:String) {
+fun InputCard(price: Double) {
     var inputcode by remember { mutableStateOf("") }
 
     Column(
@@ -437,7 +437,7 @@ fun InputCard(price: Double,quantitySend:Int,productIdSend:String) {
 }
 
 @Composable
-fun Total(price: Double,quantitySend:Int,productIdSend:String) {
+fun Total(price: Double) {
     val context = LocalContext.current
     Column {
         Row(

@@ -2,6 +2,7 @@ package com.example.asm_mvvm.screens.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -47,6 +48,7 @@ import com.example.asm_mvvm.request.FavoritesRequest
 import com.example.asm_mvvm.request.NotificationRequest
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyToolbar3
+import com.example.asm_mvvm.viewmodels.CartViewModel
 import com.example.asm_mvvm.viewmodels.NotificationViewModel
 import com.example.asm_mvvm.viewmodels.ShippingViewModel
 import com.example.asm_mvvm.viewmodels.UserViewModel
@@ -328,13 +330,21 @@ fun DeMuc3(tittle: String, price: String) {
 fun ContentTotal(pricePro: Double, priceShip: Double) {
     val priceAll = pricePro + priceShip
     val context = LocalContext.current
+
     val notificationViewModel = NotificationViewModel()
     val shippingViewModel = ShippingViewModel()
+    val carViewModel = CartViewModel()
     val userViewModel = UserViewModel()
 
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
+
     val shipState = shippingViewModel.ships.observeAsState(initial = emptyList())
     val ships = shipState.value
+
+    val cartState = carViewModel.carts.observeAsState(initial = emptyList())
+    val carts = cartState.value
+
+    carViewModel.getCartByAccount(account)
     shippingViewModel.getShipAddressBySelect(1, account)
     Card(
         shape = RoundedCornerShape(5.dp), modifier = Modifier
@@ -373,13 +383,19 @@ fun ContentTotal(pricePro: Double, priceShip: Double) {
                     )
                     .show()
             }else{
-                val notificationBody = NotificationRequest(
-                    title = "Đặt hàng thành công",
-                    content = "bạn đã mua ",
-                    state = 1,
-                    image = ,
-                    account = account
-                )
+                for (cart in carts){
+                    val priceOnePro = cart.price * cart.quantity.toDouble()
+                    val notificationBody = NotificationRequest(
+                        title = "Đặt hàng thành công",
+                        content = "bạn đã mua ${cart.quantity} ${cart.productName} với giá ${priceOnePro}",
+                        state = 1,
+                        image = cart.image,
+                        account = account
+                    )
+                    notificationViewModel.addNotification(account,notificationBody)
+                    carViewModel.deleteCart(cart.id,account,context,0)
+                }
+
                 val intent = Intent(context, PaymentSuccessActivity::class.java)
                 context.startActivity(intent)
             }
