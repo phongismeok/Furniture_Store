@@ -110,7 +110,7 @@ fun ListCart(screen: String) {
     cartViewModel.getCartByAccount(account)
     if (carts.isEmpty()) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().background(Color.White),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {

@@ -29,4 +29,14 @@ object SharedPreferencesManager {
     fun getPassword(): String? {
         return sharedPreferences.getString("pass", null)
     }
+
+    fun saveChecked(check: String) {
+        val editor = sharedPreferences.edit()
+        editor.putString("check", check)
+        editor.apply()
+    }
+
+    fun getChecked(): String? {
+        return sharedPreferences.getString("check", null)
+    }
 }

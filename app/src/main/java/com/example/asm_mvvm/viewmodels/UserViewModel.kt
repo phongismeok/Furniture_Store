@@ -19,7 +19,7 @@ class UserViewModel() : ViewModel() {
     private val _user = MutableLiveData<List<User>>()
     val user: LiveData<List<User>> = _user
 
-    fun login(context: Context, email: String, password: String, onResult: (Boolean) -> Unit) {
+    fun login(context: Context, email: String, password: String,checked:String, onResult: (Boolean) -> Unit) {
         SharedPreferencesManager.init(context)
         viewModelScope.launch {
             try {
@@ -28,6 +28,7 @@ class UserViewModel() : ViewModel() {
                         if (task.isSuccessful) {
                                 SharedPreferencesManager.saveEmail(email)
                                 SharedPreferencesManager.savePassword(password)
+                                SharedPreferencesManager.saveChecked(checked)
                             onResult(true)
                         } else {
                             onResult(false)
@@ -62,6 +63,10 @@ class UserViewModel() : ViewModel() {
 
     fun getPassFromSharedPreferences(): String? {
         return SharedPreferencesManager.getPassword()
+    }
+
+    fun getCheckFromSharedPreferences(): String? {
+        return SharedPreferencesManager.getChecked()
     }
 
 

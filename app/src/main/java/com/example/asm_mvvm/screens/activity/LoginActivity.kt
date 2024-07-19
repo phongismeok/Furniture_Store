@@ -89,8 +89,12 @@ class LoginActivity : AppCompatActivity() {
             val icon1: Painter = painterResource(id = R.drawable.iceye)
             val icon2: Painter = painterResource(id = R.drawable.iccloseye)
 
+            var stateChange by remember { mutableStateOf(0) }
+
             val emailSave = userViewModel.getEmailFromSharedPreferences()
             val passSave = userViewModel.getPassFromSharedPreferences()
+            val checkSave = userViewModel.getCheckFromSharedPreferences()
+
 
             Column(
                 modifier = Modifier
@@ -119,8 +123,23 @@ class LoginActivity : AppCompatActivity() {
                 Spacer(modifier = Modifier.height(8.dp))
                 // Username TextField
                 OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value =
+                    if(emailSave != ""){
+                        if(stateChange == 1){
+                            email
+                        }else{
+                            if(checkSave=="save"){
+                                emailSave.toString()
+                            }else{
+                                ""
+                            }
+                        }
+                    }else{
+                        email
+                    },
+                    onValueChange = {
+                        stateChange = 1
+                        email = it },
                     label = { Text("E-mail") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -130,7 +149,16 @@ class LoginActivity : AppCompatActivity() {
                 Spacer(modifier = Modifier.height(8.dp))
                 // Password TextField
                 OutlinedTextField(
-                    value = password,
+                    value =
+                    if(stateChange == 1){
+                        password
+                    }else{
+                        if(checkSave=="save"){
+                            passSave.toString()
+                        }else{
+                            ""
+                        }
+                    },
                     onValueChange = { password = it },
                     label = { Text("Password") },
                     singleLine = true,
@@ -190,8 +218,23 @@ class LoginActivity : AppCompatActivity() {
                     onClick = {
                         userViewModel.login(
                             this@LoginActivity,
-                            email,
-                            password,
+                            if(stateChange == 1){
+                                email
+                            }else{
+                                emailSave.toString()
+                            }
+                            ,
+                            if(stateChange == 1){
+                                password
+                            }else{
+                                passSave.toString()
+                            },
+                            if(checked){
+                                "save"
+                            }else{
+                                "noSave"
+                            }
+                            ,
                         ) { success ->
                             if (success) {
                                 Toast.makeText(
