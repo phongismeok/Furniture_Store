@@ -71,4 +71,20 @@ class NotificationViewModel : ViewModel(){
         }
     }
 
+    fun deleteNotifications(id: String,account: String,context: Context) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitBase().notificationService.deleteNotification(id)
+                if (response.isSuccessful) {
+                    getNotificationByAccount(account)
+                    Toast.makeText(context, "xoá thông báo thành công", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "xoá thông báo thất bại", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("TAG", "DeleteNoti error: " + e.message)
+            }
+        }
+    }
+
 }

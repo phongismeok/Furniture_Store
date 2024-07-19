@@ -27,7 +27,7 @@ router.get('/get-list-users',userController.getAllUser)
 router.get('/get-user-by-username/:username',userController.getUserByUserName)
 
 // cart
-router.get('/get-list-cart-by-account/:account',cartController.getAllUserByAccount)
+router.get('/get-list-cart-by-account/:account',cartController.getAllCartByAccount)
 router.get('/get-cart-by-productId/:account/:productId',cartController.getCartByProductIdAndAccount)
 router.post('/add-product-to-cart',cartController.addProductToCart)
 router.put('/update-quantity-cart',cartController.updateQuantity);
@@ -61,7 +61,7 @@ router.put('/update-payment',paymentController.updatePayment);
 
 // notification
 router.get('/get-list-notification-by-account/:account',notificationController.getAllNotificationByAccount);
-router.get('/search-notification/:account',notificationController.searchNotification);
+router.get('/search-notification/',notificationController.searchNotification);
 router.post('/add-notification',notificationController.addNotification)
 router.put('/update-state-notification',notificationController.updateState);
 router.delete('/delete-notification/:id',notificationController.deleteNotification)

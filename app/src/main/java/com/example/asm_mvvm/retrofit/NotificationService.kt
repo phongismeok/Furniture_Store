@@ -4,8 +4,10 @@ import com.example.asm_mvvm.request.FavoritesRequest
 import com.example.asm_mvvm.request.NotificationRequest
 import com.example.asm_mvvm.response.FavoritesResponse
 import com.example.asm_mvvm.response.NotificationResponse
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -23,4 +25,7 @@ interface NotificationService {
         @Query("key") key: String,
         @Query("account") account: String
     ): Response<List<NotificationResponse>>
+
+    @DELETE("delete-notification/{id}")
+    suspend fun deleteNotification(@Path("id") id: String): Response<ResponseBody>
 }
