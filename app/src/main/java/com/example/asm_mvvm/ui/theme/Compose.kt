@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -130,13 +131,13 @@ fun MyButtonSmailScreen(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 3.dp)
-            .height(55.dp),
+            .height(50.dp),
         shape = RoundedCornerShape(15.dp)
     ) {
         Text(
             text = title,
             color = mauChu,
-            fontSize = 18.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight(500)
         )
     }
@@ -242,7 +243,7 @@ fun MyButtonWithImageSmailScreen(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 3.dp)
-            .height(55.dp),
+            .height(50.dp),
         shape = RoundedCornerShape(15.dp),
         border = BorderStroke(1.dp, Color.Black)
 
@@ -256,7 +257,7 @@ fun MyButtonWithImageSmailScreen(
         Text(
             text = title,
             color = mauChu,
-            fontSize = 18.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight(500),
             modifier = Modifier.padding(start = 10.dp)
         )
@@ -510,3 +511,50 @@ fun MyFloatingButton(onClick: () -> Unit) {
     }
 }
 
+@Composable
+fun CustomLineBigScreen() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Divider(
+            color = Color(0xFF997777),
+            thickness = 1.dp,
+            modifier = Modifier.weight(0.1f)
+        )
+
+        Text(text = "or", fontSize = 18.sp)
+
+        Divider(
+            color = Color(0xFF997777),
+            thickness = 1.dp,
+            modifier = Modifier.weight(0.1f)
+        )
+    }
+}
+
+@Composable
+fun CustomLineSmailScreen() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Divider(
+            color = Color(0xFF997777),
+            thickness = 1.dp,
+            modifier = Modifier.weight(0.1f)
+        )
+
+        Text(text = "or", fontSize = 13.sp)
+
+        Divider(
+            color = Color(0xFF997777),
+            thickness = 1.dp,
+            modifier = Modifier.weight(0.1f)
+        )
+    }
+}

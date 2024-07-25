@@ -22,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -53,6 +52,8 @@ import androidx.compose.ui.unit.sp
 import com.example.asm_mvvm.MainActivity
 import com.example.asm_mvvm.R
 import com.example.asm_mvvm.SharedPreferencesManager
+import com.example.asm_mvvm.ui.theme.CustomLineBigScreen
+import com.example.asm_mvvm.ui.theme.CustomLineSmailScreen
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyButtonSmailScreen
 import com.example.asm_mvvm.ui.theme.MyButtonWithImage
@@ -388,54 +389,6 @@ fun NextSignUpSmailScreen() {
 }
 
 @Composable
-fun CustomLineLoginBigScreen() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Divider(
-            color = Color(0xFF997777),
-            thickness = 1.dp,
-            modifier = Modifier.weight(0.1f)
-        )
-
-        Text(text = "or", fontSize = 18.sp)
-
-        Divider(
-            color = Color(0xFF997777),
-            thickness = 1.dp,
-            modifier = Modifier.weight(0.1f)
-        )
-    }
-}
-
-@Composable
-fun CustomLineLoginSmailScreen() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Divider(
-            color = Color(0xFF997777),
-            thickness = 1.dp,
-            modifier = Modifier.weight(0.1f)
-        )
-
-        Text(text = "or", fontSize = 13.sp)
-
-        Divider(
-            color = Color(0xFF997777),
-            thickness = 1.dp,
-            modifier = Modifier.weight(0.1f)
-        )
-    }
-}
-
-@Composable
 fun OtherMethodLoginBigScreen() {
     MyButtonWithImage(
         title = "Log In with Google",
@@ -559,7 +512,7 @@ fun BigPhoneScreenLogin() {
         Spacer(modifier = Modifier.height(8.dp))
         NextSignUpBigScreen()
         Spacer(modifier = Modifier.height(8.dp))
-        CustomLineLoginBigScreen()
+        CustomLineBigScreen()
         OtherMethodLoginBigScreen()
     }
 }
@@ -646,7 +599,7 @@ fun SmailPhoneScreenLogin() {
         )
         Spacer(modifier = Modifier.height(8.dp))
         NextSignUpSmailScreen()
-        CustomLineLoginSmailScreen()
+        CustomLineSmailScreen()
         OtherMethodLoginSmailScreen()
     }
 }
