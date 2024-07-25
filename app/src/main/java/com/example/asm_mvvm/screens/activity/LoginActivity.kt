@@ -3,7 +3,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -65,7 +64,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
             BoxWithConstraints(modifier = Modifier
                 .fillMaxSize()
@@ -116,7 +115,7 @@ fun TitleLoginSmailScreen() {
     Text(
         text = "Login Account",
         style = TextStyle(
-            fontSize = 25.sp,
+            fontSize = 22.sp,
             color = Color.Black,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Serif
@@ -317,7 +316,7 @@ fun CheckBoxLoginSmailScreen(checked: MutableState<Boolean>) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth(0.4f)
-                .height(70.dp)
+                .height(50.dp)
         ) {
             Checkbox(
                 checked = checked.value,
@@ -331,7 +330,7 @@ fun CheckBoxLoginSmailScreen(checked: MutableState<Boolean>) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(0.6f)
-                .height(70.dp), verticalAlignment = Alignment.CenterVertically
+                .height(50.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "Forget Password?",

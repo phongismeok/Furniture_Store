@@ -241,7 +241,7 @@ fun MyButtonWithImageSmailScreen(
         colors = ButtonDefaults.buttonColors(containerColor = mauNen, contentColor = mauChu),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
+            .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 3.dp)
             .height(55.dp),
         shape = RoundedCornerShape(15.dp),
         border = BorderStroke(1.dp, Color.Black)
