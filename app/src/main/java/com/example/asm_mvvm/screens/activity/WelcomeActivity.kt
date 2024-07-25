@@ -34,13 +34,13 @@ class WelcomeActivity : AppCompatActivity() {
         setContent {
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                 if (maxWidth >= 720.dp) {
-                    BigScreenTablet()
+                    BigScreenTabletWelcome()
                 } else if (maxWidth < 720.dp && maxWidth > 448.dp) {
-                    SmailScreenTablet()
+                    SmailScreenTabletWelcome()
                 } else if (maxWidth <= 448.dp && maxWidth > 360.dp) {
-                    BigPhoneScreen()
+                    BigPhoneScreenWelcome()
                 } else {
-                    SmailPhoneScreen()
+                    SmailPhoneScreenWelcome()
                 }
             }
         }
@@ -48,7 +48,7 @@ class WelcomeActivity : AppCompatActivity() {
 }
 
 @Composable
-fun BigPhoneScreen () {
+fun BigPhoneScreenWelcome () {
     val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -97,7 +97,7 @@ fun BigPhoneScreen () {
 }
 
 @Composable
-fun SmailPhoneScreen () {
+fun SmailPhoneScreenWelcome () {
     val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -146,7 +146,7 @@ fun SmailPhoneScreen () {
 }
 
 @Composable
-fun BigScreenTablet () {
+fun BigScreenTabletWelcome () {
     val context = LocalContext.current
     Column {
 
@@ -154,7 +154,7 @@ fun BigScreenTablet () {
 }
 
 @Composable
-fun SmailScreenTablet () {
+fun SmailScreenTabletWelcome () {
     val context = LocalContext.current
     Column {
 

@@ -228,6 +228,41 @@ fun MyButtonWithImage(
     }
 }
 
+@Composable
+fun MyButtonWithImageSmailScreen(
+    title: String,
+    onClick: () -> Unit,
+    mauChu: Color,
+    mauNen: Color,
+    image: Int
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = mauNen, contentColor = mauChu),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+            .height(55.dp),
+        shape = RoundedCornerShape(15.dp),
+        border = BorderStroke(1.dp, Color.Black)
+
+    ) {
+        Image(
+            painter = painterResource(id = image),
+            contentDescription = "anh nen",
+            modifier = Modifier.size(25.dp),
+            contentScale = ContentScale.Crop
+        )
+        Text(
+            text = title,
+            color = mauChu,
+            fontSize = 18.sp,
+            fontWeight = FontWeight(500),
+            modifier = Modifier.padding(start = 10.dp)
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyToolbar(title: String, type: String, place: String, textState: MutableState<String>) {
