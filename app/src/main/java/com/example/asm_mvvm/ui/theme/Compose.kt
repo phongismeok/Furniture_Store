@@ -77,6 +77,22 @@ fun Animation(image: Int) {
 }
 
 @Composable
+fun AnimationBigScreen(image: Int) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(image))
+    val progress by animateLottieCompositionAsState(composition)
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.size(300.dp)
+    ) {
+        LottieAnimation(
+            composition = composition,
+            progress = progress,
+        )
+    }
+}
+
+@Composable
 fun MyButton(
     title: String,
     onClick: () -> Unit,
@@ -96,6 +112,31 @@ fun MyButton(
             text = title,
             color = mauChu,
             fontSize = 22.sp,
+            fontWeight = FontWeight(500)
+        )
+    }
+}
+
+@Composable
+fun MyButtonSmailScreen(
+    title: String,
+    onClick: () -> Unit,
+    mauChu: Color,
+    mauNen: Color
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = mauNen, contentColor = mauChu),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 3.dp)
+            .height(55.dp),
+        shape = RoundedCornerShape(15.dp)
+    ) {
+        Text(
+            text = title,
+            color = mauChu,
+            fontSize = 18.sp,
             fontWeight = FontWeight(500)
         )
     }
