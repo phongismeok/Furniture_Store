@@ -2,6 +2,7 @@ package com.example.asm_mvvm.screens.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -9,7 +10,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,7 +49,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.asm_mvvm.R
-import com.example.asm_mvvm.ui.theme.CustomLineScreen
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyButtonWithImage
 import com.example.asm_mvvm.viewmodels.UserViewModel
@@ -58,70 +57,91 @@ class SignUpActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            BoxWithConstraints(modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)) {
-                if (maxWidth >= 720.dp) {
-                    BigTabletScreenSignUp()
-                } else if (maxWidth < 720.dp && maxWidth > 448.dp) {
-                    SmailTabletScreenSignUp()
-                } else if (maxWidth <= 448.dp && maxWidth > 360.dp) {
-                    BigPhoneScreenSignUp()
-                } else {
-                    SmailPhoneScreenSignUp()
-                }
-            }
+            SizeSignUpScreen()
         }
     }
 }
 
 @Composable
-fun TitleSignUpBigScreen () {
+fun TitleSignUpScreen (type:String) {
     Image(
         painter = painterResource(id = R.drawable.logoapp),
         contentDescription = "anh nen",
-        modifier = Modifier.size(200.dp),
+        modifier = Modifier.size(
+            when (type) {
+                "large" -> {
+                    200.dp
+                }
+
+                "fairly" -> {
+                    150.dp
+                }
+
+                "medium" -> {
+                    100.dp
+                }
+
+                else -> {
+                    70.dp
+                }
+            }
+        ),
         contentScale = ContentScale.Crop
     )
     Text(
         text = "Create Account",
         style = TextStyle(
-            fontSize = 35.sp,
+            fontSize =
+            when (type) {
+                "large" -> {
+                    35.sp
+                }
+
+                "fairly" -> {
+                    30.sp
+                }
+
+                "medium" -> {
+                    25.sp
+                }
+
+                else -> {
+                    22.sp
+                }
+            },
             color = Color.Black,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Serif
         ),
-        modifier = Modifier.padding(bottom = 30.dp)
+        modifier = Modifier.padding(bottom =
+        when (type) {
+            "large" -> {
+                30.dp
+            }
+
+            "fairly" -> {
+                20.dp
+            }
+
+            "medium" -> {
+                10.dp
+            }
+
+            else -> {
+                5.dp
+            }
+        })
     )
 }
 
 @Composable
-fun TitleSignUpSmailScreen () {
-    Image(
-        painter = painterResource(id = R.drawable.logoapp),
-        contentDescription = "anh nen",
-        modifier = Modifier.size(70.dp),
-        contentScale = ContentScale.Crop
-    )
-    Text(
-        text = "Create Account",
-        style = TextStyle(
-            fontSize = 22.sp,
-            color = Color.Black,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Serif
-        ),
-        modifier = Modifier.padding(bottom = 5.dp)
-    )
-}
-
-@Composable
-fun InputSignUpBigScreen (
+fun InputSignUpScreen (
     username: MutableState<String>,
     email: MutableState<String>,
     password: MutableState<String>,
     checked: MutableState<Boolean>,
     passwordVisible: MutableState<Boolean>,
+    type: String
 ) {
     val iconEye: Painter = painterResource(id = R.drawable.iceye)
     val iconCloseEye: Painter = painterResource(id = R.drawable.iccloseye)
@@ -132,6 +152,25 @@ fun InputSignUpBigScreen (
         label = { Text("Full Name") },
         modifier = Modifier
             .fillMaxWidth()
+            .height(
+                when (type) {
+                    "large" -> {
+                        70.dp
+                    }
+
+                    "fairly" -> {
+                        65.dp
+                    }
+
+                    "medium" -> {
+                        62.dp
+                    }
+
+                    else -> {
+                        60.dp
+                    }
+                }
+            )
             .padding(start = 10.dp, end = 10.dp),
         shape = RoundedCornerShape(10.dp),
     )
@@ -143,6 +182,25 @@ fun InputSignUpBigScreen (
         label = { Text("E-mail") },
         modifier = Modifier
             .fillMaxWidth()
+            .height(
+                when (type) {
+                    "large" -> {
+                        70.dp
+                    }
+
+                    "fairly" -> {
+                        65.dp
+                    }
+
+                    "medium" -> {
+                        62.dp
+                    }
+
+                    else -> {
+                        60.dp
+                    }
+                }
+            )
             .padding(start = 10.dp, end = 10.dp),
         shape = RoundedCornerShape(10.dp),
     )
@@ -167,253 +225,206 @@ fun InputSignUpBigScreen (
         shape = RoundedCornerShape(10.dp),
         modifier = Modifier
             .fillMaxWidth()
+            .height(
+                when (type) {
+                    "large" -> {
+                        70.dp
+                    }
+
+                    "fairly" -> {
+                        65.dp
+                    }
+
+                    "medium" -> {
+                        62.dp
+                    }
+
+                    else -> {
+                        60.dp
+                    }
+                }
+            )
             .padding(start = 10.dp, end = 10.dp)
     )
 }
 
 @Composable
-fun InputSignUpSmailScreen (
-    username: MutableState<String>,
-    email: MutableState<String>,
-    password: MutableState<String>,
-    checked: MutableState<Boolean>,
-    passwordVisible: MutableState<Boolean>,
-) {
-    val iconEye: Painter = painterResource(id = R.drawable.iceye)
-    val iconCloseEye: Painter = painterResource(id = R.drawable.iccloseye)
-    // Username TextField
-    OutlinedTextField(
-        value = username.value,
-        onValueChange = { username.value = it },
-        label = { Text("Full Name") },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .padding(start = 10.dp, end = 10.dp),
-        shape = RoundedCornerShape(10.dp),
-    )
-// Email TextField
-    OutlinedTextField(
-        value = email.value,
-        onValueChange = { email.value = it },
-        label = { Text("E-mail") },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .padding(start = 10.dp, end = 10.dp),
-        shape = RoundedCornerShape(10.dp),
-    )
-    // Password TextField
-    OutlinedTextField(
-        value = password.value,
-        onValueChange = { password.value = it },
-        label = { Text("Password") },
-        singleLine = true,
-        placeholder = { Text("Password") },
-        visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        trailingIcon = {
-            val image = if (passwordVisible.value) iconEye else iconCloseEye
-            val description =
-                if (passwordVisible.value) "Hide password" else "Show password"
-            IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
-                Icon(painter = image, contentDescription = description)
-            }
-        },
-        shape = RoundedCornerShape(10.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)
-            .padding(start = 10.dp, end = 10.dp)
-    )
-}
-
-@Composable
-fun ConfirmCheckSignUpBigScreen (checked: MutableState<Boolean>) {
+fun ConfirmCheckSignUpScreen (type: String,checked: MutableState<Boolean>) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
             .fillMaxWidth()
-            .height(70.dp)
+            .height(
+                when (type) {
+                    "large" -> {
+                        70.dp
+                    }
+
+                    "fairly" -> {
+                        65.dp
+                    }
+
+                    "medium" -> {
+                        55.dp
+                    }
+
+                    else -> {
+                        50.dp
+                    }
+                }
+            )
     ) {
         Checkbox(
             checked = checked.value,
             onCheckedChange = { checked.value = it }
         )
         Text(
-            " I agree with", fontSize = 16.sp
+            " I agree with", fontSize =
+            when (type) {
+                "large" -> {
+                    16.sp
+                }
+
+                "fairly" -> {
+                    14.sp
+                }
+
+                "medium" -> {
+                    12.sp
+                }
+
+                else -> {
+                    11.sp
+                }
+            }
         )
         Text(
             " Privacy Policy",
-            fontSize = 16.sp,
-            textDecoration = TextDecoration.Underline,
-            color = Color.Blue
-        )
-        Text(
-            " and", fontSize = 16.sp
-        )
-        Text(
-            " Terms & Conditions",
-            fontSize = 16.sp,
-            textDecoration = TextDecoration.Underline,
-            color = Color.Blue
-        )
-    }
-}
+            fontSize =
+            when (type) {
+                "large" -> {
+                    16.sp
+                }
 
-@Composable
-fun ConfirmCheckSignUpSmailScreen (checked: MutableState<Boolean>) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-    ) {
-        Checkbox(
-            checked = checked.value,
-            onCheckedChange = { checked.value = it },
-        )
-        Text(
-            " I agree with", fontSize = 11.sp
-        )
-        Text(
-            " Privacy Policy",
-            fontSize = 11.sp,
-            textDecoration = TextDecoration.Underline,
-            color = Color.Blue
-        )
-        Text(
-            " and", fontSize = 11.sp
-        )
-        Text(
-            " Terms & Conditions",
-            fontSize = 11.sp,
-            textDecoration = TextDecoration.Underline,
-            color = Color.Blue
-        )
-    }
-}
+                "fairly" -> {
+                    14.sp
+                }
 
+                "medium" -> {
+                    12.sp
+                }
 
-@Composable
-fun NextLoginBigScreen () {
-    val context = LocalContext.current
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(10.dp)
-    ) {
-        Text(text = "Already have an account?", fontSize = 18.sp)
-        Text(
-            text = " Log in",
-            textDecoration = TextDecoration.Underline,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.clickable(onClick = {
-                val intent = Intent(context, LoginActivity::class.java)
-                context.startActivity(intent)
-            })
-        )
-    }
-}
-
-@Composable
-fun NextLoginSmailScreen () {
-    val context = LocalContext.current
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(10.dp)
-    ) {
-        Text(text = "Already have an account?", fontSize = 13.sp)
-        Text(
-            text = " Log in",
-            textDecoration = TextDecoration.Underline,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.clickable(onClick = {
-                val intent = Intent(context, LoginActivity::class.java)
-                context.startActivity(intent)
-            })
-        )
-    }
-}
-
-@Composable
-fun OtherMethodSignUpBigScreen () {
-    MyButtonWithImage(
-        title = "Sign Up with Google",
-        onClick = { /*TODO*/ },
-        mauChu = Color.Black,
-        mauNen = Color.White,
-        image = R.drawable.icongoogle
-    )
-
-    MyButtonWithImage(
-        title = "Sign Up with Facebook",
-        onClick = { /*TODO*/ },
-        mauChu = Color.Black,
-        mauNen = Color.White,
-        image = R.drawable.iconfacebook
-    )
-}
-
-@Composable
-fun OtherMethodSignUpSmailScreen () {
-
-
-
-}
-
-@Composable
-fun BigPhoneScreenSignUp() {
-    val context = LocalContext.current
-    val userViewModel = UserViewModel()
-    val username = remember { mutableStateOf("") }
-    val email = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
-    val passwordVisible = rememberSaveable { mutableStateOf(false) }
-    val checked = remember { mutableStateOf(true) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp)
-            .background(Color.White).verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        TitleSignUpBigScreen()
-        InputSignUpBigScreen(
-            username = username,
-            email = email,
-            password = password,
-            checked = checked,
-            passwordVisible = passwordVisible
-        )
-        ConfirmCheckSignUpBigScreen(checked = checked)
-        MyButton(
-            title = "Sign Up",
-            onClick = {
-                userViewModel.signUp(email.value, password.value) { success ->
-                    if (success) {
-                        Toast.makeText(context,"Sign up success", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context,"Sign up fail", Toast.LENGTH_SHORT).show()
-                    }
+                else -> {
+                    11.sp
                 }
             },
-            mauChu = Color.White,
-            mauNen = Color.Gray
+            textDecoration = TextDecoration.Underline,
+            color = Color.Blue
         )
-        NextLoginBigScreen()
-//        CustomLineScreen()
-        OtherMethodSignUpBigScreen()
+        Text(
+            " and", fontSize =
+            when (type) {
+                "large" -> {
+                    16.sp
+                }
+
+                "fairly" -> {
+                    14.sp
+                }
+
+                "medium" -> {
+                    12.sp
+                }
+
+                else -> {
+                    11.sp
+                }
+            }
+        )
+        Text(
+            " Terms & Conditions",
+            fontSize =
+            when (type) {
+                "large" -> {
+                    16.sp
+                }
+
+                "fairly" -> {
+                    14.sp
+                }
+
+                "medium" -> {
+                    12.sp
+                }
+
+                else -> {
+                    11.sp
+                }
+            },
+            textDecoration = TextDecoration.Underline,
+            color = Color.Blue
+        )
     }
 }
 
 @Composable
-fun SmailPhoneScreenSignUp() {
+fun NextLoginScreen (type: String) {
+    val context = LocalContext.current
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(10.dp)
+    ) {
+        Text(text = "Already have an account?", fontSize =
+        when (type) {
+            "large" -> {
+                18.sp
+            }
+
+            "fairly" -> {
+                16.sp
+            }
+
+            "medium" -> {
+                14.sp
+            }
+
+            else -> {
+                13.sp
+            }
+        })
+        Text(
+            text = " Log in",
+            textDecoration = TextDecoration.Underline,
+            fontSize =
+            when (type) {
+                "large" -> {
+                    18.sp
+                }
+
+                "fairly" -> {
+                    16.sp
+                }
+
+                "medium" -> {
+                    14.sp
+                }
+
+                else -> {
+                    13.sp
+                }
+            },
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.clickable(onClick = {
+                val intent = Intent(context, LoginActivity::class.java)
+                context.startActivity(intent)
+            })
+        )
+    }
+}
+
+@Composable
+fun ScreenSignUp(type: String) {
     val context = LocalContext.current
     val userViewModel = UserViewModel()
     val username = remember { mutableStateOf("") }
@@ -431,15 +442,16 @@ fun SmailPhoneScreenSignUp() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TitleSignUpSmailScreen()
-        InputSignUpSmailScreen(
+        TitleSignUpScreen(type = type)
+        InputSignUpScreen(
             username = username,
             email = email,
             password = password,
             checked = checked,
-            passwordVisible = passwordVisible
+            passwordVisible = passwordVisible,
+            type = type
         )
-        ConfirmCheckSignUpSmailScreen(checked = checked)
+        ConfirmCheckSignUpScreen(type = type, checked = checked)
         MyButton(
             title = "Sign Up",
             onClick = {
@@ -454,20 +466,50 @@ fun SmailPhoneScreenSignUp() {
             mauChu = Color.White,
             mauNen = Color.Gray
         )
-        NextLoginSmailScreen()
+        NextLoginScreen(type = type)
 //        CustomLineScreen()
-        OtherMethodSignUpSmailScreen()
+        MyButtonWithImage(
+            title = "Log In with Google",
+            onClick = { /*TODO*/ },
+            mauChu = Color.Black,
+            mauNen = Color.White,
+            image = R.drawable.icongoogle,
+            type = type
+        )
+
+        MyButtonWithImage(
+            title = "Log In with Facebook",
+            onClick = { /*TODO*/ },
+            mauChu = Color.Black,
+            mauNen = Color.White,
+            image = R.drawable.iconfacebook,
+            type = type
+        )
     }
 }
 
 @Composable
-fun BigTabletScreenSignUp() {
+fun SizeSignUpScreen() {
     val context = LocalContext.current
+    val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+//    val screenWidthPx = displayMetrics.widthPixels
+    val screenHeightPx = displayMetrics.heightPixels
+    val density = displayMetrics.density
+
+//    val screenWidthDp = screenWidthPx / density
+    val screenHeightDp = screenHeightPx / density
+
+    if (screenHeightDp > 890) {
+        // large
+        ScreenSignUp(type = "large")
+    } else if (screenHeightDp > 800) {
+        // fairly
+        ScreenSignUp(type = "medium")
+    } else if (screenHeightDp > 714) {
+        // medium
+        ScreenSignUp(type = "medium")
+    } else {
+        // smail
+        ScreenSignUp(type = "smail")
+    }
 }
-
-@Composable
-fun SmailTabletScreenSignUp() {
-    val context = LocalContext.current
-}
-
-

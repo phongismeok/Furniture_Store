@@ -557,7 +557,7 @@ fun SizeLoginScreen() {
         ScreenLogin(type = "large")
     } else if (screenHeightDp > 800) {
         // fairly
-        ScreenLogin(type = "medium")
+        ScreenLogin(type = "fairly")
     } else if (screenHeightDp > 714) {
         // medium
         ScreenLogin(type = "medium")
