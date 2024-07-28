@@ -203,15 +203,62 @@ fun MyButtonWithImage(
     onClick: () -> Unit,
     mauChu: Color,
     mauNen: Color,
-    image: Int
+    image: Int,
+    type: String = "no"
 ) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = mauNen, contentColor = mauChu),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
-            .height(70.dp),
+            .padding(
+                start = 10.dp, end = 10.dp, top =
+                when (type) {
+                    "large" -> {
+                        10.dp
+                    }
+                    "fairly" -> {
+                        7.dp
+                    }
+                    "medium" -> {
+                        6.dp
+                    }
+                    else -> {
+                        5.dp
+                    }
+                },
+                bottom =
+                when (type) {
+                    "large" -> {
+                        10.dp
+                    }
+                    "fairly" -> {
+                        8.dp
+                    }
+                    "medium" -> {
+                        5.dp
+                    }
+                    else -> {
+                        3.dp
+                    }
+                }
+            )
+            .height(
+                when (type) {
+                    "large" -> {
+                        70.dp
+                    }
+                    "fairly" -> {
+                        60.dp
+                    }
+                    "medium" -> {
+                        55.dp
+                    }
+                    else -> {
+                        50.dp
+                    }
+                }
+            ),
         shape = RoundedCornerShape(15.dp),
         border = BorderStroke(1.dp, Color.Black)
 
@@ -219,53 +266,48 @@ fun MyButtonWithImage(
         Image(
             painter = painterResource(id = image),
             contentDescription = "anh nen",
-            modifier = Modifier.size(30.dp),
+            modifier = Modifier.size(
+                when (type) {
+                    "large" -> {
+                        30.dp
+                    }
+                    "fairly" -> {
+                        27.dp
+                    }
+                    "medium" -> {
+                        22.dp
+                    }
+                    else -> {
+                        20.dp
+                    }
+                }
+            ),
             contentScale = ContentScale.Crop
         )
         Text(
             text = title,
             color = mauChu,
-            fontSize = 22.sp,
+            fontSize =
+            when (type) {
+                "large" -> {
+                    22.sp
+                }
+                "fairly" -> {
+                    20.sp
+                }
+                "medium" -> {
+                    18.sp
+                }
+                else -> {
+                    16.sp
+                }
+            },
             fontWeight = FontWeight(500),
             modifier = Modifier.padding(start = 10.dp)
         )
     }
 }
 
-@Composable
-fun MyButtonWithImageSmailScreen(
-    title: String,
-    onClick: () -> Unit,
-    mauChu: Color,
-    mauNen: Color,
-    image: Int
-) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = mauNen, contentColor = mauChu),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 3.dp)
-            .height(50.dp),
-        shape = RoundedCornerShape(15.dp),
-        border = BorderStroke(1.dp, Color.Black)
-
-    ) {
-        Image(
-            painter = painterResource(id = image),
-            contentDescription = "anh nen",
-            modifier = Modifier.size(25.dp),
-            contentScale = ContentScale.Crop
-        )
-        Text(
-            text = title,
-            color = mauChu,
-            fontSize = 16.sp,
-            fontWeight = FontWeight(500),
-            modifier = Modifier.padding(start = 10.dp)
-        )
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -515,11 +557,26 @@ fun MyFloatingButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun CustomLineBigScreen() {
+fun CustomLineScreen(type: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp),
+            .padding(
+                when (type) {
+                    "large" -> {
+                        15.dp
+                    }
+                    "fairly" -> {
+                        13.dp
+                    }
+                    "medium" -> {
+                        10.dp
+                    }
+                    else -> {
+                        8.dp
+                    }
+                }
+            ),
         horizontalArrangement = Arrangement.Center
     ) {
         Divider(
@@ -538,26 +595,3 @@ fun CustomLineBigScreen() {
     }
 }
 
-@Composable
-fun CustomLineSmailScreen() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Divider(
-            color = Color(0xFF997777),
-            thickness = 1.dp,
-            modifier = Modifier.weight(0.1f)
-        )
-
-        Text(text = "or", fontSize = 13.sp)
-
-        Divider(
-            color = Color(0xFF997777),
-            thickness = 1.dp,
-            modifier = Modifier.weight(0.1f)
-        )
-    }
-}

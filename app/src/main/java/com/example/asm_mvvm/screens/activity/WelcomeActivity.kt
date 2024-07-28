@@ -31,13 +31,13 @@ class WelcomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SizeScreen()
+            SizeWelcomeScreen()
         }
     }
 }
 
 @Composable
-fun ScreenWelcome (type:String) {
+fun ScreenWelcome(type: String) {
     val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -53,17 +53,19 @@ fun ScreenWelcome (type:String) {
                 "large" -> {
                     30.sp
                 }
+
                 "fairly" -> {
                     27.sp
                 }
+
                 "medium" -> {
                     25.sp
                 }
+
                 else -> {
                     20.sp
                 }
-            }
-            ,
+            },
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 20.dp),
             color = Color.Gray,
@@ -77,12 +79,15 @@ fun ScreenWelcome (type:String) {
                 "large" -> {
                     29.sp
                 }
+
                 "fairly" -> {
                     26.sp
                 }
+
                 "medium" -> {
                     24.sp
                 }
+
                 else -> {
                     20.sp
                 }
@@ -101,12 +106,15 @@ fun ScreenWelcome (type:String) {
                 "large" -> {
                     18.sp
                 }
+
                 "fairly" -> {
                     16.sp
                 }
+
                 "medium" -> {
                     15.sp
                 }
+
                 else -> {
                     13.sp
                 }
@@ -124,12 +132,12 @@ fun ScreenWelcome (type:String) {
         MyButton(title = "Sign Up", onClick = {
             val intent = Intent(context, SignUpActivity::class.java)
             context.startActivity(intent)
-        }, mauChu = Color.White, mauNen = Color.Red,type)
+        }, mauChu = Color.White, mauNen = Color.Red, type)
     }
 }
 
 @Composable
-fun SizeScreen() {
+fun SizeWelcomeScreen() {
     val context = LocalContext.current
     val displayMetrics: DisplayMetrics = context.resources.displayMetrics
 //    val screenWidthPx = displayMetrics.widthPixels
@@ -139,16 +147,16 @@ fun SizeScreen() {
 //    val screenWidthDp = screenWidthPx / density
     val screenHeightDp = screenHeightPx / density
 
-    if(screenHeightDp > 890) {
+    if (screenHeightDp > 890) {
         // large
         ScreenWelcome(type = "large")
-    } else if(screenHeightDp > 800){
+    } else if (screenHeightDp > 800) {
         // fairly
         ScreenWelcome(type = "fairly")
-    }else if(screenHeightDp > 714 ){
+    } else if (screenHeightDp > 714) {
         // medium
         ScreenWelcome(type = "medium")
-    }else{
+    } else {
         // smail
         ScreenWelcome(type = "smail")
     }

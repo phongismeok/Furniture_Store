@@ -49,11 +49,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.asm_mvvm.R
-import com.example.asm_mvvm.ui.theme.CustomLineBigScreen
-import com.example.asm_mvvm.ui.theme.CustomLineSmailScreen
+import com.example.asm_mvvm.ui.theme.CustomLineScreen
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyButtonWithImage
-import com.example.asm_mvvm.ui.theme.MyButtonWithImageSmailScreen
 import com.example.asm_mvvm.viewmodels.UserViewModel
 
 class SignUpActivity : AppCompatActivity() {
@@ -362,21 +360,9 @@ fun OtherMethodSignUpBigScreen () {
 
 @Composable
 fun OtherMethodSignUpSmailScreen () {
-    MyButtonWithImageSmailScreen(
-        title = "Sign Up with Google",
-        onClick = { /*TODO*/ },
-        mauChu = Color.Black,
-        mauNen = Color.White,
-        image = R.drawable.icongoogle
-    )
 
-    MyButtonWithImageSmailScreen(
-        title = "Sign Up with Facebook",
-        onClick = { /*TODO*/ },
-        mauChu = Color.Black,
-        mauNen = Color.White,
-        image = R.drawable.iconfacebook
-    )
+
+
 }
 
 @Composable
@@ -421,7 +407,7 @@ fun BigPhoneScreenSignUp() {
             mauNen = Color.Gray
         )
         NextLoginBigScreen()
-        CustomLineBigScreen()
+//        CustomLineScreen()
         OtherMethodSignUpBigScreen()
     }
 }
@@ -469,7 +455,7 @@ fun SmailPhoneScreenSignUp() {
             mauNen = Color.Gray
         )
         NextLoginSmailScreen()
-        CustomLineSmailScreen()
+//        CustomLineScreen()
         OtherMethodSignUpSmailScreen()
     }
 }
