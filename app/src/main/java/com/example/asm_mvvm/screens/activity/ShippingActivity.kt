@@ -3,10 +3,8 @@ package com.example.asm_mvvm.screens.activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +27,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +40,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.asm_mvvm.MainActivity
 import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.ui.theme.AnimationLoading
 import com.example.asm_mvvm.ui.theme.MyFloatingButton
@@ -53,7 +51,6 @@ class ShippingActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         SharedPreferencesManager.init(applicationContext)
         val priceNhan = intent.getStringExtra("PRICE")
         val getId = intent.getStringExtra("CLICK") ?: ""
@@ -95,26 +92,35 @@ fun ListShip(id: String) {
     val ships = shipState.value
     val context = LocalContext.current
 
-    shippingViewModel.getShipAddressByAccount(account)
+    LaunchedEffect(account) {
+        shippingViewModel.getShipAddressByAccount(account)
+    }
 
     var dataClick by remember { mutableStateOf("") }
     var dataOld by remember { mutableStateOf(id) }
     var isChecked by remember { mutableStateOf(false) }
 
     if (ships.isEmpty()) {
-        AnimationLoading()
+        if (id == "no") {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "hãy thêm địa chỉ nhận hàng nhé", fontSize = 22.sp)
+            }
+        } else {
+            AnimationLoading()
+        }
+
     } else {
         LazyColumn {
             items(ships.size) { index ->
 
-                if (id == ships[index].id && dataClick == "") {
-                    isChecked = true
+                isChecked = if (id == ships[index].id && dataClick == "") {
+                    true
                 } else {
-                    if (dataClick == ships[index].id) {
-                        isChecked = true
-                    } else {
-                        isChecked = false
-                    }
+                    dataClick == ships[index].id
                 }
 
                 Column(
@@ -166,7 +172,7 @@ fun ListShip(id: String) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(220.dp)
+
                             .padding(10.dp),
                         shape = RoundedCornerShape(15.dp),
                         colors = CardDefaults.cardColors(
@@ -187,7 +193,12 @@ fun ListShip(id: String) {
                         Text(
                             text = ships[index].address,
                             fontSize = 20.sp,
-                            modifier = Modifier.padding(15.dp)
+                            modifier = Modifier.padding(
+                                start = 15.dp,
+                                end = 15.dp,
+                                top = 5.dp,
+                                bottom = 5.dp
+                            )
                         )
                         Divider(
                             modifier = Modifier
@@ -197,7 +208,12 @@ fun ListShip(id: String) {
                         Text(
                             text = ships[index].addressDetail,
                             fontSize = 18.sp,
-                            modifier = Modifier.padding(15.dp)
+                            modifier = Modifier.padding(
+                                start = 15.dp,
+                                end = 15.dp,
+                                top = 5.dp,
+                                bottom = 5.dp
+                            )
                         )
                     }
 
@@ -212,7 +228,7 @@ fun TitleShip(tittle: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 10.dp, start = 25.dp, end = 25.dp),
+            .padding(start = 15.dp, end = 15.dp, top = 5.dp, bottom = 5.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

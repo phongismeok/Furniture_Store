@@ -1,4 +1,7 @@
 const Ships = require('../models/shippingModel')
+const Products = require("../models/productModel");
+const {log} = require("debug");
+const Favorites = require("../models/favoritesModel");
 
 exports.getAllShip = async (req, res) => {
     try {
@@ -22,14 +25,19 @@ exports.getAllShipByAccount = async (req, res) => {
 
 exports.getAllShipBySelectAndAccount = async (req, res) => {
     try {
-        const { select, account } = req.params;
-        const data = await Ships.find({ select: select, account: account }).populate('select').populate('account');
-        res.status(200).send(data);
+        const { account, select } = req.params;
+        const data = await Ships.findOne({ account: account, select: select }).populate('account');
+
+        if (data) {
+            res.status(200).send(data);
+        } else {
+            res.status(404).send("Không tìm thấy dữ liệu");
+        }
     } catch (error) {
         console.log(error);
-        res.status(500).send("loi");
+        res.status(500).send("Lỗi");
     }
-}
+};
 
 exports.deleteShip = async (req, res) => {
     try {

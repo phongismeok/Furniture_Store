@@ -12,6 +12,8 @@ import com.example.asm_mvvm.models.Product
 import com.example.asm_mvvm.models.Shipping
 import com.example.asm_mvvm.request.FavoritesRequest
 import com.example.asm_mvvm.request.ShippingRequest
+import com.example.asm_mvvm.response.FavoritesResponse
+import com.example.asm_mvvm.response.ShippingResponse
 import com.example.asm_mvvm.retrofit.RetrofitBase
 import com.example.asm_mvvm.screens.activity.ShippingActivity
 import com.example.asm_mvvm.screens.activity.SignUpActivity
@@ -20,6 +22,9 @@ import kotlinx.coroutines.launch
 class ShippingViewModel : ViewModel() {
     private val _ship = MutableLiveData<List<Shipping>>()
     val ships: LiveData<List<Shipping>> = _ship
+
+    private val _ship2 = MutableLiveData<ShippingResponse>()
+    val ships2: LiveData<ShippingResponse> = _ship2
 
     fun getShipping() {
         viewModelScope.launch {
@@ -60,17 +65,14 @@ class ShippingViewModel : ViewModel() {
     fun getShipAddressBySelect(select: Int,account:String) {
         viewModelScope.launch {
             try {
-                val response = RetrofitBase().shippingService.getShippingBySelect(select,account)
-                Log.d("TAG", "getShipSl: $response")
-
-                if (response.isSuccessful) {
-                    _ship.postValue(response.body()?.map { it.toShip() })
+                val response = RetrofitBase().shippingService.getShippingBySelect(account,select)
+                if (response.isSuccessful && response.body() != null) {
+                    _ship2.value = response.body()
                 } else {
-                    _ship.postValue(emptyList())
+                    Log.d("check", "getShipBySelect: fail1")
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "getShipSl: " + e.message)
-                _ship.postValue(emptyList())
+                Log.d("check", "getShipBySelect: fail1 $e" )
             }
         }
     }

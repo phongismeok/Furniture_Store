@@ -36,7 +36,7 @@ router.delete('/delete-cart/:id',cartController.deleteCart)
 // shipping
 router.get('/get-list-ships',shipController.getAllShip)
 router.get('/get-list-ship-by-account/:account',shipController.getAllShipByAccount);
-router.get('/get-list-ship-by-select/:select/:account',shipController.getAllShipBySelectAndAccount);
+router.get('/get-ship-by-select/:account/:select',shipController.getAllShipBySelectAndAccount);
 router.delete('/delete-ship/:id',shipController.deleteShip)
 router.post('/add-shipping',shipController.addShip)
 router.put('/update-select-shipping',shipController.updateSelectShip);

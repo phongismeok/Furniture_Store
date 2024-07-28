@@ -2,11 +2,13 @@ package com.example.asm_mvvm.screens.activity
 
 import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -56,25 +58,15 @@ class AddShippingActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        val ghnViewModel = GhnViewModel()
         setContent {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White), horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                MyToolbar3(title = "Add shipping address")
-                IconAnimation()
-                DropDown(ghnViewModel = ghnViewModel)
-            }
+            SizeAddShipScreen()
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun IconAnimation() {
+fun IconAnimation(sizeScreen: String) {
     val context = LocalContext.current
     val imageRequest = ImageRequest.Builder(context)
         .data(R.drawable.home)
@@ -84,13 +76,31 @@ fun IconAnimation() {
     AsyncImage(
         model = imageRequest,
         contentDescription = null,
-        modifier = Modifier.size(150.dp)
+        modifier = Modifier.size(
+            when (sizeScreen) {
+                "large" -> {
+                    150.dp
+                }
+
+                "fairly" -> {
+                    140.dp
+                }
+
+                "medium" -> {
+                    130.dp
+                }
+
+                else -> {
+                    120.dp
+                }
+            }
+        )
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropDown(ghnViewModel: GhnViewModel) {
+fun DropDown(ghnViewModel: GhnViewModel, sizeScreen: String) {
     val provinces by ghnViewModel.provinces.observeAsState(emptyList())
     ghnViewModel.fetchProvinces()
 
@@ -127,8 +137,34 @@ fun DropDown(ghnViewModel: GhnViewModel) {
     val wards by ghnViewModel.wards.observeAsState(emptyList())
     ghnViewModel.fetchWards(idDistrict)
 
-    Column(modifier = Modifier.fillMaxSize().padding(15.dp)) {
-        Column(modifier = Modifier.padding(top = 40.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(start = 15.dp, end = 15.dp, top = 15.dp, bottom = 10.dp),
+        verticalArrangement = Arrangement.SpaceAround
+    ) {
+        Column(
+            modifier = Modifier.padding(
+                top =
+                when (sizeScreen) {
+                    "large" -> {
+                        30.dp
+                    }
+
+                    "fairly" -> {
+                        20.dp
+                    }
+
+                    "medium" -> {
+                        15.dp
+                    }
+
+                    else -> {
+                        7.dp
+                    }
+                }
+            )
+        ) {
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded },
@@ -170,7 +206,28 @@ fun DropDown(ghnViewModel: GhnViewModel) {
             }
         }
         //
-        Column(modifier = Modifier.padding(top = 30.dp)) {
+        Column(
+            modifier = Modifier.padding(
+                top =
+                when (sizeScreen) {
+                    "large" -> {
+                        30.dp
+                    }
+
+                    "fairly" -> {
+                        20.dp
+                    }
+
+                    "medium" -> {
+                        15.dp
+                    }
+
+                    else -> {
+                        7.dp
+                    }
+                }
+            )
+        ) {
             ExposedDropdownMenuBox(
                 expanded = expandedDistrict,
                 onExpandedChange = { expandedDistrict = !expandedDistrict },
@@ -212,7 +269,28 @@ fun DropDown(ghnViewModel: GhnViewModel) {
             }
         }
         //
-        Column(modifier = Modifier.padding(top = 30.dp)) {
+        Column(
+            modifier = Modifier.padding(
+                top =
+                when (sizeScreen) {
+                    "large" -> {
+                        30.dp
+                    }
+
+                    "fairly" -> {
+                        20.dp
+                    }
+
+                    "medium" -> {
+                        15.dp
+                    }
+
+                    else -> {
+                        7.dp
+                    }
+                }
+            )
+        ) {
             ExposedDropdownMenuBox(
                 expanded = expandedWard,
                 onExpandedChange = { expandedWard = !expandedWard },
@@ -253,14 +331,14 @@ fun DropDown(ghnViewModel: GhnViewModel) {
                 }
             }
         }
-        FormInput(addressDetail = dataAddress)
+        FormInput(addressDetail = dataAddress, sizeScreen = sizeScreen)
     }
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormInput(addressDetail: String) {
+fun FormInput(addressDetail: String, sizeScreen: String) {
     val shippingViewModel = ShippingViewModel()
     var fullname by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
@@ -283,7 +361,26 @@ fun FormInput(addressDetail: String) {
                 label = { Text("Địa chỉ chi tiết") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 10.dp, top = 20.dp)
+                    .padding(
+                        top =
+                        when (sizeScreen) {
+                            "large" -> {
+                                30.dp
+                            }
+
+                            "fairly" -> {
+                                20.dp
+                            }
+
+                            "medium" -> {
+                                10.dp
+                            }
+
+                            else -> {
+                                7.dp
+                            }
+                        }
+                    )
                     .height(65.dp),
                 colors = ExposedDropdownMenuDefaults.textFieldColors(
                     focusedContainerColor = Color.LightGray,
@@ -300,7 +397,26 @@ fun FormInput(addressDetail: String) {
                 label = { Text("Full name") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp)
+                    .padding(
+                        top =
+                        when (sizeScreen) {
+                            "large" -> {
+                                30.dp
+                            }
+
+                            "fairly" -> {
+                                20.dp
+                            }
+
+                            "medium" -> {
+                                10.dp
+                            }
+
+                            else -> {
+                                7.dp
+                            }
+                        }
+                    )
                     .height(65.dp),
                 colors = ExposedDropdownMenuDefaults.textFieldColors(
                     focusedContainerColor = Color.LightGray,
@@ -345,4 +461,43 @@ fun FormInput(addressDetail: String) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
+@Composable
+fun ScreenAddShip(sizeScreen: String) {
+    val ghnViewModel = GhnViewModel()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White), horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        MyToolbar3(title = "Add shipping address")
+        IconAnimation(sizeScreen = sizeScreen)
+        DropDown(ghnViewModel = ghnViewModel, sizeScreen = sizeScreen)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.P)
+@Composable
+fun SizeAddShipScreen() {
+    val context = LocalContext.current
+    val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+    val screenHeightPx = displayMetrics.heightPixels
+    val density = displayMetrics.density
+
+    val screenHeightDp = screenHeightPx / density
+
+    if (screenHeightDp > 890) {
+        // large
+        ScreenAddShip(sizeScreen = "large")
+    } else if (screenHeightDp > 800) {
+        // fairly
+        ScreenAddShip(sizeScreen = "medium")
+    } else if (screenHeightDp > 714) {
+        // medium
+        ScreenAddShip(sizeScreen = "medium")
+    } else {
+        // smail
+        ScreenAddShip(sizeScreen = "smail")
+    }
+}
 
