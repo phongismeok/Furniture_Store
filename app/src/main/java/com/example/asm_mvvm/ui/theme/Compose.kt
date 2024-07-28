@@ -229,14 +229,30 @@ fun MyButton3(
     title: String,
     onClick: () -> Unit,
     mauChu: Color,
-    mauNen: Color
+    mauNen: Color,
+    type: String
 ) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = mauNen, contentColor = mauChu),
         modifier = Modifier
             .padding(10.dp)
-            .height(70.dp)
+            .height(
+                when (type) {
+                    "large" -> {
+                        70.dp
+                    }
+                    "fairly" -> {
+                        65.dp
+                    }
+                    "medium" -> {
+                        60.dp
+                    }
+                    else -> {
+                        50.dp
+                    }
+                }
+            )
             .fillMaxWidth(),
         shape = RoundedCornerShape(15.dp),
         border = BorderStroke(1.dp, Color.Black)
@@ -244,7 +260,21 @@ fun MyButton3(
         Text(
             text = title,
             color = mauChu,
-            fontSize = 22.sp,
+            fontSize =
+            when (type) {
+                "large" -> {
+                    22.sp
+                }
+                "fairly" -> {
+                    20.sp
+                }
+                "medium" -> {
+                    18.sp
+                }
+                else -> {
+                    16.sp
+                }
+            },
             fontWeight = FontWeight(500)
         )
     }

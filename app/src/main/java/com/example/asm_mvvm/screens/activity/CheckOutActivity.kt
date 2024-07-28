@@ -731,7 +731,7 @@ fun ContentTotal(pricePro: Double, priceShip: Double, sizeScreen: String) {
 
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
 
-    val shipState = shippingViewModel.ships.observeAsState(initial = emptyList())
+    val shipState = shippingViewModel.ships2.observeAsState()
     val ships = shipState.value
 
     val cartState = carViewModel.carts.observeAsState(initial = emptyList())
@@ -794,7 +794,7 @@ fun ContentTotal(pricePro: Double, priceShip: Double, sizeScreen: String) {
         }
     }
     MyButton(title = "SUBMIT ORDER", onClick = {
-        if (ships.isEmpty()) {
+        if (ships == null) {
             Toast
                 .makeText(
                     context,
