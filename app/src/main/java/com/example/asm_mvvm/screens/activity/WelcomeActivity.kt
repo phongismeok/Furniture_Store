@@ -2,10 +2,10 @@ package com.example.asm_mvvm.screens.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.DisplayMetrics
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,31 +24,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.asm_mvvm.R
 import com.example.asm_mvvm.ui.theme.Animation
-import com.example.asm_mvvm.ui.theme.AnimationBigScreen
 import com.example.asm_mvvm.ui.theme.MyButton
-import com.example.asm_mvvm.ui.theme.MyButtonSmailScreen
+
 
 class WelcomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                if (maxWidth >= 720.dp) {
-                    BigScreenTabletWelcome()
-                } else if (maxWidth < 720.dp && maxWidth > 448.dp) {
-                    SmailScreenTabletWelcome()
-                } else if (maxWidth <= 448.dp && maxWidth > 360.dp) {
-                    BigPhoneScreenWelcome()
-                } else {
-                    SmailPhoneScreenWelcome()
-                }
-            }
+            SizeScreen()
         }
     }
 }
 
 @Composable
-fun BigPhoneScreenWelcome () {
+fun ScreenWelcome (type:String) {
     val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -59,16 +48,45 @@ fun BigPhoneScreenWelcome () {
     ) {
         Text(
             text = "FURNITURE STORE",
-            fontSize = 30.sp,
+            fontSize =
+            when (type) {
+                "large" -> {
+                    30.sp
+                }
+                "fairly" -> {
+                    27.sp
+                }
+                "medium" -> {
+                    25.sp
+                }
+                else -> {
+                    20.sp
+                }
+            }
+            ,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 20.dp),
             color = Color.Gray,
             fontFamily = FontFamily.Serif
         )
-        AnimationBigScreen(image = R.raw.animation)
+        Animation(image = R.raw.animation, type = "large")
         Text(
             text = "Welcome!",
-            fontSize = 26.sp,
+            fontSize =
+            when (type) {
+                "large" -> {
+                    29.sp
+                }
+                "fairly" -> {
+                    26.sp
+                }
+                "medium" -> {
+                    24.sp
+                }
+                else -> {
+                    20.sp
+                }
+            },
             fontWeight = FontWeight(550),
             modifier = Modifier.padding(bottom = 10.dp),
             color = Color.Black
@@ -78,7 +96,21 @@ fun BigPhoneScreenWelcome () {
                     "Explore our diverse selection of elegant decorations " +
                     "and luxurious furniture, all chosen to beautify and " +
                     "comfort your home.",
-            fontSize = 18.sp,
+            fontSize =
+            when (type) {
+                "large" -> {
+                    18.sp
+                }
+                "fairly" -> {
+                    16.sp
+                }
+                "medium" -> {
+                    15.sp
+                }
+                else -> {
+                    13.sp
+                }
+            },
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 20.dp),
             color = Color.Black
@@ -87,79 +119,39 @@ fun BigPhoneScreenWelcome () {
         MyButton(title = "Log in", onClick = {
             val intent = Intent(context, LoginActivity::class.java)
             context.startActivity(intent)
-        }, mauChu = Color.White, mauNen = Color.Blue)
+        }, mauChu = Color.White, mauNen = Color.Blue, type)
 
         MyButton(title = "Sign Up", onClick = {
             val intent = Intent(context, SignUpActivity::class.java)
             context.startActivity(intent)
-        }, mauChu = Color.White, mauNen = Color.Red)
+        }, mauChu = Color.White, mauNen = Color.Red,type)
     }
 }
 
 @Composable
-fun SmailPhoneScreenWelcome () {
+fun SizeScreen() {
     val context = LocalContext.current
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        Text(
-            text = "FURNITURE STORE",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 10.dp),
-            color = Color.Gray,
-            fontFamily = FontFamily.Serif
-        )
-        Animation(image = R.raw.animation)
-        Text(
-            text = "Welcome!",
-            fontSize = 18.sp,
-            fontWeight = FontWeight(550),
-            modifier = Modifier.padding(bottom = 10.dp),
-            color = Color.Black
-        )
-        Text(
-            text = "Welcome to our modern online furniture store! " +
-                    "Explore our diverse selection of elegant decorations " +
-                    "and luxurious furniture, all chosen to beautify and " +
-                    "comfort your home.",
-            fontSize = 14.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 20.dp),
-            color = Color.Black
-        )
+    val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+//    val screenWidthPx = displayMetrics.widthPixels
+    val screenHeightPx = displayMetrics.heightPixels
+    val density = displayMetrics.density
 
-        MyButtonSmailScreen(title = "Log in", onClick = {
-            val intent = Intent(context, LoginActivity::class.java)
-            context.startActivity(intent)
-        }, mauChu = Color.White, mauNen = Color.Blue)
+//    val screenWidthDp = screenWidthPx / density
+    val screenHeightDp = screenHeightPx / density
 
-        MyButtonSmailScreen(title = "Sign Up", onClick = {
-            val intent = Intent(context, SignUpActivity::class.java)
-            context.startActivity(intent)
-        }, mauChu = Color.White, mauNen = Color.Red)
+    if(screenHeightDp > 890) {
+        // large
+        ScreenWelcome(type = "large")
+    } else if(screenHeightDp > 800){
+        // fairly
+        ScreenWelcome(type = "fairly")
+    }else if(screenHeightDp > 714 ){
+        // medium
+        ScreenWelcome(type = "medium")
+    }else{
+        // smail
+        ScreenWelcome(type = "smail")
     }
 }
-
-@Composable
-fun BigScreenTabletWelcome () {
-    val context = LocalContext.current
-    Column {
-
-    }
-}
-
-@Composable
-fun SmailScreenTabletWelcome () {
-    val context = LocalContext.current
-    Column {
-
-    }
-}
-
 
 

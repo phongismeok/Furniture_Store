@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Asm_mvvm"
+rootProject.name = "FURNITURE_STORE"
 include(":app")
  

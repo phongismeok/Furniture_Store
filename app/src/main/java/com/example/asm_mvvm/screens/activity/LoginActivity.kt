@@ -55,7 +55,6 @@ import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.ui.theme.CustomLineBigScreen
 import com.example.asm_mvvm.ui.theme.CustomLineSmailScreen
 import com.example.asm_mvvm.ui.theme.MyButton
-import com.example.asm_mvvm.ui.theme.MyButtonSmailScreen
 import com.example.asm_mvvm.ui.theme.MyButtonWithImage
 import com.example.asm_mvvm.ui.theme.MyButtonWithImageSmailScreen
 import com.example.asm_mvvm.viewmodels.UserViewModel
@@ -70,14 +69,19 @@ class LoginActivity : AppCompatActivity() {
             BoxWithConstraints(modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)) {
-                if (maxWidth >= 720.dp) {
-                    BigTabletScreenLogin()
-                } else if (maxWidth < 720.dp && maxWidth > 448.dp) {
-                    SmailTabletScreenLogin()
-                } else if (maxWidth <= 448.dp && maxWidth > 360.dp) {
-                    BigPhoneScreenLogin()
-                } else {
-                    SmailPhoneScreenLogin()
+                when {
+                    maxHeight >= 720.dp -> {
+                        BigTabletScreenLogin()
+                    }
+                    maxHeight > 448.dp -> {
+                        SmailTabletScreenLogin()
+                    }
+                    maxHeight > 400.dp -> {
+                        BigPhoneScreenLogin()
+                    }
+                    else -> {
+                        SmailPhoneScreenLogin()
+                    }
                 }
             }
         }
@@ -554,7 +558,7 @@ fun SmailPhoneScreenLogin() {
             checkSave = checkSave ?: ""
         )
         CheckBoxLoginSmailScreen(checked = checked)
-        MyButtonSmailScreen(
+        MyButton(
             title = "Log in",
             onClick = {
                 userViewModel.login(

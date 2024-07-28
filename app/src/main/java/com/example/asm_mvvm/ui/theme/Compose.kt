@@ -62,29 +62,28 @@ import com.example.asm_mvvm.screens.activity.LoginActivity
 
 
 @Composable
-fun Animation(image: Int) {
+fun Animation(image: Int,type:String) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(image))
     val progress by animateLottieCompositionAsState(composition)
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.size(200.dp)
-    ) {
-        LottieAnimation(
-            composition = composition,
-            progress = progress,
+        modifier = Modifier.size(
+            when (type) {
+                "large" -> {
+                    300.dp
+                }
+                "fairly" -> {
+                    270.dp
+                }
+                "medium" -> {
+                    240.dp
+                }
+                else -> {
+                    200.dp
+                }
+            }
         )
-    }
-}
-
-@Composable
-fun AnimationBigScreen(image: Int) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(image))
-    val progress by animateLottieCompositionAsState(composition)
-
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.size(300.dp)
     ) {
         LottieAnimation(
             composition = composition,
@@ -98,7 +97,8 @@ fun MyButton(
     title: String,
     onClick: () -> Unit,
     mauChu: Color,
-    mauNen: Color
+    mauNen: Color,
+    type : String = "no"
 ) {
     Button(
         onClick = onClick,
@@ -106,38 +106,41 @@ fun MyButton(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
-            .height(70.dp),
+            .height(
+                when (type) {
+                    "large" -> {
+                        70.dp
+                    }
+                    "fairly" -> {
+                        65.dp
+                    }
+                    "medium" -> {
+                        60.dp
+                    }
+                    else -> {
+                        50.dp
+                    }
+                }
+            ),
         shape = RoundedCornerShape(15.dp)
     ) {
         Text(
             text = title,
             color = mauChu,
-            fontSize = 22.sp,
-            fontWeight = FontWeight(500)
-        )
-    }
-}
-
-@Composable
-fun MyButtonSmailScreen(
-    title: String,
-    onClick: () -> Unit,
-    mauChu: Color,
-    mauNen: Color
-) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = mauNen, contentColor = mauChu),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 3.dp)
-            .height(50.dp),
-        shape = RoundedCornerShape(15.dp)
-    ) {
-        Text(
-            text = title,
-            color = mauChu,
-            fontSize = 16.sp,
+            fontSize = when (type) {
+                "large" -> {
+                    22.sp
+                }
+                "fairly" -> {
+                    20.sp
+                }
+                "medium" -> {
+                    18.sp
+                }
+                else -> {
+                    16.sp
+                }
+            },
             fontWeight = FontWeight(500)
         )
     }

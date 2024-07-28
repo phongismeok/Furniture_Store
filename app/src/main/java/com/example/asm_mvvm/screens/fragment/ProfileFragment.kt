@@ -45,7 +45,7 @@ import com.example.asm_mvvm.viewmodels.ShippingViewModel
 import com.example.asm_mvvm.viewmodels.UserViewModel
 
 @Composable
-fun ProfileFragment(){
+fun ProfileFragment() {
     val context = LocalContext.current
     SharedPreferencesManager.init(context)
     val userViewModel = UserViewModel()
@@ -59,7 +59,7 @@ fun ProfileFragment(){
         }
         MyOptions(tittle = "Shipping Addresses", content = "haha") {
             val intent = Intent(context, ShippingActivity::class.java)
-                context.startActivity(intent)
+            context.startActivity(intent)
         }
         MyOptions(tittle = "Payment Method", content = "haha") {
             Toast
@@ -109,7 +109,8 @@ fun MyInfo(userViewModel: UserViewModel) {
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier
-                            .size(80.dp).clip(CircleShape)
+                            .size(80.dp)
+                            .clip(CircleShape)
                     )
                     Column(modifier = Modifier.padding(start = 15.dp)) {
                         Text(text = it[0].username, fontSize = 20.sp, fontWeight = FontWeight.Bold)

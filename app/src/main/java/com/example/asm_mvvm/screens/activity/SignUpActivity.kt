@@ -52,7 +52,6 @@ import com.example.asm_mvvm.R
 import com.example.asm_mvvm.ui.theme.CustomLineBigScreen
 import com.example.asm_mvvm.ui.theme.CustomLineSmailScreen
 import com.example.asm_mvvm.ui.theme.MyButton
-import com.example.asm_mvvm.ui.theme.MyButtonSmailScreen
 import com.example.asm_mvvm.ui.theme.MyButtonWithImage
 import com.example.asm_mvvm.ui.theme.MyButtonWithImageSmailScreen
 import com.example.asm_mvvm.viewmodels.UserViewModel
@@ -455,7 +454,7 @@ fun SmailPhoneScreenSignUp() {
             passwordVisible = passwordVisible
         )
         ConfirmCheckSignUpSmailScreen(checked = checked)
-        MyButtonSmailScreen(
+        MyButton(
             title = "Sign Up",
             onClick = {
                 userViewModel.signUp(email.value, password.value) { success ->
