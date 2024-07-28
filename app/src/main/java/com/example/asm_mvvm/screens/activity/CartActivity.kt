@@ -3,10 +3,10 @@ package com.example.asm_mvvm.screens.activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
@@ -71,12 +71,11 @@ class CartActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             val type = intent.getStringExtra("TYPE") ?: "home"
             Column {
                 MyToolbar3(title = "My cart")
-                ListCart(screen = type)
+                SizeCartScreen(screen = type)
             }
         }
     }
@@ -85,7 +84,7 @@ class CartActivity : AppCompatActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ListCart(screen: String) {
+fun ListCart(screen: String, sizeScreen: String) {
     val context = LocalContext.current
     SharedPreferencesManager.init(context)
     BackHandler {
@@ -110,7 +109,9 @@ fun ListCart(screen: String) {
     cartViewModel.getCartByAccount(account)
     if (carts.isEmpty()) {
         Column(
-            modifier = Modifier.fillMaxSize().background(Color.White),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -145,7 +146,7 @@ fun ListCart(screen: String) {
             contentPadding = PaddingValues(8.dp),
             modifier = Modifier
                 .padding(top = 20.dp)
-                .fillMaxHeight(0.72f)
+                .fillMaxHeight(0.7f)
         ) {
             items(carts.size) { index ->
                 val priceProduct = carts[index].price * carts[index].quantity.toDouble()
@@ -266,17 +267,15 @@ fun ListCart(screen: String) {
                                         var newQuantity2 = carts[index].quantity
                                         newQuantity2 = newQuantity2.minus(1)
                                         if (newQuantity2 > 0) {
-                                            if (account != null) {
-                                                cartViewModel.updateQuantityCart(
-                                                    id = carts[index].id,
-                                                    newQuantity2,
-                                                    account,
-                                                    "b",
-                                                    "",
-                                                    context,
-                                                    type = 0
-                                                )
-                                            }
+                                            cartViewModel.updateQuantityCart(
+                                                id = carts[index].id,
+                                                newQuantity2,
+                                                account,
+                                                "b",
+                                                "",
+                                                context,
+                                                type = 0
+                                            )
                                         } else {
                                             Toast.makeText(
                                                 context,
@@ -317,7 +316,7 @@ fun ListCart(screen: String) {
                                         .size(30.dp)
                                         .clickable {
                                             val id = carts[index].id
-                                            cartViewModel.deleteCart(id, account, context,1)
+                                            cartViewModel.deleteCart(id, account, context, 1)
                                         }
                                 )
 
@@ -344,13 +343,13 @@ fun ListCart(screen: String) {
 
             }
         }
-        InputCard(price = totalPrice)
+        InputCard(price = totalPrice, type = sizeScreen)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputCard(price: Double) {
+fun InputCard(price: Double,type:String) {
     var inputcode by remember { mutableStateOf("") }
 
     Column(
@@ -358,7 +357,6 @@ fun InputCard(price: Double) {
             .fillMaxSize()
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
     ) {
         Row(
             modifier = Modifier
@@ -432,23 +430,28 @@ fun InputCard(price: Double) {
                 }
             }
         }
-        Total(price = price)
+        Total(price = price, type = type)
     }
 }
 
 @Composable
-fun Total(price: Double) {
+fun Total(price: Double,type: String) {
     val context = LocalContext.current
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 5.dp),
+        verticalArrangement = Arrangement.Bottom
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp), Arrangement.SpaceBetween
+                .padding(start = 15.dp, end = 15.dp), Arrangement.SpaceBetween
         ) {
             Text(
                 text = "Total:", fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Color(
                     0xFF408143
-                ), modifier = Modifier.fillMaxWidth(0.5f)
+                ), modifier = Modifier.fillMaxWidth(0.4f)
             )
 
 
@@ -468,7 +471,33 @@ fun Total(price: Double) {
                 context.startActivity(intent)
             },
             mauChu = Color.White,
-            mauNen = Color.DarkGray
+            mauNen = Color.DarkGray,
+            type = type
         )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.P)
+@Composable
+fun SizeCartScreen(screen: String) {
+    val context = LocalContext.current
+    val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+    val screenHeightPx = displayMetrics.heightPixels
+    val density = displayMetrics.density
+
+    val screenHeightDp = screenHeightPx / density
+
+    if (screenHeightDp > 890) {
+        // large
+        ListCart(screen = screen, sizeScreen = "large")
+    } else if (screenHeightDp > 800) {
+        // fairly
+        ListCart(screen = screen, sizeScreen = "medium")
+    } else if (screenHeightDp > 714) {
+        // medium
+        ListCart(screen = screen, sizeScreen = "medium")
+    } else {
+        // smail
+        ListCart(screen = screen, sizeScreen = "smail")
     }
 }

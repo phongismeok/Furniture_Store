@@ -1,6 +1,7 @@
 package com.example.asm_mvvm.screens.fragment
 
 import android.content.Intent
+import android.util.DisplayMetrics
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
@@ -35,33 +38,57 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.asm_mvvm.SharedPreferencesManager
-import com.example.asm_mvvm.screens.activity.CartActivity
 import com.example.asm_mvvm.screens.activity.MyOrderActivity
 import com.example.asm_mvvm.screens.activity.MyReviewActivity
 import com.example.asm_mvvm.screens.activity.SettingActivity
 import com.example.asm_mvvm.screens.activity.ShippingActivity
 import com.example.asm_mvvm.ui.theme.MyToolbar2
-import com.example.asm_mvvm.viewmodels.ShippingViewModel
 import com.example.asm_mvvm.viewmodels.UserViewModel
 
 @Composable
 fun ProfileFragment() {
     val context = LocalContext.current
+
+    val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+    val screenHeightPx = displayMetrics.heightPixels
+    val density = displayMetrics.density
+    val screenHeightDp = screenHeightPx / density
+
+    if (screenHeightDp > 890) {
+        // large
+        ScreenProfile(type = "large")
+    } else if (screenHeightDp > 800) {
+        // fairly
+        ScreenProfile(type = "fairly")
+    } else if (screenHeightDp > 714) {
+        // medium
+        ScreenProfile(type = "medium")
+    } else {
+        // smail
+        ScreenProfile(type = "smail")
+    }
+
+}
+
+@Composable
+fun ScreenProfile (type:String){
+    val context = LocalContext.current
     SharedPreferencesManager.init(context)
     val userViewModel = UserViewModel()
-
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState())) {
         MyToolbar2(title = "Profile")
-        MyInfo(userViewModel = userViewModel)
-        MyOptions(tittle = "My orders", content = "haha") {
+        MyInfo(userViewModel = userViewModel, type = type)
+        MyOptions(tittle = "My orders", content = "haha", type = type) {
             val intent = Intent(context, MyOrderActivity::class.java)
             context.startActivity(intent)
         }
-        MyOptions(tittle = "Shipping Addresses", content = "haha") {
+        MyOptions(tittle = "Shipping Addresses", content = "haha", type = type) {
             val intent = Intent(context, ShippingActivity::class.java)
             context.startActivity(intent)
         }
-        MyOptions(tittle = "Payment Method", content = "haha") {
+        MyOptions(tittle = "Payment Method", content = "haha", type = type) {
             Toast
                 .makeText(
                     context,
@@ -70,11 +97,11 @@ fun ProfileFragment() {
                 )
                 .show()
         }
-        MyOptions(tittle = "My reviews", content = "haha") {
+        MyOptions(tittle = "My reviews", content = "haha", type = type) {
             val intent = Intent(context, MyReviewActivity::class.java)
             context.startActivity(intent)
         }
-        MyOptions(tittle = "Setting", content = "haha") {
+        MyOptions(tittle = "Setting", content = "haha", type = type) {
             val intent = Intent(context, SettingActivity::class.java)
             context.startActivity(intent)
         }
@@ -82,7 +109,7 @@ fun ProfileFragment() {
 }
 
 @Composable
-fun MyInfo(userViewModel: UserViewModel) {
+fun MyInfo(userViewModel: UserViewModel,type: String) {
     val account = userViewModel.getEmailFromSharedPreferences()
 
     Row(
@@ -113,8 +140,42 @@ fun MyInfo(userViewModel: UserViewModel) {
                             .clip(CircleShape)
                     )
                     Column(modifier = Modifier.padding(start = 15.dp)) {
-                        Text(text = it[0].username, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                        Text(text = it[0].name, fontSize = 22.sp)
+                        Text(text = it[0].username, fontSize =
+                        when (type) {
+                            "large" -> {
+                                20.sp
+                            }
+
+                            "fairly" -> {
+                                19.sp
+                            }
+
+                            "medium" -> {
+                                18.sp
+                            }
+
+                            else -> {
+                                17.sp
+                            }
+                        }, fontWeight = FontWeight.Bold)
+                        Text(text = it[0].name, fontSize =
+                        when (type) {
+                            "large" -> {
+                                21.sp
+                            }
+
+                            "fairly" -> {
+                                20.sp
+                            }
+
+                            "medium" -> {
+                                19.sp
+                            }
+
+                            else -> {
+                                18.sp
+                            }
+                        })
                     }
                 }
             } ?: run {
@@ -126,7 +187,7 @@ fun MyInfo(userViewModel: UserViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyOptions(tittle: String, content: String, onClick: () -> Unit) {
+fun MyOptions(type: String,tittle: String, content: String, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor =
@@ -138,7 +199,25 @@ fun MyOptions(tittle: String, content: String, onClick: () -> Unit) {
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
+            .height(
+                when (type) {
+                    "large" -> {
+                        120.dp
+                    }
+
+                    "fairly" -> {
+                        110.dp
+                    }
+
+                    "medium" -> {
+                        100.dp
+                    }
+
+                    else -> {
+                        90.dp
+                    }
+                }
+            )
             .padding(10.dp),
         shape = RectangleShape,
         onClick = onClick
@@ -154,7 +233,24 @@ fun MyOptions(tittle: String, content: String, onClick: () -> Unit) {
             ) {
                 Text(
                     text = tittle,
-                    fontSize = 23.sp,
+                    fontSize =
+                    when (type) {
+                        "large" -> {
+                            23.sp
+                        }
+
+                        "fairly" -> {
+                            21.sp
+                        }
+
+                        "medium" -> {
+                            19.sp
+                        }
+
+                        else -> {
+                            17.sp
+                        }
+                    },
                     fontWeight = FontWeight(550),
                     color = Color.Black
                 )

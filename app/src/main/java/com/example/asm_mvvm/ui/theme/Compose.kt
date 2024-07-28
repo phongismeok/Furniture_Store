@@ -77,10 +77,10 @@ fun Animation(image: Int,type:String) {
                     270.dp
                 }
                 "medium" -> {
-                    240.dp
+                    200.dp
                 }
                 else -> {
-                    200.dp
+                    170.dp
                 }
             }
         )
@@ -123,6 +123,59 @@ fun MyButton(
                 }
             ),
         shape = RoundedCornerShape(15.dp)
+    ) {
+        Text(
+            text = title,
+            color = mauChu,
+            fontSize = when (type) {
+                "large" -> {
+                    22.sp
+                }
+                "fairly" -> {
+                    20.sp
+                }
+                "medium" -> {
+                    18.sp
+                }
+                else -> {
+                    16.sp
+                }
+            },
+            fontWeight = FontWeight(500)
+        )
+    }
+}
+
+@Composable
+fun MyButtonCustom1(
+    title: String,
+    onClick: () -> Unit,
+    mauChu: Color,
+    mauNen: Color,
+    type : String = "no"
+) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = mauNen, contentColor = mauChu),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(
+                when (type) {
+                    "large" -> {
+                        70.dp
+                    }
+                    "fairly" -> {
+                        65.dp
+                    }
+                    "medium" -> {
+                        60.dp
+                    }
+                    else -> {
+                        50.dp
+                    }
+                }
+            ),
+        shape = RoundedCornerShape(bottomEnd = 10.dp, topEnd = 10.dp)
     ) {
         Text(
             text = title,
@@ -333,7 +386,7 @@ fun MyToolbar(title: String, type: String, place: String, textState: MutableStat
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 10.dp, end = 10.dp, top = 25.dp),
+                .padding(start = 10.dp, end = 10.dp),
         )
     } else {
         TopAppBar(

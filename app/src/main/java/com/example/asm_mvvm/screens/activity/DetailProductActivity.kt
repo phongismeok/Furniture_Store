@@ -2,11 +2,10 @@ package com.example.asm_mvvm.screens.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.util.DisplayMetrics
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,8 +26,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,6 +58,7 @@ import com.example.asm_mvvm.R
 import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.request.CartRequest
 import com.example.asm_mvvm.request.FavoritesRequest
+import com.example.asm_mvvm.ui.theme.MyButtonCustom1
 import com.example.asm_mvvm.viewmodels.CartViewModel
 import com.example.asm_mvvm.viewmodels.FavoritesViewModel
 import com.example.asm_mvvm.viewmodels.ProductViewModel
@@ -69,71 +67,17 @@ import com.example.asm_mvvm.viewmodels.UserViewModel
 class DetailProductActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        val productViewModel = ProductViewModel()
         val idPro = intent.getStringExtra("ID_PRODUCT")
         val screen = intent.getStringExtra("SCREEN")
-
         setContent {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                if (idPro != null) {
-                    val product by productViewModel.product.observeAsState()
-
-                    LaunchedEffect(idPro) {
-                        if (idPro != "") {
-                            productViewModel.getProductById(idPro)
-                        }
-                    }
-                    product?.let {
-                        Column( // phan image
-                            modifier = Modifier
-                                .fillMaxHeight(0.55f)
-                                .fillMaxWidth()
-                        ) {
-                            if (screen != null) {
-                                TransactionImage(
-                                    image1 = it.image1,
-                                    image2 = it.image2,
-                                    image3 = it.image3,
-                                    screen = screen
-                                )
-                            }
-                        }
-
-                        Column( // phan content
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth()
-                                .padding(top = 35.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
-                        ) {
-                            TransactionContent(
-                                name = it.productName,
-                                price = it.price,
-                                content = it.describe,
-                                image = it.image1,
-                                it.id
-                            )
-                        }
-                    } ?: run {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text("Loading...", fontSize = 22.sp)
-                        }
-                    }
-                }
-            }
+            SizeDetailScreen(idPro = idPro, screen = screen)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransactionImage(image1: String, image2: String, image3: String, screen: String) {
+fun TransactionImage(image1: String, image2: String, image3: String, screen: String, type: String) {
     val context = LocalContext.current
     var selected by remember {
         mutableStateOf("image1")
@@ -190,12 +134,30 @@ fun TransactionImage(image1: String, image2: String, image3: String, screen: Str
             modifier = Modifier
                 .fillMaxWidth(0.85f)
                 .align(Alignment.TopEnd)
-                .padding(top = 100.dp)
+                .padding(
+                    top =
+                    when (type) {
+                        "large" -> {
+                            100.dp
+                        }
+
+                        "fairly" -> {
+                            90.dp
+                        }
+
+                        "medium" -> {
+                            40.dp
+                        }
+
+                        else -> {
+                            20.dp
+                        }
+                    }
+                )
         ) {
             Card(
                 modifier = Modifier
-                    .width(50.dp)
-                    .height(50.dp),
+                    .size(50.dp),
                 shape = RoundedCornerShape(10.dp),
                 colors = CardDefaults.cardColors(
                     containerColor =
@@ -228,7 +190,26 @@ fun TransactionImage(image1: String, image2: String, image3: String, screen: Str
             modifier = Modifier
                 .fillMaxWidth(0.87f)
                 .align(Alignment.TopEnd)
-                .padding(top = 200.dp)
+                .padding(
+                    top =
+                    when (type) {
+                        "large" -> {
+                            200.dp
+                        }
+
+                        "fairly" -> {
+                            170.dp
+                        }
+
+                        "medium" -> {
+                            130.dp
+                        }
+
+                        else -> {
+                            120.dp
+                        }
+                    }
+                )
         ) {
             Card(
                 modifier = Modifier
@@ -358,6 +339,7 @@ fun TransactionContent(
     content: String,
     image: String,
     id: String,
+    type: String
 ) {
     val icon1: Painter = painterResource(id = R.drawable.icontru)
     val icon2: Painter = painterResource(id = R.drawable.bookmark)
@@ -377,20 +359,58 @@ fun TransactionContent(
     SharedPreferencesManager.init(context)
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
 
-    cartViewModel.getCartsByProductId(account,id)
+    cartViewModel.getCartsByProductId(account, id)
     favoritesViewModel.getFavoritesByProductId(account, id)
 
     var bienDem by rememberSaveable {
         mutableIntStateOf(1)
     }
     Column(modifier = Modifier.fillMaxHeight()) {
-        Text(text = name, fontSize = 28.sp, fontFamily = FontFamily.Serif)
+        Text(
+            text = name, fontSize =
+            when (type) {
+                "large" -> {
+                    28.sp
+                }
+
+                "fairly" -> {
+                    26.sp
+                }
+
+                "medium" -> {
+                    24.sp
+                }
+
+                else -> {
+                    22.sp
+                }
+            }, fontFamily = FontFamily.Serif
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "$ $price", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = "$ $price", fontSize =
+                when (type) {
+                    "large" -> {
+                        30.sp
+                    }
+
+                    "fairly" -> {
+                        28.sp
+                    }
+
+                    "medium" -> {
+                        26.sp
+                    }
+
+                    else -> {
+                        24.sp
+                    }
+                }, fontWeight = FontWeight.Bold
+            )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Card(
                     shape = RoundedCornerShape(10.dp),
@@ -412,18 +432,125 @@ fun TransactionContent(
                         Icons.Filled.Add,
                         contentDescription = "Check icon",
                         modifier = Modifier
-                            .size(40.dp)
-                            .padding(5.dp)
+                            .size(
+                                when (type) {
+                                    "large" -> {
+                                        40.dp
+                                    }
+
+                                    "fairly" -> {
+                                        38.dp
+                                    }
+
+                                    "medium" -> {
+                                        35.dp
+                                    }
+
+                                    else -> {
+                                        30.dp
+                                    }
+                                }
+                            )
+                            .padding(
+                                when (type) {
+                                    "large" -> {
+                                        5.dp
+                                    }
+
+                                    "fairly" -> {
+                                        4.dp
+                                    }
+
+                                    "medium" -> {
+                                        3.dp
+                                    }
+
+                                    else -> {
+                                        2.dp
+                                    }
+                                }
+                            )
                     )
                 }
 
                 Text(
                     text = "" + bienDem,
-                    fontSize = 27.sp,
+                    fontSize =
+                    when (type) {
+                        "large" -> {
+                            27.sp
+                        }
+
+                        "fairly" -> {
+                            25.sp
+                        }
+
+                        "medium" -> {
+                            23.sp
+                        }
+
+                        else -> {
+                            21.sp
+                        }
+                    },
                     fontWeight = FontWeight(400),
                     modifier = Modifier
-                        .padding(start = 10.dp, end = 10.dp)
-                        .width(40.dp),
+                        .padding(
+                            start =
+                            when (type) {
+                                "large" -> {
+                                    10.dp
+                                }
+
+                                "fairly" -> {
+                                    8.dp
+                                }
+
+                                "medium" -> {
+                                    6.dp
+                                }
+
+                                else -> {
+                                    4.dp
+                                }
+                            }, end =
+                            when (type) {
+                                "large" -> {
+                                    10.dp
+                                }
+
+                                "fairly" -> {
+                                    8.dp
+                                }
+
+                                "medium" -> {
+                                    6.dp
+                                }
+
+                                else -> {
+                                    4.dp
+                                }
+                            }
+                        )
+                        .width(
+                            when (type) {
+                                "large" -> {
+                                    40.dp
+                                }
+
+                                "fairly" -> {
+                                    38.dp
+                                }
+
+                                "medium" -> {
+                                    35.dp
+                                }
+
+                                else -> {
+                                    30.dp
+                                }
+                            }
+                        ),
                     textAlign = TextAlign.Center
                 )
 
@@ -445,8 +572,44 @@ fun TransactionContent(
                         painter = icon1,
                         contentDescription = "",
                         modifier = Modifier
-                            .size(40.dp)
-                            .padding(5.dp)
+                            .size(
+                                when (type) {
+                                    "large" -> {
+                                        40.dp
+                                    }
+
+                                    "fairly" -> {
+                                        38.dp
+                                    }
+
+                                    "medium" -> {
+                                        35.dp
+                                    }
+
+                                    else -> {
+                                        30.dp
+                                    }
+                                }
+                            )
+                            .padding(
+                                when (type) {
+                                    "large" -> {
+                                        5.dp
+                                    }
+
+                                    "fairly" -> {
+                                        4.dp
+                                    }
+
+                                    "medium" -> {
+                                        3.dp
+                                    }
+
+                                    else -> {
+                                        2.dp
+                                    }
+                                }
+                            )
                     )
                 }
             }
@@ -486,27 +649,62 @@ fun TransactionContent(
         }
 
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
-            Column(modifier = Modifier.fillMaxHeight(0.6f)) {
+            Column(modifier = Modifier.fillMaxHeight(0.45f)) {
                 Text(
                     text = content,
-                    fontSize = 20.sp,
+                    fontSize =
+                    when (type) {
+                        "large" -> {
+                            20.sp
+                        }
+
+                        "fairly" -> {
+                            19.sp
+                        }
+
+                        "medium" -> {
+                            18.sp
+                        }
+
+                        else -> {
+                            17.sp
+                        }
+                    },
                     modifier = Modifier.verticalScroll(rememberScrollState())
                 )
             }
             Row(
                 modifier = Modifier
                     .height(80.dp)
+                    .fillMaxWidth()
                     .padding(top = 10.dp)
             ) {
                 if (favorites != null) {
                     Card(
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(topStart = 10.dp, bottomStart = 10.dp),
                         colors = CardDefaults.cardColors(
                             Color.DarkGray
                         ),
                         modifier = Modifier
-                            .width(70.dp)
-                            .height(70.dp),
+                            .size(
+                                when (type) {
+                                    "large" -> {
+                                        70.dp
+                                    }
+
+                                    "fairly" -> {
+                                        65.dp
+                                    }
+
+                                    "medium" -> {
+                                        60.dp
+                                    }
+
+                                    else -> {
+                                        50.dp
+                                    }
+                                }
+                            ),
                         onClick = {
                             val idFv = favorites.id
                             favoritesViewModel.deleteFavorites(idFv, account, context)
@@ -527,15 +725,32 @@ fun TransactionContent(
                     }
                 } else {
                     Card(
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(topStart = 5.dp, bottomStart = 5.dp),
                         colors = CardDefaults.cardColors(
                             Color.LightGray
                         ),
                         modifier = Modifier
-                            .width(70.dp)
-                            .height(70.dp),
+                            .size(
+                                when (type) {
+                                    "large" -> {
+                                        70.dp
+                                    }
+
+                                    "fairly" -> {
+                                        65.dp
+                                    }
+
+                                    "medium" -> {
+                                        60.dp
+                                    }
+
+                                    else -> {
+                                        50.dp
+                                    }
+                                }
+                            ),
                         onClick = {
-                            favoritesViewModel.getFavoritesByProductId(account,id)
+                            favoritesViewModel.getFavoritesByProductId(account, id)
                             val fvBody = FavoritesRequest(
                                 productId = id,
                                 productName = name,
@@ -568,68 +783,132 @@ fun TransactionContent(
                     }
                 }
 
-
-                Button(
-                    onClick = {
-
-                        if (cart != null) {
-                                val quantityBefore = cart.quantity
-                                val quantitySuggest = 99 - quantityBefore
-                                if (bienDem + quantityBefore < 100) {
-                                    cartViewModel.updateQuantityCart(
-                                        cart.id,
-                                        bienDem + quantityBefore,
-                                        account = account,
-                                        "Thêm vào giỏ hàng thành công",
-                                        "Thêm vào giỏ hàng thất bại",
-                                        context,
-                                        type = 1
-                                    )
-                                } else if (bienDem + quantityBefore >= 100) {
-                                    Toast.makeText(
-                                        context,
-                                        "Bạn chỉ có thể mua thêm $quantitySuggest sản phẩm này",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                        }else{
-                            val cartBody = CartRequest(
-                                productId = id,
-                                productName = name,
-                                quantity = bienDem,
-                                image = image,
-                                price = price,
-                                account = account
-                            )
-                            cartViewModel.addProductToCart(
-                                account,
-                                cartBody,
+                MyButtonCustom1(title = "Add to cart", onClick = {
+                    if (cart != null) {
+                        val quantityBefore = cart.quantity
+                        val quantitySuggest = 99 - quantityBefore
+                        if (bienDem + quantityBefore < 100) {
+                            cartViewModel.updateQuantityCart(
+                                cart.id,
+                                bienDem + quantityBefore,
+                                account = account,
                                 "Thêm vào giỏ hàng thành công",
                                 "Thêm vào giỏ hàng thất bại",
-                                context
+                                context,
+                                type = 1
                             )
+                        } else if (bienDem + quantityBefore >= 100) {
+                            Toast.makeText(
+                                context,
+                                "Bạn chỉ có thể mua thêm $quantitySuggest sản phẩm này",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
+                    } else {
+                        val cartBody = CartRequest(
+                            productId = id,
+                            productName = name,
+                            quantity = bienDem,
+                            image = image,
+                            price = price,
+                            account = account
+                        )
+                        cartViewModel.addProductToCart(
+                            account,
+                            cartBody,
+                            "Thêm vào giỏ hàng thành công",
+                            "Thêm vào giỏ hàng thất bại",
+                            context
+                        )
+                    }
+                }, mauChu = Color.White, mauNen = Color.Black, type = type)
 
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Black,
-                        contentColor = Color.White,
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(7f)
-                        .height(70.dp)
-                        .padding(start = 10.dp),
-                    shape = RoundedCornerShape(10)
-                ) {
-                    Text(
-                        text = "Add to cart",
-                        fontSize = 25.sp,
-                        fontWeight = FontWeight(500)
-                    )
-                }
             }
         }
 
+    }
+}
+
+@Composable
+fun DetailScreen(type: String, idPro: String?, screen: String?) {
+    val productViewModel = ProductViewModel()
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        if (idPro != null) {
+            val product by productViewModel.product.observeAsState()
+
+            LaunchedEffect(idPro) {
+                if (idPro != "") {
+                    productViewModel.getProductById(idPro)
+                }
+            }
+            product?.let {
+                Column( // phan image
+                    modifier = Modifier
+                        .fillMaxHeight(0.55f)
+                        .fillMaxWidth()
+                ) {
+                    if (screen != null) {
+                        TransactionImage(
+                            image1 = it.image1,
+                            image2 = it.image2,
+                            image3 = it.image3,
+                            screen = screen,
+                            type = type
+                        )
+                    }
+                }
+
+                Column( // phan content
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                ) {
+                    TransactionContent(
+                        name = it.productName,
+                        price = it.price,
+                        content = it.describe,
+                        image = it.image1,
+                        it.id,
+                        type = type
+                    )
+                }
+            } ?: run {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text("Loading...", fontSize = 22.sp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SizeDetailScreen(idPro: String?, screen: String?) {
+    val context = LocalContext.current
+    val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+    val screenHeightPx = displayMetrics.heightPixels
+    val density = displayMetrics.density
+
+    val screenHeightDp = screenHeightPx / density
+
+    if (screenHeightDp > 890) {
+        // large
+        DetailScreen(type = "large", idPro, screen)
+    } else if (screenHeightDp > 800) {
+        // fairly
+        DetailScreen(type = "medium", idPro, screen)
+    } else if (screenHeightDp > 714) {
+        // medium
+        DetailScreen(type = "medium", idPro, screen)
+    } else {
+        // smail
+        DetailScreen(type = "smail", idPro, screen)
     }
 }

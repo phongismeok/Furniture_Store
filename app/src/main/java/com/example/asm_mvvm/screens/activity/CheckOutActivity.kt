@@ -2,11 +2,10 @@ package com.example.asm_mvvm.screens.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.util.DisplayMetrics
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,7 +21,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
@@ -44,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.asm_mvvm.R
 import com.example.asm_mvvm.SharedPreferencesManager
-import com.example.asm_mvvm.request.FavoritesRequest
 import com.example.asm_mvvm.request.NotificationRequest
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyToolbar3
@@ -56,29 +56,16 @@ import com.example.asm_mvvm.viewmodels.UserViewModel
 class CheckOutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         SharedPreferencesManager.init(applicationContext)
         val priceNhan = intent.getStringExtra("PRICE")
         setContent {
-            Column {
-                MyToolbar3(title = "Check out")
-                Title(title = "Shipping Address", 1)
-                ContentShippingAddress()
-                Title(title = "Payment", 2)
-                ContentPayment(number = "1234 5678 9012 3456")
-                Title(title = "Delivery method", 3)
-                ContentDeliveryMethod(speed = "Fast (2-3days)")
-                if (priceNhan != null) {
-                    ContentTotal(pricePro = priceNhan.toDouble(), priceShip = 5.0)
-                }
-                ClickBackCheckOut()
-            }
+            SizeCheckOutScreen(price = priceNhan!!)
         }
     }
 }
 
 @Composable
-fun Title(title: String, type: Int) {
+fun Title(title: String, type: Int,sizeScreen:String) {
     val shippingViewModel = ShippingViewModel()
     val userViewModel = UserViewModel()
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
@@ -93,14 +80,48 @@ fun Title(title: String, type: Int) {
     ) {
         Text(
             text = title,
-            fontSize = 25.sp,
+            fontSize = when (sizeScreen) {
+                "large" -> {
+                    25.sp
+                }
+
+                "fairly" -> {
+                    23.sp
+                }
+
+                "medium" -> {
+                    21.sp
+                }
+
+                else -> {
+                    19.sp
+                }
+            },
             color = Color(0xFF408143),
             modifier = Modifier.fillMaxWidth(0.5f)
         )
         Spacer(modifier = Modifier)
         Icon(
             Icons.Default.Edit, contentDescription = null, modifier = Modifier
-                .size(30.dp)
+                .size(
+                    when (sizeScreen) {
+                        "large" -> {
+                            30.dp
+                        }
+
+                        "fairly" -> {
+                            28.dp
+                        }
+
+                        "medium" -> {
+                            26.dp
+                        }
+
+                        else -> {
+                            24.dp
+                        }
+                    }
+                )
                 .fillMaxWidth(0.5f)
                 .clickable {
                     when (type) {
@@ -141,7 +162,7 @@ fun Title(title: String, type: Int) {
 }
 
 @Composable
-fun ContentShippingAddress() {
+fun ContentShippingAddress(sizeScreen: String) {
     val shippingViewModel = ShippingViewModel()
     val userViewModel = UserViewModel()
 
@@ -163,7 +184,41 @@ fun ContentShippingAddress() {
     } else {
         Card(
             shape = RoundedCornerShape(5.dp),
-            modifier = Modifier.padding(top = 20.dp, start = 30.dp, end = 30.dp, bottom = 20.dp),
+            modifier = Modifier.padding(top =
+            when (sizeScreen) {
+                "large" -> {
+                    20.dp
+                }
+
+                "fairly" -> {
+                    17.dp
+                }
+
+                "medium" -> {
+                    15.dp
+                }
+
+                else -> {
+                    13.dp
+                }
+            }, start = 20.dp, end = 20.dp, bottom =
+            when (sizeScreen) {
+                "large" -> {
+                    10.dp
+                }
+
+                "fairly" -> {
+                    8.dp
+                }
+
+                "medium" -> {
+                    6.dp
+                }
+
+                else -> {
+                    4.dp
+                }
+            }),
             colors = CardDefaults.cardColors(
                 containerColor =
                 Color.White
@@ -176,7 +231,24 @@ fun ContentShippingAddress() {
             Column {
                 Text(
                     text = ships[0].name,
-                    fontSize = 25.sp,
+                    fontSize =
+                    when (sizeScreen) {
+                        "large" -> {
+                            25.sp
+                        }
+
+                        "fairly" -> {
+                            23.sp
+                        }
+
+                        "medium" -> {
+                            21.sp
+                        }
+
+                        else -> {
+                            19.sp
+                        }
+                    },
                     modifier = Modifier.padding(top = 10.dp, start = 20.dp, bottom = 10.dp)
                 )
                 Divider(
@@ -186,7 +258,24 @@ fun ContentShippingAddress() {
                 )
                 Text(
                     text = ships[0].address,
-                    fontSize = 20.sp,
+                    fontSize =
+                    when (sizeScreen) {
+                        "large" -> {
+                            20.sp
+                        }
+
+                        "fairly" -> {
+                            18.sp
+                        }
+
+                        "medium" -> {
+                            16.sp
+                        }
+
+                        else -> {
+                            14.sp
+                        }
+                    },
                     modifier = Modifier.padding(top = 10.dp, start = 20.dp, bottom = 20.dp)
                 )
             }
@@ -196,10 +285,44 @@ fun ContentShippingAddress() {
 }
 
 @Composable
-fun ContentPayment(number: String) {
+fun ContentPayment(number: String,sizeScreen: String) {
     Card(
         shape = RoundedCornerShape(5.dp),
-        modifier = Modifier.padding(top = 20.dp, start = 30.dp, end = 30.dp, bottom = 20.dp),
+        modifier = Modifier.padding(top =
+        when (sizeScreen) {
+            "large" -> {
+                20.dp
+            }
+
+            "fairly" -> {
+                17.dp
+            }
+
+            "medium" -> {
+                15.dp
+            }
+
+            else -> {
+                13.dp
+            }
+        }, start = 20.dp, end = 20.dp, bottom =
+        when (sizeScreen) {
+            "large" -> {
+                10.dp
+            }
+
+            "fairly" -> {
+                8.dp
+            }
+
+            "medium" -> {
+                6.dp
+            }
+
+            else -> {
+                4.dp
+            }
+        }),
         colors = CardDefaults.cardColors(
             containerColor =
             Color.White
@@ -212,7 +335,25 @@ fun ContentPayment(number: String) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp),
+                .height(
+                    when (sizeScreen) {
+                        "large" -> {
+                            100.dp
+                        }
+
+                        "fairly" -> {
+                            80.dp
+                        }
+
+                        "medium" -> {
+                            60.dp
+                        }
+
+                        else -> {
+                            50.dp
+                        }
+                    }
+                ),
             horizontalArrangement = Arrangement.Center,
             Alignment.CenterVertically
         ) {
@@ -220,12 +361,47 @@ fun ContentPayment(number: String) {
                 painter = painterResource(id = R.drawable.iconcard),
                 contentDescription = "anh nen",
                 modifier = Modifier
-                    .height(60.dp)
+                    .height(
+                        when (sizeScreen) {
+                            "large" -> {
+                                60.dp
+                            }
+
+                            "fairly" -> {
+                                50.dp
+                            }
+
+                            "medium" -> {
+                                40.dp
+                            }
+
+                            else -> {
+                                35.dp
+                            }
+                        }
+                    )
                     .weight(0.4f),
                 contentScale = ContentScale.Fit
             )
             Text(
-                text = number, fontSize = 20.sp, modifier = Modifier
+                text = number, fontSize =
+                when (sizeScreen) {
+                    "large" -> {
+                        20.sp
+                    }
+
+                    "fairly" -> {
+                        18.sp
+                    }
+
+                    "medium" -> {
+                        16.sp
+                    }
+
+                    else -> {
+                        14.sp
+                    }
+                }, modifier = Modifier
                     .padding(top = 10.dp, start = 10.dp, bottom = 10.dp)
                     .weight(0.6f)
             )
@@ -234,10 +410,44 @@ fun ContentPayment(number: String) {
 }
 
 @Composable
-fun ContentDeliveryMethod(speed: String) {
+fun ContentDeliveryMethod(speed: String,sizeScreen: String) {
     Card(
         shape = RoundedCornerShape(5.dp),
-        modifier = Modifier.padding(top = 20.dp, start = 30.dp, end = 30.dp, bottom = 20.dp),
+        modifier = Modifier.padding(top =
+        when (sizeScreen) {
+            "large" -> {
+                20.dp
+            }
+
+            "fairly" -> {
+                17.dp
+            }
+
+            "medium" -> {
+                15.dp
+            }
+
+            else -> {
+                13.dp
+            }
+        }, start = 20.dp, end = 20.dp, bottom =
+        when (sizeScreen) {
+            "large" -> {
+                10.dp
+            }
+
+            "fairly" -> {
+                8.dp
+            }
+
+            "medium" -> {
+                6.dp
+            }
+
+            else -> {
+                4.dp
+            }
+        }),
         colors = CardDefaults.cardColors(
             containerColor =
             Color.White
@@ -250,7 +460,25 @@ fun ContentDeliveryMethod(speed: String) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp),
+                .height(
+                    when (sizeScreen) {
+                        "large" -> {
+                            100.dp
+                        }
+
+                        "fairly" -> {
+                            80.dp
+                        }
+
+                        "medium" -> {
+                            60.dp
+                        }
+
+                        else -> {
+                            50.dp
+                        }
+                    }
+                ),
             horizontalArrangement = Arrangement.Center,
             Alignment.CenterVertically
         ) {
@@ -263,15 +491,68 @@ fun ContentDeliveryMethod(speed: String) {
                     painter = painterResource(id = R.drawable.anhdhl),
                     contentDescription = "anh nen",
                     modifier = Modifier
-                        .height(50.dp)
-                        .width(130.dp)
+                        .height(
+                            when (sizeScreen) {
+                                "large" -> {
+                                    50.dp
+                                }
+
+                                "fairly" -> {
+                                    40.dp
+                                }
+
+                                "medium" -> {
+                                    35.dp
+                                }
+
+                                else -> {
+                                    30.dp
+                                }
+                            }
+                        )
+                        .width(
+                            when (sizeScreen) {
+                                "large" -> {
+                                    130.dp
+                                }
+
+                                "fairly" -> {
+                                    120.dp
+                                }
+
+                                "medium" -> {
+                                    115.dp
+                                }
+
+                                else -> {
+                                    110.dp
+                                }
+                            }
+                        )
                         .background(Color.Yellow),
                     contentScale = ContentScale.Fit
                 )
             }
 
             Text(
-                text = speed, fontSize = 20.sp, modifier = Modifier
+                text = speed, fontSize =
+                when (sizeScreen) {
+                    "large" -> {
+                        20.sp
+                    }
+
+                    "fairly" -> {
+                        18.sp
+                    }
+
+                    "medium" -> {
+                        16.sp
+                    }
+
+                    else -> {
+                        14.sp
+                    }
+                }, modifier = Modifier
                     .padding(top = 10.dp, bottom = 10.dp)
                     .weight(0.5f), fontWeight = FontWeight(550)
             )
@@ -280,21 +561,73 @@ fun ContentDeliveryMethod(speed: String) {
 }
 
 @Composable
-fun DeMuc2(tittle: String, price: String) {
+fun DeMuc2(tittle: String, price: String,sizeScreen: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp), Arrangement.SpaceBetween
+            .padding(
+                when (sizeScreen) {
+                    "large" -> {
+                        10.dp
+                    }
+
+                    "fairly" -> {
+                        8.dp
+                    }
+
+                    "medium" -> {
+                        6.dp
+                    }
+
+                    else -> {
+                        4.dp
+                    }
+                }
+            ), Arrangement.SpaceBetween
     ) {
         Text(
             text = tittle,
-            fontSize = 25.sp,
+            fontSize =
+            when (sizeScreen) {
+                "large" -> {
+                    25.sp
+                }
+
+                "fairly" -> {
+                    23.sp
+                }
+
+                "medium" -> {
+                    21.sp
+                }
+
+                else -> {
+                    19.sp
+                }
+            },
             color = Color(0xFF408143),
             modifier = Modifier.fillMaxWidth(0.4f)
         )
         Text(
             text = price,
-            fontSize = 25.sp,
+            fontSize =
+            when (sizeScreen) {
+                "large" -> {
+                    25.sp
+                }
+
+                "fairly" -> {
+                    23.sp
+                }
+
+                "medium" -> {
+                    21.sp
+                }
+
+                else -> {
+                    19.sp
+                }
+            },
             color = Color.Black,
             modifier = Modifier.fillMaxWidth(0.6f),
             textAlign = TextAlign.End
@@ -303,21 +636,73 @@ fun DeMuc2(tittle: String, price: String) {
 }
 
 @Composable
-fun DeMuc3(tittle: String, price: String) {
+fun DeMuc3(tittle: String, price: String,sizeScreen: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp), Arrangement.SpaceBetween
+            .padding(
+                when (sizeScreen) {
+                    "large" -> {
+                        10.dp
+                    }
+
+                    "fairly" -> {
+                        8.dp
+                    }
+
+                    "medium" -> {
+                        6.dp
+                    }
+
+                    else -> {
+                        4.dp
+                    }
+                }
+            ), Arrangement.SpaceBetween
     ) {
         Text(
             text = tittle,
-            fontSize = 25.sp,
+            fontSize =
+            when (sizeScreen) {
+                "large" -> {
+                    25.sp
+                }
+
+                "fairly" -> {
+                    23.sp
+                }
+
+                "medium" -> {
+                    21.sp
+                }
+
+                else -> {
+                    19.sp
+                }
+            },
             color = Color(0xFF408143),
             modifier = Modifier.fillMaxWidth(0.4f)
         )
         Text(
             text = price,
-            fontSize = 25.sp,
+            fontSize =
+            when (sizeScreen) {
+                "large" -> {
+                    25.sp
+                }
+
+                "fairly" -> {
+                    23.sp
+                }
+
+                "medium" -> {
+                    21.sp
+                }
+
+                else -> {
+                    19.sp
+                }
+            },
             color = Color.Black,
             modifier = Modifier.fillMaxWidth(0.6f),
             fontWeight = FontWeight.Bold,
@@ -327,7 +712,7 @@ fun DeMuc3(tittle: String, price: String) {
 }
 
 @Composable
-fun ContentTotal(pricePro: Double, priceShip: Double) {
+fun ContentTotal(pricePro: Double, priceShip: Double,sizeScreen: String) {
     val priceAll = pricePro + priceShip
     val context = LocalContext.current
 
@@ -348,7 +733,41 @@ fun ContentTotal(pricePro: Double, priceShip: Double) {
     shippingViewModel.getShipAddressBySelect(1, account)
     Card(
         shape = RoundedCornerShape(5.dp), modifier = Modifier
-            .padding(top = 10.dp, start = 30.dp, end = 30.dp, bottom = 10.dp)
+            .padding(top =
+            when (sizeScreen) {
+                "large" -> {
+                    10.dp
+                }
+
+                "fairly" -> {
+                    8.dp
+                }
+
+                "medium" -> {
+                    6.dp
+                }
+
+                else -> {
+                    4.dp
+                }
+            }, start = 20.dp, end = 20.dp, bottom =
+            when (sizeScreen) {
+                "large" -> {
+                    10.dp
+                }
+
+                "fairly" -> {
+                    8.dp
+                }
+
+                "medium" -> {
+                    6.dp
+                }
+
+                else -> {
+                    4.dp
+                }
+            })
             .fillMaxWidth(), colors = CardDefaults.cardColors(
             containerColor =
             Color.White
@@ -359,9 +778,9 @@ fun ContentTotal(pricePro: Double, priceShip: Double) {
         )
     ) {
         Column {
-            DeMuc2(tittle = "Order:", price = "$ $pricePro")
-            DeMuc2(tittle = "Delivery:", price = "$ $priceShip")
-            DeMuc3(tittle = "Total:", price = "$ $priceAll")
+            DeMuc2(tittle = "Order:", price = "$ $pricePro", sizeScreen = sizeScreen)
+            DeMuc2(tittle = "Delivery:", price = "$ $priceShip", sizeScreen = sizeScreen)
+            DeMuc3(tittle = "Total:", price = "$ $priceAll", sizeScreen = sizeScreen)
         }
     }
     MyButton(title = "SUBMIT ORDER", onClick = {
@@ -387,7 +806,7 @@ fun ContentTotal(pricePro: Double, priceShip: Double) {
                     val priceOnePro = cart.price * cart.quantity.toDouble()
                     val notificationBody = NotificationRequest(
                         title = "Đặt hàng thành công",
-                        content = "bạn đã mua ${cart.quantity} ${cart.productName} với giá ${priceOnePro}",
+                        content = "bạn đã mua ${cart.quantity} ${cart.productName} với giá $priceOnePro",
                         state = 1,
                         image = cart.image,
                         account = account
@@ -402,7 +821,27 @@ fun ContentTotal(pricePro: Double, priceShip: Double) {
 
         }
 
-    }, mauChu = Color.White, mauNen = Color.Black)
+    }, mauChu = Color.White, mauNen = Color.Black, type = sizeScreen)
+}
+
+@Composable
+fun ScreenCheckOut (type:String,price: String?) {
+    Column (
+        verticalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState())){
+        MyToolbar3(title = "Check out")
+        Title(title = "Shipping Address", 1, sizeScreen = type)
+        ContentShippingAddress(sizeScreen = type)
+        Title(title = "Payment", 2, sizeScreen = type)
+        ContentPayment(number = "1234 5678 9012 3456", sizeScreen = type)
+        Title(title = "Delivery method", 3, sizeScreen = type)
+        ContentDeliveryMethod(speed = "Fast (2-3days)", sizeScreen = type)
+        if (price != null) {
+            ContentTotal(pricePro = price.toDouble(), priceShip = 5.0, sizeScreen = type)
+        }
+    }
 }
 
 
@@ -412,5 +851,30 @@ fun ClickBackCheckOut() {
     BackHandler {
         val intent = Intent(context, CartActivity::class.java)
         context.startActivity(intent)
+    }
+}
+
+@Composable
+fun SizeCheckOutScreen(price: String) {
+    ClickBackCheckOut()
+    val context = LocalContext.current
+    val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+    val screenHeightPx = displayMetrics.heightPixels
+    val density = displayMetrics.density
+
+    val screenHeightDp = screenHeightPx / density
+
+    if (screenHeightDp > 890) {
+        // large
+        ScreenCheckOut(type = "large", price = price)
+    } else if (screenHeightDp > 800) {
+        // fairly
+        ScreenCheckOut(type = "medium", price = price)
+    } else if (screenHeightDp > 714) {
+        // medium
+        ScreenCheckOut(type = "medium", price = price)
+    } else {
+        // smail
+        ScreenCheckOut(type = "smail", price = price)
     }
 }

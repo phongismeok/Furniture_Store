@@ -2,6 +2,7 @@ package com.example.asm_mvvm.screens.fragment
 
 import android.content.Intent
 import android.os.Build
+import android.util.DisplayMetrics
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -61,21 +62,41 @@ import com.example.asm_mvvm.viewmodels.UserViewModel
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun HomeFragment() {
+    val context = LocalContext.current
     val textState = remember { mutableStateOf("") }
+
+    val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+    val screenHeightPx = displayMetrics.heightPixels
+    val density = displayMetrics.density
+    val screenHeightDp = screenHeightPx / density
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFFFEFD))
+            .background(Color(0xFFFFFEFD)),
     ) {
         MyToolbar(title = "Home", type = "home", "Search product", textState)
-        ListType(textState.value)
+        if (screenHeightDp > 890) {
+            // large
+            ListType(textState.value, type = "large")
+        } else if (screenHeightDp > 800) {
+            // fairly
+            ListType(textState.value, type = "fairly")
+        } else if (screenHeightDp > 714) {
+            // medium
+            ListType(textState.value, type = "medium")
+        } else {
+            // smail
+            ListType(textState.value, type = "smail")
+        }
+
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListType(textSearch: String) {
+fun ListType(textSearch: String, type: String) {
     val typeViewModel = TypeViewModel()
 
     val typesState = typeViewModel.types.observeAsState(initial = emptyList())
@@ -93,13 +114,30 @@ fun ListType(textSearch: String) {
                 Column(
                     modifier = Modifier
                         .background(Color.White)
-                        .padding(top = 10.dp, start = 10.dp, end = 10.dp, bottom = 15.dp),
+                        .padding(top = 5.dp, start = 10.dp, end = 10.dp, bottom = 15.dp),
                     Arrangement.Center, Alignment.CenterHorizontally,
                 ) {
                     Card(
                         modifier = Modifier
-                            .width(70.dp)
-                            .height(70.dp)
+                            .size(
+                                when (type) {
+                                    "large" -> {
+                                        75.dp
+                                    }
+
+                                    "fairly" -> {
+                                        70.dp
+                                    }
+
+                                    "medium" -> {
+                                        65.dp
+                                    }
+
+                                    else -> {
+                                        60.dp
+                                    }
+                                }
+                            )
                             .padding(2.dp),
                         shape = RoundedCornerShape(15.dp),
                         colors = CardDefaults.cardColors(
@@ -132,18 +170,17 @@ fun ListType(textSearch: String) {
             }
         }
 
-
         when (selected) {
             "" -> {
-                ListProduct(type = "", dataSearch = textSearch)
+                ListProduct(type = "", dataSearch = textSearch, sizeScreen = type)
             }
 
             "Popular" -> {
-                ListProduct(type = "Popular", dataSearch = textSearch)
+                ListProduct(type = "Popular", dataSearch = textSearch, sizeScreen = type)
             }
 
             else -> {
-                ListProduct(type = selected, dataSearch = textSearch)
+                ListProduct(type = selected, dataSearch = textSearch, sizeScreen = type)
             }
         }
     }
@@ -153,7 +190,7 @@ fun ListType(textSearch: String) {
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListProduct(type: String, dataSearch: String) {
+fun ListProduct(type: String, dataSearch: String, sizeScreen: String) {
 
     val productViewModel = ProductViewModel()
     val context = LocalContext.current
@@ -189,7 +226,7 @@ fun ListProduct(type: String, dataSearch: String) {
             columns = StaggeredGridCells.Fixed(2), // chia theo số cột
             contentPadding = PaddingValues(8.dp),
             modifier = Modifier
-                .padding(top = 20.dp)
+                .padding(top = 5.dp)
         ) {
             items(products.size) { index ->
                 var showDialog by remember { mutableStateOf(false) }
@@ -213,7 +250,25 @@ fun ListProduct(type: String, dataSearch: String) {
                         modifier = Modifier
                             .padding(10.dp)
                             .width(200.dp)
-                            .height(250.dp),
+                            .height(
+                                when (sizeScreen) {
+                                    "large" -> {
+                                        250.dp
+                                    }
+
+                                    "fairly" -> {
+                                        240.dp
+                                    }
+
+                                    "medium" -> {
+                                        230.dp
+                                    }
+
+                                    else -> {
+                                        200.dp
+                                    }
+                                }
+                            ),
                         shape = RoundedCornerShape(15.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White),
                         onClick = {

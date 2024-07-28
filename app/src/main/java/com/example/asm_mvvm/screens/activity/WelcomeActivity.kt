@@ -152,7 +152,7 @@ fun SizeWelcomeScreen() {
         ScreenWelcome(type = "large")
     } else if (screenHeightDp > 800) {
         // fairly
-        ScreenWelcome(type = "fairly")
+        ScreenWelcome(type = "medium")
     } else if (screenHeightDp > 714) {
         // medium
         ScreenWelcome(type = "medium")

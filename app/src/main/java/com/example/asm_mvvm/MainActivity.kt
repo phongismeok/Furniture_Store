@@ -38,7 +38,6 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             val navigationController = rememberNavController()
             val type = intent.getStringExtra("TYPE2") ?: ""
@@ -57,7 +56,6 @@ class MainActivity : ComponentActivity() {
                         mutableStateOf(Icons.Default.Notifications)
                     }
                 }
-
             }
 
             BackHandler {

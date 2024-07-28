@@ -1,16 +1,11 @@
 package com.example.asm_mvvm.screens.fragment
 
-import android.content.Intent
 import android.os.Build
-import android.util.Log
+import android.util.DisplayMetrics
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,15 +19,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -56,33 +47,46 @@ import coil.request.ImageRequest
 import com.example.asm_mvvm.R
 import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.request.CartRequest
-import com.example.asm_mvvm.screens.activity.DetailProductActivity
-import com.example.asm_mvvm.screens.activity.LoginActivity
-import com.example.asm_mvvm.ui.theme.AnimationLoading
-import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyButton2
 import com.example.asm_mvvm.ui.theme.MyToolbar
 import com.example.asm_mvvm.viewmodels.CartViewModel
 import com.example.asm_mvvm.viewmodels.FavoritesViewModel
-import com.example.asm_mvvm.viewmodels.ProductViewModel
-import com.example.asm_mvvm.viewmodels.TypeViewModel
 import com.example.asm_mvvm.viewmodels.UserViewModel
 
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun FavoritesFragment() {
+    val context = LocalContext.current
     val textState = remember { mutableStateOf("") }
+
+    val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+    val screenHeightPx = displayMetrics.heightPixels
+    val density = displayMetrics.density
+    val screenHeightDp = screenHeightPx / density
+
     Column(modifier = Modifier.fillMaxSize()) {
         MyToolbar(title = "Favorites", type = "favorites", "Search favorites", textState)
-        ListFavorites(textState.value)
+        if (screenHeightDp > 890) {
+            // large
+            ListFavorites(textState.value, type = "large")
+        } else if (screenHeightDp > 800) {
+            // fairly
+            ListFavorites(textState.value, type = "fairly")
+        } else if (screenHeightDp > 714) {
+            // medium
+            ListFavorites(textState.value, type = "medium")
+        } else {
+            // smail
+            ListFavorites(textState.value, type = "smail")
+        }
     }
 }
 
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ListFavorites(dataSearch: String) {
+fun ListFavorites(dataSearch: String, type: String) {
     val context = LocalContext.current
     SharedPreferencesManager.init(context)
     val favoritesViewModel = FavoritesViewModel()
@@ -154,7 +158,25 @@ fun ListFavorites(dataSearch: String) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(180.dp)
+                        .height(
+                            when (type) {
+                                "large" -> {
+                                    180.dp
+                                }
+
+                                "fairly" -> {
+                                    170.dp
+                                }
+
+                                "medium" -> {
+                                    160.dp
+                                }
+
+                                else -> {
+                                    150.dp
+                                }
+                            }
+                        )
                         .padding(10.dp),
                     colors = CardDefaults.cardColors(
                         containerColor =
@@ -175,8 +197,25 @@ fun ListFavorites(dataSearch: String) {
                         Row {
                             Card(
                                 modifier = Modifier
-                                    .width(140.dp)
-                                    .height(140.dp),
+                                    .size(
+                                        when (type) {
+                                            "large" -> {
+                                                140.dp
+                                            }
+
+                                            "fairly" -> {
+                                                130.dp
+                                            }
+
+                                            "medium" -> {
+                                                120.dp
+                                            }
+
+                                            else -> {
+                                                110.dp
+                                            }
+                                        }
+                                    ),
                                 shape = RoundedCornerShape(15.dp),
                             ) {
                                 AsyncImage(
