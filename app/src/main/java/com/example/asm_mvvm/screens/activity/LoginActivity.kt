@@ -69,12 +69,12 @@ class LoginActivity : AppCompatActivity() {
 }
 
 @Composable
-fun TitleLoginScreen(type: String) {
+fun TitleLoginScreen(sizeScreen: String) {
     Image(
         painter = painterResource(id = R.drawable.logoapp),
         contentDescription = "anh nen",
         modifier = Modifier.size(
-            when (type) {
+            when (sizeScreen) {
                 "large" -> {
                     200.dp
                 }
@@ -98,7 +98,7 @@ fun TitleLoginScreen(type: String) {
         text = "Login Account",
         style = TextStyle(
             fontSize =
-            when (type) {
+            when (sizeScreen) {
                 "large" -> {
                     35.sp
                 }
@@ -120,7 +120,7 @@ fun TitleLoginScreen(type: String) {
             fontFamily = FontFamily.Serif
         ),
         modifier = Modifier.padding(
-            when (type) {
+            when (sizeScreen) {
                 "large" -> {
                     30.dp
                 }
@@ -174,15 +174,22 @@ fun InputLoginScreen(
             stateChange.value = 1
             email.value = it
         },
-        label = { Text("E-mail", modifier = Modifier.padding(bottom =
-        when (type) {
-            "smail" -> {
-                5.dp
-            }
-            else -> {
-                0.dp
-            }
-        })) },
+        label = {
+            Text(
+                "E-mail", modifier = Modifier.padding(
+                    bottom =
+                    when (type) {
+                        "smail" -> {
+                            5.dp
+                        }
+
+                        else -> {
+                            0.dp
+                        }
+                    }
+                )
+            )
+        },
         modifier = Modifier
             .fillMaxWidth()
             .height(
@@ -204,15 +211,18 @@ fun InputLoginScreen(
                     }
                 }
             )
-            .padding(start = 10.dp, end = 10.dp, top =
-            when (type) {
-                "smail" -> {
-                    0.dp
+            .padding(
+                start = 10.dp, end = 10.dp, top =
+                when (type) {
+                    "smail" -> {
+                        0.dp
+                    }
+
+                    else -> {
+                        5.dp
+                    }
                 }
-                else -> {
-                    5.dp
-                }
-            }),
+            ),
         shape = RoundedCornerShape(10.dp),
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -346,7 +356,8 @@ fun CheckBoxLoginScreen(checked: MutableState<Boolean>, type: String) {
                             30.dp
                         }
                     }
-                ).padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically
+                )
+                .padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "Forget Password?",
@@ -476,7 +487,7 @@ fun ScreenLogin(type: String) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TitleLoginScreen(type = type)
+        TitleLoginScreen(sizeScreen = type)
         Spacer(modifier = Modifier.height(8.dp))
         InputLoginScreen(
             email = email,
@@ -494,17 +505,26 @@ fun ScreenLogin(type: String) {
         MyButton(
             title = "Log in",
             onClick = {
+
                 userViewModel.login(
                     context,
                     if (stateChange.intValue == 1) {
                         email.value
                     } else {
-                        emailSave.toString()
+                        if(checkSave == "save"){
+                            emailSave.toString()
+                        } else {
+                            ""
+                        }.toString()
                     },
                     if (stateChange.intValue == 1) {
                         password.value
                     } else {
-                        passSave.toString()
+                        if(checkSave == "save"){
+                            passSave.toString()
+                        } else {
+                            ""
+                        }.toString()
                     },
                     if (checked.value) {
                         "save"
@@ -530,6 +550,8 @@ fun ScreenLogin(type: String) {
                         ).show()
                     }
                 }
+
+
             },
             mauChu = Color.White,
             mauNen = Color.Gray,

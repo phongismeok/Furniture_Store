@@ -1,7 +1,15 @@
 package com.example.asm_mvvm.retrofit
 
+import android.content.Context
+import android.net.wifi.WifiManager
+import android.text.format.Formatter
+import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.net.Inet4Address
+import java.net.NetworkInterface
+import java.util.Collections
 
 class RetrofitBase {
     private val baseUrl = "http://192.168.0.119:3000/api/"
@@ -32,4 +40,5 @@ class RetrofitBase {
     val notificationService: NotificationService by lazy {
         retrofit.create(NotificationService::class.java)
     }
+
 }

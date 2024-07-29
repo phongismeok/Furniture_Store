@@ -117,7 +117,7 @@ fun ListType(textSearch: String, type: String) {
                 Column(
                     modifier = Modifier
                         .background(Color.White)
-                        .padding(top = 5.dp, start = 10.dp, end = 10.dp, bottom = 15.dp),
+                        .padding(top = 15.dp, start = 10.dp, end = 10.dp, bottom = 15.dp),
                     Arrangement.Center, Alignment.CenterHorizontally,
                 ) {
                     Card(
