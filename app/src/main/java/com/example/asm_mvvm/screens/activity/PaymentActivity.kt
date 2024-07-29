@@ -18,7 +18,7 @@ class PaymentActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContent {
             Column(modifier = Modifier.fillMaxSize()) {
-                MyToolbar3(title = "Payment method")
+                MyToolbar3(title = "Payment method","")
             }
         }
     }

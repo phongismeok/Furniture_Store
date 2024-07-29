@@ -74,7 +74,7 @@ fun TitleSignUpScreen (type:String) {
                 }
 
                 "fairly" -> {
-                    150.dp
+                    130.dp
                 }
 
                 "medium" -> {
@@ -464,7 +464,8 @@ fun ScreenSignUp(type: String) {
                 }
             },
             mauChu = Color.White,
-            mauNen = Color.Gray
+            mauNen = Color.Gray,
+            type = type
         )
         NextLoginScreen(type = type)
 //        CustomLineScreen()
@@ -504,7 +505,7 @@ fun SizeSignUpScreen() {
         ScreenSignUp(type = "large")
     } else if (screenHeightDp > 800) {
         // fairly
-        ScreenSignUp(type = "medium")
+        ScreenSignUp(type = "fairly")
     } else if (screenHeightDp > 714) {
         // medium
         ScreenSignUp(type = "medium")

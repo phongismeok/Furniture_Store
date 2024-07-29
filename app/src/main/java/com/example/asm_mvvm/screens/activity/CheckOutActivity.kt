@@ -842,7 +842,7 @@ fun ScreenCheckOut(type: String, price: String?) {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        MyToolbar3(title = "Check out")
+        MyToolbar3(title = "Check out", sizeScreen = type)
         Title(title = "Shipping Address", 1, sizeScreen = type)
         ContentShippingAddress(sizeScreen = type)
         Title(title = "Payment", 2, sizeScreen = type)
@@ -880,7 +880,7 @@ fun SizeCheckOutScreen(price: String) {
         ScreenCheckOut(type = "large", price = price)
     } else if (screenHeightDp > 800) {
         // fairly
-        ScreenCheckOut(type = "medium", price = price)
+        ScreenCheckOut(type = "fairly", price = price)
     } else if (screenHeightDp > 714) {
         // medium
         ScreenCheckOut(type = "medium", price = price)

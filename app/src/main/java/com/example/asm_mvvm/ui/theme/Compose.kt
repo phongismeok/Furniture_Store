@@ -105,7 +105,35 @@ fun MyButton(
         colors = ButtonDefaults.buttonColors(containerColor = mauNen, contentColor = mauChu),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
+            .padding(start = 10.dp, end = 10.dp, top =
+            when (type) {
+                "large" -> {
+                    10.dp
+                }
+                "fairly" -> {
+                    8.dp
+                }
+                "medium" -> {
+                    6.dp
+                }
+                else -> {
+                    4.dp
+                }
+            }, bottom =
+            when (type) {
+                "large" -> {
+                    10.dp
+                }
+                "fairly" -> {
+                    8.dp
+                }
+                "medium" -> {
+                    6.dp
+                }
+                else -> {
+                    4.dp
+                }
+            })
             .height(
                 when (type) {
                     "large" -> {
@@ -394,7 +422,7 @@ fun MyButtonWithImage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyToolbar(title: String, type: String, place: String, textState: MutableState<String>) {
+fun MyToolbar(title: String, type: String, place: String, textState: MutableState<String>,sizeScreen:String) {
     val isSearchActive = remember { mutableStateOf(false) }
     val context = LocalContext.current
     if (isSearchActive.value) {
@@ -438,7 +466,22 @@ fun MyToolbar(title: String, type: String, place: String, textState: MutableStat
                             Icons.Default.Search,
                             contentDescription = null,
                             modifier = Modifier
-                                .size(30.dp)
+                                .size(
+                                    when (sizeScreen){
+                                        "large" -> {
+                                            30.dp
+                                        }
+                                        "fairly" -> {
+                                            28.dp
+                                        }
+                                        "medium" -> {
+                                            26.dp
+                                        }
+                                        else -> {
+                                            25.dp
+                                        }
+                                    }
+                                )
                                 .clickable {
                                     isSearchActive.value = true
                                 },
@@ -454,7 +497,21 @@ fun MyToolbar(title: String, type: String, place: String, textState: MutableStat
                             Text(
                                 text = title,
                                 color = Color.Black,
-                                fontSize = 24.sp,
+                                fontSize =
+                                when (sizeScreen){
+                                    "large" -> {
+                                        24.sp
+                                    }
+                                    "fairly" -> {
+                                        22.sp
+                                    }
+                                    "medium" -> {
+                                        20.sp
+                                    }
+                                    else -> {
+                                        19.sp
+                                    }
+                                },
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Center
                             )
@@ -470,7 +527,22 @@ fun MyToolbar(title: String, type: String, place: String, textState: MutableStat
                             Icons.Default.ShoppingCart,
                             contentDescription = null,
                             modifier = Modifier
-                                .size(30.dp)
+                                .size(
+                                    when (sizeScreen){
+                                        "large" -> {
+                                            30.dp
+                                        }
+                                        "fairly" -> {
+                                            28.dp
+                                        }
+                                        "medium" -> {
+                                            26.dp
+                                        }
+                                        else -> {
+                                            25.dp
+                                        }
+                                    }
+                                )
                                 .clickable {
                                     val intent = Intent(context, CartActivity::class.java)
                                     intent.putExtra("TYPE", type)
@@ -489,7 +561,7 @@ fun MyToolbar(title: String, type: String, place: String, textState: MutableStat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyToolbar2(title: String) {
+fun MyToolbar2(title: String,sizeScreen: String) {
     val context = LocalContext.current
     TopAppBar(
         title = {
@@ -509,7 +581,22 @@ fun MyToolbar2(title: String) {
                     Icon(
                         Icons.Default.Search,
                         contentDescription = null,
-                        modifier = Modifier.size(30.dp),
+                        modifier = Modifier.size(
+                            when (sizeScreen){
+                                "large" -> {
+                                    30.dp
+                                }
+                                "fairly" -> {
+                                    28.dp
+                                }
+                                "medium" -> {
+                                    26.dp
+                                }
+                                else -> {
+                                    25.dp
+                                }
+                            }
+                        ),
                     )
                 }
                 // tittle
@@ -522,7 +609,21 @@ fun MyToolbar2(title: String) {
                         Text(
                             text = title,
                             color = Color.Black,
-                            fontSize = 24.sp,
+                            fontSize =
+                            when (sizeScreen){
+                                "large" -> {
+                                    24.sp
+                                }
+                                "fairly" -> {
+                                    22.sp
+                                }
+                                "medium" -> {
+                                    20.sp
+                                }
+                                else -> {
+                                    19.sp
+                                }
+                            },
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
                         )
@@ -538,7 +639,22 @@ fun MyToolbar2(title: String) {
                         Icons.Default.ExitToApp,
                         contentDescription = null,
                         modifier = Modifier
-                            .size(30.dp)
+                            .size(
+                                when (sizeScreen){
+                                    "large" -> {
+                                        30.dp
+                                    }
+                                    "fairly" -> {
+                                        28.dp
+                                    }
+                                    "medium" -> {
+                                        26.dp
+                                    }
+                                    else -> {
+                                        25.dp
+                                    }
+                                }
+                            )
                             .clickable {
                                 val intent = Intent(context, LoginActivity::class.java)
                                 context.startActivity(intent)
@@ -555,7 +671,7 @@ fun MyToolbar2(title: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyToolbar3(title: String) {
+fun MyToolbar3(title: String,sizeScreen: String) {
     val context = LocalContext.current
     TopAppBar(
         title = {
@@ -575,7 +691,22 @@ fun MyToolbar3(title: String) {
                     Icon(
                         Icons.Default.KeyboardArrowLeft,
                         contentDescription = null,
-                        modifier = Modifier.size(35.dp),
+                        modifier = Modifier.size(
+                            when (sizeScreen){
+                                "large" -> {
+                                    35.dp
+                                }
+                                "fairly" -> {
+                                    33.dp
+                                }
+                                "medium" -> {
+                                    31.dp
+                                }
+                                else -> {
+                                    29.dp
+                                }
+                            }
+                        ),
                     )
                 }
                 // tittle
@@ -588,7 +719,21 @@ fun MyToolbar3(title: String) {
                         Text(
                             text = title,
                             color = Color.Black,
-                            fontSize = 24.sp,
+                            fontSize =
+                            when (sizeScreen){
+                                "large" -> {
+                                    24.sp
+                                }
+                                "fairly" -> {
+                                    22.sp
+                                }
+                                "medium" -> {
+                                    20.sp
+                                }
+                                else -> {
+                                    19.sp
+                                }
+                            },
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
                         )
@@ -650,10 +795,10 @@ fun CustomLineScreen(type: String) {
                         15.dp
                     }
                     "fairly" -> {
-                        13.dp
+                        10.dp
                     }
                     "medium" -> {
-                        10.dp
+                        9.dp
                     }
                     else -> {
                         8.dp

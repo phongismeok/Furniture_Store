@@ -80,7 +80,7 @@ fun TitleLoginScreen(type: String) {
                 }
 
                 "fairly" -> {
-                    170.dp
+                    140.dp
                 }
 
                 "medium" -> {
@@ -174,7 +174,15 @@ fun InputLoginScreen(
             stateChange.value = 1
             email.value = it
         },
-        label = { Text("E-mail") },
+        label = { Text("E-mail", modifier = Modifier.padding(bottom =
+        when (type) {
+            "smail" -> {
+                5.dp
+            }
+            else -> {
+                0.dp
+            }
+        })) },
         modifier = Modifier
             .fillMaxWidth()
             .height(
@@ -192,11 +200,19 @@ fun InputLoginScreen(
                     }
 
                     else -> {
-                        60.dp
+                        58.dp
                     }
                 }
             )
-            .padding(start = 10.dp, end = 10.dp),
+            .padding(start = 10.dp, end = 10.dp, top =
+            when (type) {
+                "smail" -> {
+                    0.dp
+                }
+                else -> {
+                    5.dp
+                }
+            }),
         shape = RoundedCornerShape(10.dp),
     )
     Spacer(modifier = Modifier.height(8.dp))
@@ -245,7 +261,7 @@ fun InputLoginScreen(
                     }
 
                     else -> {
-                        60.dp
+                        58.dp
                     }
                 }
             )
@@ -269,15 +285,15 @@ fun CheckBoxLoginScreen(checked: MutableState<Boolean>, type: String) {
                         }
 
                         "fairly" -> {
-                            60.dp
+                            40.dp
                         }
 
                         "medium" -> {
-                            50.dp
+                            35.dp
                         }
 
                         else -> {
-                            45.dp
+                            30.dp
                         }
                     }
                 )
@@ -309,6 +325,7 @@ fun CheckBoxLoginScreen(checked: MutableState<Boolean>, type: String) {
         }
 
         Row(
+            horizontalArrangement = Arrangement.End,
             modifier = Modifier
                 .fillMaxWidth(0.6f)
                 .height(
@@ -318,18 +335,18 @@ fun CheckBoxLoginScreen(checked: MutableState<Boolean>, type: String) {
                         }
 
                         "fairly" -> {
-                            60.dp
+                            40.dp
                         }
 
                         "medium" -> {
-                            55.dp
+                            35.dp
                         }
 
                         else -> {
-                            50.dp
+                            30.dp
                         }
                     }
-                ), verticalAlignment = Alignment.CenterVertically
+                ).padding(end = 10.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "Forget Password?",
@@ -369,11 +386,11 @@ fun NextSignUpScreen(type: String) {
                 }
 
                 "fairly" -> {
-                    8.dp
+                    7.dp
                 }
 
                 "medium" -> {
-                    7.dp
+                    6.dp
                 }
 
                 else -> {
@@ -515,7 +532,8 @@ fun ScreenLogin(type: String) {
                 }
             },
             mauChu = Color.White,
-            mauNen = Color.Gray
+            mauNen = Color.Gray,
+            type = type
         )
         Spacer(modifier = Modifier.height(8.dp))
         NextSignUpScreen(type = type)
@@ -545,11 +563,9 @@ fun ScreenLogin(type: String) {
 fun SizeLoginScreen() {
     val context = LocalContext.current
     val displayMetrics: DisplayMetrics = context.resources.displayMetrics
-//    val screenWidthPx = displayMetrics.widthPixels
     val screenHeightPx = displayMetrics.heightPixels
     val density = displayMetrics.density
 
-//    val screenWidthDp = screenWidthPx / density
     val screenHeightDp = screenHeightPx / density
 
     if (screenHeightDp > 890) {
@@ -557,7 +573,7 @@ fun SizeLoginScreen() {
         ScreenLogin(type = "large")
     } else if (screenHeightDp > 800) {
         // fairly
-        ScreenLogin(type = "medium")
+        ScreenLogin(type = "fairly")
     } else if (screenHeightDp > 714) {
         // medium
         ScreenLogin(type = "medium")

@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,18 +48,21 @@ fun NotificationFragment() {
     val screenHeightDp = screenHeightPx / density
 
     Column(modifier = Modifier.fillMaxSize()) {
-        MyToolbar(title = "Notifications", "notification", "Search notification", textState)
         if (screenHeightDp > 890) {
             // large
+            MyToolbar(title = "Notifications", "notification", "Search notification", textState, sizeScreen = "large")
             ListNotification(textState.value, type = "large")
         } else if (screenHeightDp > 800) {
             // fairly
+            MyToolbar(title = "Notifications", "notification", "Search notification", textState, sizeScreen = "fairly")
             ListNotification(textState.value, type = "fairly")
         } else if (screenHeightDp > 714) {
             // medium
+            MyToolbar(title = "Notifications", "notification", "Search notification", textState, sizeScreen = "medium")
             ListNotification(textState.value, type = "medium")
         } else {
             // smail
+            MyToolbar(title = "Notifications", "notification", "Search notification", textState, sizeScreen = "smail")
             ListNotification(textState.value, type = "smail")
         }
     }
@@ -183,7 +187,7 @@ fun ContentNotification(
                                 }
                             }
                         )
-                        .aspectRatio(1f)
+                        .aspectRatio(1f), contentScale = ContentScale.Crop
 
                 )
             }

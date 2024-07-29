@@ -78,7 +78,7 @@ fun ScreenProfile (type:String){
     Column(modifier = Modifier
         .fillMaxSize()
         .verticalScroll(rememberScrollState())) {
-        MyToolbar2(title = "Profile")
+        MyToolbar2(title = "Profile", sizeScreen = type)
         MyInfo(userViewModel = userViewModel, type = type)
         MyOptions(tittle = "My orders", content = "haha", type = type) {
             val intent = Intent(context, MyOrderActivity::class.java)

@@ -3,6 +3,7 @@ package com.example.asm_mvvm.screens.activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -52,37 +53,18 @@ class ShippingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         SharedPreferencesManager.init(applicationContext)
-        val priceNhan = intent.getStringExtra("PRICE")
+        val priceNhan = intent.getStringExtra("PRICE") ?: ""
         val getId = intent.getStringExtra("CLICK") ?: ""
 
         setContent {
-            Column(modifier = Modifier.fillMaxSize()) {
-                MyToolbar3(title = "Shipping address")
-                Box(modifier = Modifier.fillMaxSize()) {
-                    ListShip(id = getId)
-                    Box(
-                        contentAlignment = Alignment.BottomEnd, modifier = Modifier
-                            .padding(end = 20.dp, bottom = 70.dp)
-                            .fillMaxSize()
-                    ) {
-                        MyFloatingButton {
-                            val intent =
-                                Intent(this@ShippingActivity, AddShippingActivity::class.java)
-                            startActivity(intent)
-                        }
-                    }
-                }
-                if (priceNhan != null) {
-                    ClickBackShip(price = priceNhan)
-                }
-            }
+            SizeShippingScreen(price = priceNhan, id = getId)
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ListShip(id: String) {
+fun ListShip(id: String,sizeScreen: String) {
     val shippingViewModel = ShippingViewModel()
     val userViewModel = UserViewModel()
 
@@ -172,7 +154,6 @@ fun ListShip(id: String) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-
                             .padding(10.dp),
                         shape = RoundedCornerShape(15.dp),
                         colors = CardDefaults.cardColors(
@@ -184,7 +165,7 @@ fun ListShip(id: String) {
                             3.dp
                         ),
                     ) {
-                        TitleShip(tittle = ships[index].name)
+                        TitleShip(tittle = ships[index].name, sizeScreen = sizeScreen)
                         Divider(
                             modifier = Modifier
                                 .height(1.dp)
@@ -192,7 +173,24 @@ fun ListShip(id: String) {
                         )
                         Text(
                             text = ships[index].address,
-                            fontSize = 20.sp,
+                            fontSize =
+                            when (sizeScreen) {
+                                "large" -> {
+                                    20.sp
+                                }
+
+                                "fairly" -> {
+                                    18.sp
+                                }
+
+                                "medium" -> {
+                                    16.sp
+                                }
+
+                                else -> {
+                                    15.sp
+                                }
+                            },
                             modifier = Modifier.padding(
                                 start = 15.dp,
                                 end = 15.dp,
@@ -207,7 +205,24 @@ fun ListShip(id: String) {
                         )
                         Text(
                             text = ships[index].addressDetail,
-                            fontSize = 18.sp,
+                            fontSize =
+                            when (sizeScreen) {
+                                "large" -> {
+                                    19.sp
+                                }
+
+                                "fairly" -> {
+                                    17.sp
+                                }
+
+                                "medium" -> {
+                                    15.sp
+                                }
+
+                                else -> {
+                                    14.sp
+                                }
+                            },
                             modifier = Modifier.padding(
                                 start = 15.dp,
                                 end = 15.dp,
@@ -224,7 +239,7 @@ fun ListShip(id: String) {
 }
 
 @Composable
-fun TitleShip(tittle: String) {
+fun TitleShip(tittle: String,sizeScreen: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -234,7 +249,24 @@ fun TitleShip(tittle: String) {
     ) {
         Text(
             text = tittle,
-            fontSize = 22.sp,
+            fontSize =
+            when (sizeScreen) {
+                "large" -> {
+                    22.sp
+                }
+
+                "fairly" -> {
+                    20.sp
+                }
+
+                "medium" -> {
+                    18.sp
+                }
+
+                else -> {
+                    17.sp
+                }
+            },
             color = Color.Black,
             modifier = Modifier
                 .fillMaxWidth(0.7f)
@@ -243,7 +275,25 @@ fun TitleShip(tittle: String) {
         )
         Icon(
             Icons.Default.Edit, contentDescription = null, modifier = Modifier
-                .size(30.dp)
+                .size(
+                    when (sizeScreen) {
+                        "large" -> {
+                            30.dp
+                        }
+
+                        "fairly" -> {
+                            28.dp
+                        }
+
+                        "medium" -> {
+                            26.dp
+                        }
+
+                        else -> {
+                            25.dp
+                        }
+                    }
+                )
                 .fillMaxWidth(0.3f)
         )
 
@@ -256,6 +306,55 @@ fun ClickBackShip(price: String) {
     BackHandler {
         val intent = Intent(context, CheckOutActivity::class.java)
         context.startActivity(intent)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.P)
+@Composable
+fun ScreenShip (sizeScreen:String,priceNhan:String,getId:String) {
+    val context = LocalContext.current
+    Column(modifier = Modifier.fillMaxSize()) {
+        MyToolbar3(title = "Shipping address","")
+        Box(modifier = Modifier.fillMaxSize()) {
+            ListShip(id = getId,sizeScreen = sizeScreen)
+            Box(
+                contentAlignment = Alignment.BottomEnd, modifier = Modifier
+                    .padding(end = 20.dp, bottom = 70.dp)
+                    .fillMaxSize()
+            ) {
+                MyFloatingButton {
+                    val intent =
+                        Intent(context, AddShippingActivity::class.java)
+                    context.startActivity(intent)
+                }
+            }
+        }
+        ClickBackShip(price = priceNhan)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.P)
+@Composable
+fun SizeShippingScreen(price:String,id:String) {
+    val context = LocalContext.current
+    val displayMetrics: DisplayMetrics = context.resources.displayMetrics
+    val screenHeightPx = displayMetrics.heightPixels
+    val density = displayMetrics.density
+
+    val screenHeightDp = screenHeightPx / density
+
+    if (screenHeightDp > 890) {
+        // large
+        ScreenShip(sizeScreen = "large",price,id)
+    } else if (screenHeightDp > 800) {
+        // fairly
+        ScreenShip(sizeScreen = "fairly",price,id)
+    } else if (screenHeightDp > 714) {
+        // medium
+        ScreenShip(sizeScreen = "medium",price,id)
+    } else {
+        // smail
+        ScreenShip(sizeScreen = "smail",price,id)
     }
 }
 

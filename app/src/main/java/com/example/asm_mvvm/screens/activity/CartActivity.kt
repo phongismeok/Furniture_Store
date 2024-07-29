@@ -74,7 +74,6 @@ class CartActivity : AppCompatActivity() {
         setContent {
             val type = intent.getStringExtra("TYPE") ?: "home"
             Column {
-                MyToolbar3(title = "My cart")
                 SizeCartScreen(screen = type)
             }
         }
@@ -131,7 +130,24 @@ fun ListCart(screen: String, sizeScreen: String) {
                 )
                 Text(
                     text = "Hiện tại bạn chưa thêm sản phẩm nào",
-                    fontSize = 20.sp,
+                    fontSize =
+                    when (sizeScreen) {
+                        "large" -> {
+                            20.sp
+                        }
+
+                        "fairly" -> {
+                            19.sp
+                        }
+
+                        "medium" -> {
+                            18.sp
+                        }
+
+                        else -> {
+                            17.sp
+                        }
+                    },
                     modifier = Modifier.padding(20.dp)
                 )
                 MyButton2(title = "Back to home", onClick = {
@@ -489,15 +505,19 @@ fun SizeCartScreen(screen: String) {
 
     if (screenHeightDp > 890) {
         // large
+        MyToolbar3(title = "My cart", sizeScreen = "large")
         ListCart(screen = screen, sizeScreen = "large")
     } else if (screenHeightDp > 800) {
         // fairly
-        ListCart(screen = screen, sizeScreen = "medium")
+        MyToolbar3(title = "My cart", sizeScreen = "fairly")
+        ListCart(screen = screen, sizeScreen = "fairly")
     } else if (screenHeightDp > 714) {
         // medium
+        MyToolbar3(title = "My cart", sizeScreen = "medium")
         ListCart(screen = screen, sizeScreen = "medium")
     } else {
         // smail
+        MyToolbar3(title = "My cart", sizeScreen = "smail")
         ListCart(screen = screen, sizeScreen = "smail")
     }
 }

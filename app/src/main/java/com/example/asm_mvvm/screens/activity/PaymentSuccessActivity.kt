@@ -130,7 +130,7 @@ fun SizePaymentSuccessScreen() {
         ScreenPaymentSuccess(sizeScreen = "large")
     } else if (screenHeightDp > 800) {
         // fairly
-        ScreenPaymentSuccess(sizeScreen = "medium")
+        ScreenPaymentSuccess(sizeScreen = "fairly")
     } else if (screenHeightDp > 714) {
         // medium
         ScreenPaymentSuccess(sizeScreen = "medium")

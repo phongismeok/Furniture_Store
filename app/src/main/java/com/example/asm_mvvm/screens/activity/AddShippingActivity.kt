@@ -470,7 +470,7 @@ fun ScreenAddShip(sizeScreen: String) {
             .fillMaxSize()
             .background(Color.White), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        MyToolbar3(title = "Add shipping address")
+        MyToolbar3(title = "Add shipping address",sizeScreen = sizeScreen)
         IconAnimation(sizeScreen = sizeScreen)
         DropDown(ghnViewModel = ghnViewModel, sizeScreen = sizeScreen)
     }
@@ -491,7 +491,7 @@ fun SizeAddShipScreen() {
         ScreenAddShip(sizeScreen = "large")
     } else if (screenHeightDp > 800) {
         // fairly
-        ScreenAddShip(sizeScreen = "medium")
+        ScreenAddShip(sizeScreen = "fairly")
     } else if (screenHeightDp > 714) {
         // medium
         ScreenAddShip(sizeScreen = "medium")

@@ -75,18 +75,21 @@ fun HomeFragment() {
             .fillMaxSize()
             .background(Color(0xFFFFFEFD)),
     ) {
-        MyToolbar(title = "Home", type = "home", "Search product", textState)
         if (screenHeightDp > 890) {
             // large
+            MyToolbar(title = "Home", type = "home", "Search product", textState, sizeScreen = "large")
             ListType(textState.value, type = "large")
         } else if (screenHeightDp > 800) {
             // fairly
+            MyToolbar(title = "Home", type = "home", "Search product", textState, sizeScreen = "fairly")
             ListType(textState.value, type = "fairly")
         } else if (screenHeightDp > 714) {
             // medium
+            MyToolbar(title = "Home", type = "home", "Search product", textState, sizeScreen = "medium")
             ListType(textState.value, type = "medium")
         } else {
             // smail
+            MyToolbar(title = "Home", type = "home", "Search product", textState, sizeScreen = "smail")
             ListType(textState.value, type = "smail")
         }
 

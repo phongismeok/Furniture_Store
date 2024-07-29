@@ -66,18 +66,21 @@ fun FavoritesFragment() {
     val screenHeightDp = screenHeightPx / density
 
     Column(modifier = Modifier.fillMaxSize()) {
-        MyToolbar(title = "Favorites", type = "favorites", "Search favorites", textState)
         if (screenHeightDp > 890) {
             // large
+            MyToolbar(title = "Favorites", type = "favorites", "Search favorites", textState, sizeScreen = "large")
             ListFavorites(textState.value, type = "large")
         } else if (screenHeightDp > 800) {
             // fairly
+            MyToolbar(title = "Favorites", type = "favorites", "Search favorites", textState, sizeScreen = "fairly")
             ListFavorites(textState.value, type = "fairly")
         } else if (screenHeightDp > 714) {
             // medium
+            MyToolbar(title = "Favorites", type = "favorites", "Search favorites", textState, sizeScreen = "medium")
             ListFavorites(textState.value, type = "medium")
         } else {
             // smail
+            MyToolbar(title = "Favorites", type = "favorites", "Search favorites", textState, sizeScreen = "smail")
             ListFavorites(textState.value, type = "smail")
         }
     }

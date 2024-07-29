@@ -142,7 +142,7 @@ fun TransactionImage(image1: String, image2: String, image3: String, screen: Str
                         }
 
                         "fairly" -> {
-                            90.dp
+                            70.dp
                         }
 
                         "medium" -> {
@@ -903,7 +903,7 @@ fun SizeDetailScreen(idPro: String?, screen: String?) {
         DetailScreen(type = "large", idPro, screen)
     } else if (screenHeightDp > 800) {
         // fairly
-        DetailScreen(type = "medium", idPro, screen)
+        DetailScreen(type = "fairly", idPro, screen)
     } else if (screenHeightDp > 714) {
         // medium
         DetailScreen(type = "medium", idPro, screen)

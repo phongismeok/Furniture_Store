@@ -71,7 +71,7 @@ fun ScreenWelcome(type: String) {
             color = Color.Gray,
             fontFamily = FontFamily.Serif
         )
-        Animation(image = R.raw.animation, type = "large")
+        Animation(image = R.raw.animation, type = type)
         Text(
             text = "Welcome!",
             fontSize =
@@ -152,7 +152,7 @@ fun SizeWelcomeScreen() {
         ScreenWelcome(type = "large")
     } else if (screenHeightDp > 800) {
         // fairly
-        ScreenWelcome(type = "medium")
+        ScreenWelcome(type = "fairly")
     } else if (screenHeightDp > 714) {
         // medium
         ScreenWelcome(type = "medium")
