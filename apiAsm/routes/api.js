@@ -66,4 +66,11 @@ router.post('/add-notification',notificationController.addNotification)
 router.put('/update-state-notification',notificationController.updateState);
 router.delete('/delete-notification/:id',notificationController.deleteNotification)
 
+// order
+router.get('/get-list-order-by-account/:account',orderController.getAllOrderByAccount);
+router.get('/get-list-order-by-state/:account/:state',orderController.getOrderByState);
+router.post('/add-order',orderController.addOrder)
+router.put('/update-state-order',orderController.updateStateOrder);
+router.delete('/delete-order/:id',orderController.deleteOrder)
+
 module.exports = router;

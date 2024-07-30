@@ -46,10 +46,12 @@ import androidx.compose.ui.unit.sp
 import com.example.asm_mvvm.R
 import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.request.NotificationRequest
+import com.example.asm_mvvm.request.OrderRequest
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyToolbar3
 import com.example.asm_mvvm.viewmodels.CartViewModel
 import com.example.asm_mvvm.viewmodels.NotificationViewModel
+import com.example.asm_mvvm.viewmodels.OrderViewModel
 import com.example.asm_mvvm.viewmodels.ShippingViewModel
 import com.example.asm_mvvm.viewmodels.UserViewModel
 
@@ -728,6 +730,7 @@ fun ContentTotal(pricePro: Double, priceShip: Double, sizeScreen: String) {
     val shippingViewModel = ShippingViewModel()
     val carViewModel = CartViewModel()
     val userViewModel = UserViewModel()
+    val orderViewModel = OrderViewModel()
 
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
 
@@ -821,7 +824,19 @@ fun ContentTotal(pricePro: Double, priceShip: Double, sizeScreen: String) {
                         image = cart.image,
                         account = account
                     )
+
+                    val orderBody = OrderRequest(
+                        productId = cart.productId,
+                        productName = cart.productName,
+                        image = cart.image,
+                        quantity = cart.quantity,
+                        price = cart.price,
+                        state = "Processing",
+                        account = account
+                    )
+
                     notificationViewModel.addNotification(account, notificationBody)
+                    orderViewModel.addOrder(account,orderBody)
                     carViewModel.deleteCart(cart.id, account, context, 0)
                 }
 

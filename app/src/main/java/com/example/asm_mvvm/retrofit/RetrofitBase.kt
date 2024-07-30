@@ -40,5 +40,7 @@ class RetrofitBase {
     val notificationService: NotificationService by lazy {
         retrofit.create(NotificationService::class.java)
     }
-
+    val orderService: OrderService by lazy {
+        retrofit.create(OrderService::class.java)
+    }
 }

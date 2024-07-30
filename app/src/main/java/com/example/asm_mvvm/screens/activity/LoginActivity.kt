@@ -471,7 +471,7 @@ fun ScreenLogin(type: String) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val passwordVisible = rememberSaveable { mutableStateOf(false) }
-    val checked = remember { mutableStateOf(false) }
+    val checked = remember { mutableStateOf(true) }
     val stateChange = remember { mutableIntStateOf(0) }
 
     val emailSave = userViewModel.getEmailFromSharedPreferences()

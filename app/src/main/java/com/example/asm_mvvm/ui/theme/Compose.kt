@@ -1,5 +1,6 @@
 package com.example.asm_mvvm.ui.theme
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -47,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -60,6 +62,15 @@ import com.example.asm_mvvm.R
 import com.example.asm_mvvm.screens.activity.CartActivity
 import com.example.asm_mvvm.screens.activity.LoginActivity
 
+@Composable
+fun HorizontalLine () {
+    Divider(
+        color = Color(0xFF0F0404),
+        thickness = 1.dp,
+        modifier = Modifier
+            .fillMaxWidth()
+    )
+}
 
 @Composable
 fun Animation(image: Int,type:String) {
