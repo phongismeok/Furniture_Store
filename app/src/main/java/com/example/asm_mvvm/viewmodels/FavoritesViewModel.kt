@@ -18,23 +18,31 @@ class FavoritesViewModel : ViewModel() {
     private val _favorites = MutableLiveData<List<Favorites>>()
     val favorites: LiveData<List<Favorites>> = _favorites
 
-    private val _favorite2 = MutableLiveData<FavoritesResponse>()
-    val favorite2: LiveData<FavoritesResponse> = _favorite2
+    private val _favorite = MutableLiveData<FavoritesResponse>()
+    val favorite: LiveData<FavoritesResponse> = _favorite
+
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
+    private val _isFailed = MutableLiveData<Boolean>()
+    val isFailed: LiveData<Boolean> get() = _isFailed
 
     fun getFavoritesByAccount(account: String) {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().favoritesService.getFavoritesByAccount(account)
-                Log.d("TAG", "getFv: $response")
-
                 if (response.isSuccessful) {
                     _favorites.postValue(response.body()?.map { it.toFavorites() })
+                    _isFailed.value = false
                 } else {
                     _favorites.postValue(emptyList())
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "getFv: " + e.message)
                 _favorites.postValue(emptyList())
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -44,12 +52,15 @@ class FavoritesViewModel : ViewModel() {
             try {
                 val response = RetrofitBase().favoritesService.getFavoriteByProductId(account,productId)
                 if (response.isSuccessful && response.body() != null) {
-                    _favorite2.value = response.body()
+                    _favorite.value = response.body()
+                    _isFailed.value = false
                 } else {
-                    Log.d("check", "getFvByIdPro: fail1")
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
-                Log.d("check", "getFvByIdPro: fail1 $e" )
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }

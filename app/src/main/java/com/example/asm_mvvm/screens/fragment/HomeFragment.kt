@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -51,7 +52,6 @@ import com.example.asm_mvvm.R
 import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.request.CartRequest
 import com.example.asm_mvvm.screens.activity.DetailProductActivity
-import com.example.asm_mvvm.ui.theme.AnimationLoading
 import com.example.asm_mvvm.ui.theme.MyButton2
 import com.example.asm_mvvm.ui.theme.MyToolbar
 import com.example.asm_mvvm.viewmodels.CartViewModel
@@ -77,19 +77,43 @@ fun HomeFragment() {
     ) {
         if (screenHeightDp > 890) {
             // large
-            MyToolbar(title = "Home", type = "home", "Search product", textState, sizeScreen = "large")
+            MyToolbar(
+                title = "Home",
+                type = "home",
+                "Search product",
+                textState,
+                sizeScreen = "large"
+            )
             ListType(textState.value, type = "large")
         } else if (screenHeightDp > 800) {
             // fairly
-            MyToolbar(title = "Home", type = "home", "Search product", textState, sizeScreen = "fairly")
+            MyToolbar(
+                title = "Home",
+                type = "home",
+                "Search product",
+                textState,
+                sizeScreen = "fairly"
+            )
             ListType(textState.value, type = "fairly")
         } else if (screenHeightDp > 714) {
             // medium
-            MyToolbar(title = "Home", type = "home", "Search product", textState, sizeScreen = "medium")
+            MyToolbar(
+                title = "Home",
+                type = "home",
+                "Search product",
+                textState,
+                sizeScreen = "medium"
+            )
             ListType(textState.value, type = "medium")
         } else {
             // smail
-            MyToolbar(title = "Home", type = "home", "Search product", textState, sizeScreen = "smail")
+            MyToolbar(
+                title = "Home",
+                type = "home",
+                "Search product",
+                textState,
+                sizeScreen = "smail"
+            )
             ListType(textState.value, type = "smail")
         }
 
@@ -102,6 +126,9 @@ fun HomeFragment() {
 fun ListType(textSearch: String, type: String) {
     val typeViewModel = TypeViewModel()
 
+    val isLoading by typeViewModel.isLoading.observeAsState(true)
+    val isFailed by typeViewModel.isFailed.observeAsState(false)
+
     val typesState = typeViewModel.types.observeAsState(initial = emptyList())
     val types = typesState.value
 
@@ -109,84 +136,114 @@ fun ListType(textSearch: String, type: String) {
         mutableStateOf("")
     }
 
-    if (types.isEmpty()) {
-        AnimationLoading()
+    if (isLoading) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            CircularProgressIndicator()
+        }
+    } else if (isFailed) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Error", fontSize = 22.sp)
+        }
     } else {
-        LazyRow {
-            items(types.size) { index ->
-                Column(
-                    modifier = Modifier
-                        .background(Color.White)
-                        .padding(top = 15.dp, start = 10.dp, end = 10.dp, bottom = 15.dp),
-                    Arrangement.Center, Alignment.CenterHorizontally,
-                ) {
-                    Card(
+        if (types.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 30.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+            ) {
+                Text(text = "Loading...", fontSize = 22.sp)
+            }
+        } else {
+            LazyRow {
+                items(types.size) { index ->
+                    Column(
                         modifier = Modifier
-                            .size(
-                                when (type) {
-                                    "large" -> {
-                                        75.dp
-                                    }
-
-                                    "fairly" -> {
-                                        70.dp
-                                    }
-
-                                    "medium" -> {
-                                        65.dp
-                                    }
-
-                                    else -> {
-                                        60.dp
-                                    }
-                                }
-                            )
-                            .padding(2.dp),
-                        shape = RoundedCornerShape(15.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (selected == types[index].name)
-                                Color(0xFF684646)
-                            else
-                                Color(0xFFF0E9E9)
-                        ),
-                        onClick = {
-                            selected = types[index].name
-                        }
-
+                            .background(Color.White)
+                            .padding(top = 15.dp, start = 10.dp, end = 10.dp, bottom = 15.dp),
+                        Arrangement.Center, Alignment.CenterHorizontally,
                     ) {
-                        AsyncImage(
-                            model = types[index].image,
-                            contentDescription = null,
-                            modifier = Modifier.padding(10.dp)
+                        Card(
+                            modifier = Modifier
+                                .size(
+                                    when (type) {
+                                        "large" -> {
+                                            75.dp
+                                        }
+
+                                        "fairly" -> {
+                                            70.dp
+                                        }
+
+                                        "medium" -> {
+                                            65.dp
+                                        }
+
+                                        else -> {
+                                            60.dp
+                                        }
+                                    }
+                                )
+                                .padding(2.dp),
+                            shape = RoundedCornerShape(15.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (selected == types[index].name)
+                                    Color(0xFF684646)
+                                else
+                                    Color(0xFFF0E9E9)
+                            ),
+                            onClick = {
+                                selected = types[index].name
+                            }
+
+                        ) {
+                            AsyncImage(
+                                model = types[index].image,
+                                contentDescription = null,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                        Text(
+                            text = types[index].name,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(top = 10.dp),
+                            color = if (selected == types[index].name)
+                                Color.Black
+                            else
+                                Color.Gray
                         )
                     }
-                    Text(
-                        text = types[index].name,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(top = 10.dp),
-                        color = if (selected == types[index].name)
-                            Color.Black
-                        else
-                            Color.Gray
-                    )
+                }
+            }
+
+            when (selected) {
+                "" -> {
+                    ListProduct(type = "", dataSearch = textSearch, sizeScreen = type)
+                }
+
+                "Popular" -> {
+                    ListProduct(type = "Popular", dataSearch = textSearch, sizeScreen = type)
+                }
+
+                else -> {
+                    ListProduct(type = selected, dataSearch = textSearch, sizeScreen = type)
                 }
             }
         }
-
-        when (selected) {
-            "" -> {
-                ListProduct(type = "", dataSearch = textSearch, sizeScreen = type)
-            }
-
-            "Popular" -> {
-                ListProduct(type = "Popular", dataSearch = textSearch, sizeScreen = type)
-            }
-
-            else -> {
-                ListProduct(type = selected, dataSearch = textSearch, sizeScreen = type)
-            }
-        }
     }
+
+
 }
 
 
@@ -197,6 +254,9 @@ fun ListProduct(type: String, dataSearch: String, sizeScreen: String) {
 
     val productViewModel = ProductViewModel()
     val context = LocalContext.current
+
+    val isLoading by productViewModel.isLoading.observeAsState(true)
+    val isFailed by productViewModel.isFailed.observeAsState(false)
 
     val productsState = productViewModel.products.observeAsState(initial = emptyList())
     val products = productsState.value
@@ -222,123 +282,149 @@ fun ListProduct(type: String, dataSearch: String, sizeScreen: String) {
 
     val icon: Painter = painterResource(id = R.drawable.icbag)
 
-    if (products.isEmpty()) {
-        AnimationLoading()
-    } else {
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(2), // chia theo số cột
-            contentPadding = PaddingValues(8.dp),
-            modifier = Modifier
-                .padding(top = 5.dp)
+    if (isLoading) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            items(products.size) { index ->
-                var showDialog by remember { mutableStateOf(false) }
-                if (showDialog) {
-                    DialogAddToCart(
-                        onDismissRequest = { showDialog = false },
-                        productId = products[index].id,
-                        productName = products[index].productName,
-                        image = products[index].image1,
-                        price = products[index].price
-                    )
-                }
+            CircularProgressIndicator()
+        }
+    } else if (isFailed) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Error", fontSize = 22.sp)
+        }
+    } else {
+        if (products.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(text = "Không có sản phẩm nào", fontSize = 22.sp)
+            }
+        } else {
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(2), // chia theo số cột
+                contentPadding = PaddingValues(8.dp),
+                modifier = Modifier
+                    .padding(top = 5.dp)
+            ) {
+                items(products.size) { index ->
+                    var showDialog by remember { mutableStateOf(false) }
+                    if (showDialog) {
+                        DialogAddToCart(
+                            onDismissRequest = { showDialog = false },
+                            productId = products[index].id,
+                            productName = products[index].productName,
+                            image = products[index].image1,
+                            price = products[index].price
+                        )
+                    }
 
-                Column(
-                    modifier = Modifier
-                        .background(Color.White)
-                        .padding(top = 20.dp, start = 10.dp, end = 10.dp),
-                    Arrangement.Center, Alignment.CenterHorizontally,
-                ) {
-                    Card(
+                    Column(
                         modifier = Modifier
-                            .padding(10.dp)
-                            .width(200.dp)
-                            .height(
-                                when (sizeScreen) {
-                                    "large" -> {
-                                        250.dp
-                                    }
-
-                                    "fairly" -> {
-                                        240.dp
-                                    }
-
-                                    "medium" -> {
-                                        230.dp
-                                    }
-
-                                    else -> {
-                                        200.dp
-                                    }
-                                }
-                            ),
-                        shape = RoundedCornerShape(15.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
-                        onClick = {
-                            val intent = Intent(context, DetailProductActivity::class.java)
-                            intent.putExtra("ID_PRODUCT", products[index].id)
-                            intent.putExtra("SCREEN", "home")
-                            context.startActivity(intent)
-                        }
+                            .background(Color.White)
+                            .padding(top = 20.dp, start = 10.dp, end = 10.dp),
+                        Arrangement.Center, Alignment.CenterHorizontally,
                     ) {
-                        Box(
-                            contentAlignment = Alignment.BottomEnd
-                        ) {
-                            AsyncImage(
-                                model = products[index].image1,
-                                contentDescription = null,
-                                contentScale = ContentScale.FillBounds,
-                                modifier = Modifier.fillMaxHeight()
-                            )
-                            Card(
-                                modifier = Modifier
-                                    .padding(10.dp)
-                                    .width(40.dp)
-                                    .height(40.dp),
-                                shape = RoundedCornerShape(5.dp),
-                                onClick = {
+                        Card(
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .width(200.dp)
+                                .height(
+                                    when (sizeScreen) {
+                                        "large" -> {
+                                            250.dp
+                                        }
 
-                                }
+                                        "fairly" -> {
+                                            240.dp
+                                        }
+
+                                        "medium" -> {
+                                            230.dp
+                                        }
+
+                                        else -> {
+                                            200.dp
+                                        }
+                                    }
+                                ),
+                            shape = RoundedCornerShape(15.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            onClick = {
+                                val intent = Intent(context, DetailProductActivity::class.java)
+                                intent.putExtra("ID_PRODUCT", products[index].id)
+                                intent.putExtra("SCREEN", "home")
+                                context.startActivity(intent)
+                            }
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.BottomEnd
                             ) {
-                                Box(
+                                AsyncImage(
+                                    model = products[index].image1,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.fillMaxHeight()
+                                )
+                                Card(
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(5.dp),
-                                    contentAlignment = Alignment.Center
+                                        .padding(10.dp)
+                                        .width(40.dp)
+                                        .height(40.dp),
+                                    shape = RoundedCornerShape(5.dp),
+                                    onClick = {
+
+                                    }
                                 ) {
-                                    Icon(
-                                        painter = icon,
-                                        contentDescription = null,
+                                    Box(
                                         modifier = Modifier
-                                            .size(26.dp)
-                                            .clickable {
-                                                showDialog = true
-                                            },
-                                    )
+                                            .fillMaxSize()
+                                            .padding(5.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = icon,
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .size(26.dp)
+                                                .clickable {
+                                                    showDialog = true
+                                                },
+                                        )
+                                    }
                                 }
                             }
                         }
+                        Text(
+                            text = products[index].productName,
+                            modifier = Modifier
+                                .align(Alignment.Start)
+                                .padding(start = 10.dp),
+                            fontSize = 20.sp
+                        )
+                        Text(
+                            text = "$ " + products[index].price,
+                            modifier = Modifier
+                                .align(Alignment.Start)
+                                .padding(start = 10.dp),
+                            fontSize = 20.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
-                    Text(
-                        text = products[index].productName,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(start = 10.dp),
-                        fontSize = 20.sp
-                    )
-                    Text(
-                        text = "$ " + products[index].price,
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(start = 10.dp),
-                        fontSize = 20.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold
-                    )
                 }
             }
         }
     }
+
+
 }
 
 @Composable

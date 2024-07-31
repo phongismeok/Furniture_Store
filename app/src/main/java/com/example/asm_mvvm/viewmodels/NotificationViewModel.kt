@@ -7,32 +7,38 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.asm_mvvm.models.Favorites
 import com.example.asm_mvvm.models.Notification
-import com.example.asm_mvvm.request.FavoritesRequest
 import com.example.asm_mvvm.request.NotificationRequest
-import com.example.asm_mvvm.response.FavoritesResponse
 import com.example.asm_mvvm.retrofit.RetrofitBase
 import kotlinx.coroutines.launch
 
 class NotificationViewModel : ViewModel(){
+
     private val _notification = MutableLiveData<List<Notification>>()
     val notifications: LiveData<List<Notification>> = _notification
+
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
+    private val _isFailed = MutableLiveData<Boolean>()
+    val isFailed: LiveData<Boolean> get() = _isFailed
 
     fun getNotificationByAccount(account: String) {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().notificationService.getNotificationByAccount(account)
-                Log.d("TAG", "getNotification: $response")
-
                 if (response.isSuccessful) {
                     _notification.postValue(response.body()?.map { it.toNotification() })
+                    _isFailed.value = false
                 } else {
                     _notification.postValue(emptyList())
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "getNotification: " + e.message)
                 _notification.postValue(emptyList())
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -59,14 +65,16 @@ class NotificationViewModel : ViewModel(){
                 val response = RetrofitBase().notificationService.searchNotification(key,account)
                 if (response.isSuccessful) {
                     _notification.postValue(response.body()?.map { it.toNotification() })
-                    Log.d("check", "searchNoti: ok")
+                    _isFailed.value = false
                 } else {
                     _notification.postValue(emptyList())
-                    Log.d("check", "searchNoti: fail1")
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
                 _notification.postValue(emptyList())
-                Log.d("check", "searchNoti: $e")
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }

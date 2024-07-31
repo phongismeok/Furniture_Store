@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -68,19 +69,43 @@ fun FavoritesFragment() {
     Column(modifier = Modifier.fillMaxSize()) {
         if (screenHeightDp > 890) {
             // large
-            MyToolbar(title = "Favorites", type = "favorites", "Search favorites", textState, sizeScreen = "large")
+            MyToolbar(
+                title = "Favorites",
+                type = "favorites",
+                "Search favorites",
+                textState,
+                sizeScreen = "large"
+            )
             ListFavorites(textState.value, type = "large")
         } else if (screenHeightDp > 800) {
             // fairly
-            MyToolbar(title = "Favorites", type = "favorites", "Search favorites", textState, sizeScreen = "fairly")
+            MyToolbar(
+                title = "Favorites",
+                type = "favorites",
+                "Search favorites",
+                textState,
+                sizeScreen = "fairly"
+            )
             ListFavorites(textState.value, type = "fairly")
         } else if (screenHeightDp > 714) {
             // medium
-            MyToolbar(title = "Favorites", type = "favorites", "Search favorites", textState, sizeScreen = "medium")
+            MyToolbar(
+                title = "Favorites",
+                type = "favorites",
+                "Search favorites",
+                textState,
+                sizeScreen = "medium"
+            )
             ListFavorites(textState.value, type = "medium")
         } else {
             // smail
-            MyToolbar(title = "Favorites", type = "favorites", "Search favorites", textState, sizeScreen = "smail")
+            MyToolbar(
+                title = "Favorites",
+                type = "favorites",
+                "Search favorites",
+                textState,
+                sizeScreen = "smail"
+            )
             ListFavorites(textState.value, type = "smail")
         }
     }
@@ -102,6 +127,9 @@ fun ListFavorites(dataSearch: String, type: String) {
     val favorites = favoriteState.value
     val account = userViewModel.getEmailFromSharedPreferences()
 
+    val isLoading by favoritesViewModel.isLoading.observeAsState(true)
+    val isFailed by favoritesViewModel.isFailed.observeAsState(false)
+
     if (dataSearch == "") {
         // goi phuong thuc call data binh thuong
         if (account != null) {
@@ -116,158 +144,176 @@ fun ListFavorites(dataSearch: String, type: String) {
 
     var showDialog by remember { mutableStateOf(false) }
 
-    if (favorites.isEmpty()) {
+    if (isLoading) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val imageRequest = ImageRequest.Builder(context)
-                .data(R.drawable.like)
-                .decoderFactory(ImageDecoderDecoder.Factory())
-                .build()
+            CircularProgressIndicator()
+        }
+    } else if (isFailed) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Error", fontSize = 22.sp)
+        }
+    } else {
+        if (favorites.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                AsyncImage(
-                    model = imageRequest,
-                    contentDescription = null,
-                    modifier = Modifier.size(150.dp)
-                )
-                Text(text = "Danh sách yêu thích trống", fontSize = 22.sp)
-            }
-
-        }
-    } else {
-        LazyColumn(
-            contentPadding = PaddingValues(8.dp),
-            modifier = Modifier
-                .padding(top = 10.dp)
-                .fillMaxHeight()
-        ) {
-            items(favorites.size) { index ->
-                if (showDialog) {
-                    DialogAddToCartFv(
-                        onDismissRequest = { showDialog = false },
-                        productId = favorites[index].id,
-                        productName = favorites[index].productName,
-                        image = favorites[index].image,
-                        price = favorites[index].price
+                val imageRequest = ImageRequest.Builder(context)
+                    .data(R.drawable.like)
+                    .decoderFactory(ImageDecoderDecoder.Factory())
+                    .build()
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    AsyncImage(
+                        model = imageRequest,
+                        contentDescription = null,
+                        modifier = Modifier.size(150.dp)
                     )
+                    Text(text = "Danh sách yêu thích trống", fontSize = 22.sp)
                 }
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(
-                            when (type) {
-                                "large" -> {
-                                    180.dp
-                                }
-
-                                "fairly" -> {
-                                    170.dp
-                                }
-
-                                "medium" -> {
-                                    160.dp
-                                }
-
-                                else -> {
-                                    150.dp
-                                }
-                            }
+            }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(8.dp),
+                modifier = Modifier
+                    .padding(top = 10.dp)
+                    .fillMaxHeight()
+            ) {
+                items(favorites.size) { index ->
+                    if (showDialog) {
+                        DialogAddToCartFv(
+                            onDismissRequest = { showDialog = false },
+                            productId = favorites[index].id,
+                            productName = favorites[index].productName,
+                            image = favorites[index].image,
+                            price = favorites[index].price
                         )
-                        .padding(10.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor =
-                        Color.White
-                    ),
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation =
-                        3.dp
-                    ),
-                ) {
-                    Row(
+                    }
+
+                    Card(
                         modifier = Modifier
-                            .padding(10.dp)
-                            .fillMaxSize(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        //
-                        Row {
-                            Card(
-                                modifier = Modifier
-                                    .size(
-                                        when (type) {
-                                            "large" -> {
-                                                140.dp
-                                            }
-
-                                            "fairly" -> {
-                                                130.dp
-                                            }
-
-                                            "medium" -> {
-                                                120.dp
-                                            }
-
-                                            else -> {
-                                                110.dp
-                                            }
-                                        }
-                                    ),
-                                shape = RoundedCornerShape(15.dp),
-                            ) {
-                                AsyncImage(
-                                    model = favorites[index].image,
-                                    contentDescription = null,
-                                    contentScale = ContentScale.FillBounds,
-                                    modifier = Modifier.fillMaxHeight()
-                                )
-                            }
-                            //
-                            Column(modifier = Modifier.padding(start = 15.dp)) {
-                                Text(text = favorites[index].productName, fontSize = 20.sp)
-                                Text(
-                                    text = "$ " + favorites[index].price,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                            }
-                            //
-                        }
-
-                        Column {
-                            Icon(painter = icon, contentDescription = "", modifier = Modifier
-                                .size(30.dp)
-                                .clickable {
-                                    // goi phuong thuc xoa favorites
-                                    if (account != null) {
-                                        favoritesViewModel.deleteFavorites(
-                                            favorites[index].id,
-                                            account,
-                                            context
-                                        )
+                            .fillMaxWidth()
+                            .height(
+                                when (type) {
+                                    "large" -> {
+                                        180.dp
                                     }
-                                })
-                            Spacer(modifier = Modifier.weight(1f))
-                            Icon(
-                                painter = icon2,
-                                contentDescription = null,
-                                modifier = Modifier
+
+                                    "fairly" -> {
+                                        170.dp
+                                    }
+
+                                    "medium" -> {
+                                        160.dp
+                                    }
+
+                                    else -> {
+                                        150.dp
+                                    }
+                                }
+                            )
+                            .padding(10.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor =
+                            Color.White
+                        ),
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation =
+                            3.dp
+                        ),
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            //
+                            Row {
+                                Card(
+                                    modifier = Modifier
+                                        .size(
+                                            when (type) {
+                                                "large" -> {
+                                                    140.dp
+                                                }
+
+                                                "fairly" -> {
+                                                    130.dp
+                                                }
+
+                                                "medium" -> {
+                                                    120.dp
+                                                }
+
+                                                else -> {
+                                                    110.dp
+                                                }
+                                            }
+                                        ),
+                                    shape = RoundedCornerShape(15.dp),
+                                ) {
+                                    AsyncImage(
+                                        model = favorites[index].image,
+                                        contentDescription = null,
+                                        contentScale = ContentScale.FillBounds,
+                                        modifier = Modifier.fillMaxHeight()
+                                    )
+                                }
+                                //
+                                Column(modifier = Modifier.padding(start = 15.dp)) {
+                                    Text(text = favorites[index].productName, fontSize = 20.sp)
+                                    Text(
+                                        text = "$ " + favorites[index].price,
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
+                                //
+                            }
+
+                            Column {
+                                Icon(painter = icon, contentDescription = "", modifier = Modifier
                                     .size(30.dp)
                                     .clickable {
-                                        showDialog = true
-                                    }
-                            )
+                                        // goi phuong thuc xoa favorites
+                                        if (account != null) {
+                                            favoritesViewModel.deleteFavorites(
+                                                favorites[index].id,
+                                                account,
+                                                context
+                                            )
+                                        }
+                                    })
+                                Spacer(modifier = Modifier.weight(1f))
+                                Icon(
+                                    painter = icon2,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .clickable {
+                                            showDialog = true
+                                        }
+                                )
+                            }
+                            //
                         }
-                        //
                     }
-                }
 
+                }
             }
         }
     }

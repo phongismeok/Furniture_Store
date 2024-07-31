@@ -71,13 +71,15 @@ fun ProfileFragment() {
 }
 
 @Composable
-fun ScreenProfile (type:String){
+fun ScreenProfile(type: String) {
     val context = LocalContext.current
     SharedPreferencesManager.init(context)
     val userViewModel = UserViewModel()
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState())) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
         MyToolbar2(title = "Profile", sizeScreen = type)
         MyInfo(userViewModel = userViewModel, type = type)
         MyOptions(tittle = "My orders", content = "haha", type = type) {
@@ -109,7 +111,7 @@ fun ScreenProfile (type:String){
 }
 
 @Composable
-fun MyInfo(userViewModel: UserViewModel,type: String) {
+fun MyInfo(userViewModel: UserViewModel, type: String) {
     val account = userViewModel.getEmailFromSharedPreferences()
 
     Row(
@@ -140,46 +142,58 @@ fun MyInfo(userViewModel: UserViewModel,type: String) {
                             .clip(CircleShape)
                     )
                     Column(modifier = Modifier.padding(start = 15.dp)) {
-                        Text(text = it[0].username, fontSize =
-                        when (type) {
-                            "large" -> {
-                                20.sp
-                            }
+                        Text(
+                            text = it[0].username, fontSize =
+                            when (type) {
+                                "large" -> {
+                                    20.sp
+                                }
 
-                            "fairly" -> {
-                                19.sp
-                            }
+                                "fairly" -> {
+                                    19.sp
+                                }
 
-                            "medium" -> {
-                                18.sp
-                            }
+                                "medium" -> {
+                                    18.sp
+                                }
 
-                            else -> {
-                                17.sp
-                            }
-                        }, fontWeight = FontWeight.Bold)
-                        Text(text = it[0].name, fontSize =
-                        when (type) {
-                            "large" -> {
-                                21.sp
-                            }
+                                else -> {
+                                    17.sp
+                                }
+                            }, fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = it[0].name, fontSize =
+                            when (type) {
+                                "large" -> {
+                                    21.sp
+                                }
 
-                            "fairly" -> {
-                                20.sp
-                            }
+                                "fairly" -> {
+                                    20.sp
+                                }
 
-                            "medium" -> {
-                                19.sp
-                            }
+                                "medium" -> {
+                                    19.sp
+                                }
 
-                            else -> {
-                                18.sp
+                                else -> {
+                                    18.sp
+                                }
                             }
-                        })
+                        )
                     }
                 }
             } ?: run {
-                Text("Loading...", fontSize = 22.sp)
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text("Loading...", fontSize = 22.sp)
+                }
             }
         }
     }
@@ -187,7 +201,7 @@ fun MyInfo(userViewModel: UserViewModel,type: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyOptions(type: String,tittle: String, content: String, onClick: () -> Unit) {
+fun MyOptions(type: String, tittle: String, content: String, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor =

@@ -10,9 +10,15 @@ import com.example.asm_mvvm.retrofit.RetrofitBase
 import kotlinx.coroutines.launch
 
 class TypeViewModel : ViewModel() {
-    private val _type = MutableLiveData<List<Type>>()
 
+    private val _type = MutableLiveData<List<Type>>()
     val types: LiveData<List<Type>> = _type
+
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
+    private val _isFailed = MutableLiveData<Boolean>()
+    val isFailed: LiveData<Boolean> get() = _isFailed
 
     init {
         getType()
@@ -24,14 +30,16 @@ class TypeViewModel : ViewModel() {
                 val response = RetrofitBase().typeService.getListType()
                 if (response.isSuccessful) {
                     _type.postValue(response.body()?.map { it.toType() })
-                    Log.d("check", "getType: ok")
+                    _isFailed.value = false
                 } else {
                     _type.postValue(emptyList())
-                    Log.d("check", "getType: fail1")
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
                 _type.postValue(emptyList())
-                Log.d("check", "getType: $e ")
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }

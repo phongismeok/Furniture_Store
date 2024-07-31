@@ -15,9 +15,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,6 +82,9 @@ fun ListNotification(dataSearch: String, type: String) {
         notificationViewModel.notifications.observeAsState(initial = emptyList())
     val notifications = notificationState.value
 
+    val isLoading by notificationViewModel.isLoading.observeAsState(true)
+    val isFailed by notificationViewModel.isFailed.observeAsState(false)
+
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
     if (dataSearch == "") {
         notificationViewModel.getNotificationByAccount(account)
@@ -87,24 +92,43 @@ fun ListNotification(dataSearch: String, type: String) {
         notificationViewModel.searchNotification(dataSearch, account)
     }
 
-    LazyColumn {
-        items(notifications.size) { index ->
-            ContentNotification(
-                image = notifications[index].image,
-                title = notifications[index].title,
-                content = notifications[index].content,
-                click = notifications[index].state,
-                type = type,
-                deleteClick = {
-                    notificationViewModel.deleteNotifications(
-                        notifications[index].id,
-                        account,
-                        context
-                    )
-                }
-            )
+    if(isLoading){
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }else if(isFailed){
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "Error", fontSize = 22.sp)
+        }
+    }else{
+        LazyColumn {
+            items(notifications.size) { index ->
+                ContentNotification(
+                    image = notifications[index].image,
+                    title = notifications[index].title,
+                    content = notifications[index].content,
+                    click = notifications[index].state,
+                    type = type,
+                    deleteClick = {
+                        notificationViewModel.deleteNotifications(
+                            notifications[index].id,
+                            account,
+                            context
+                        )
+                    }
+                )
+            }
         }
     }
+    
 }
 
 @Composable

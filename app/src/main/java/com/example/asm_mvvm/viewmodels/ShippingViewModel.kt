@@ -8,41 +8,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.asm_mvvm.models.Product
 import com.example.asm_mvvm.models.Shipping
-import com.example.asm_mvvm.request.FavoritesRequest
 import com.example.asm_mvvm.request.ShippingRequest
-import com.example.asm_mvvm.response.FavoritesResponse
 import com.example.asm_mvvm.response.ShippingResponse
 import com.example.asm_mvvm.retrofit.RetrofitBase
 import com.example.asm_mvvm.screens.activity.ShippingActivity
-import com.example.asm_mvvm.screens.activity.SignUpActivity
 import kotlinx.coroutines.launch
 
 class ShippingViewModel : ViewModel() {
-    private val _ship = MutableLiveData<List<Shipping>>()
-    val ships: LiveData<List<Shipping>> = _ship
 
-    private val _ship2 = MutableLiveData<ShippingResponse>()
-    val ships2: LiveData<ShippingResponse> = _ship2
+    private val _ships = MutableLiveData<List<Shipping>>()
+    val ships: LiveData<List<Shipping>> = _ships
 
-    fun getShipping() {
-        viewModelScope.launch {
-            try {
-                val response = RetrofitBase().shippingService.getListShip()
-                if (response.isSuccessful) {
-                    _ship.postValue(response.body()?.map { it.toShip() })
-                    Log.d("check", "getShip: ok")
-                } else {
-                    _ship.postValue(emptyList())
-                    Log.d("check", "getShip: fail1")
-                }
-            } catch (e: Exception) {
-                _ship.postValue(emptyList())
-                Log.d("check", "getShip: $e")
-            }
-        }
-    }
+    private val _ship = MutableLiveData<ShippingResponse>()
+    val ship: LiveData<ShippingResponse> = _ship
 
     fun getShipAddressByAccount(account: String) {
         viewModelScope.launch {
@@ -51,13 +30,13 @@ class ShippingViewModel : ViewModel() {
                 Log.d("TAG", "getShip: $response")
 
                 if (response.isSuccessful) {
-                    _ship.postValue(response.body()?.map { it.toShip() })
+                    _ships.postValue(response.body()?.map { it.toShip() })
                 } else {
-                    _ship.postValue(emptyList())
+                    _ships.postValue(emptyList())
                 }
             } catch (e: Exception) {
                 Log.e("TAG", "getShip: " + e.message)
-                _ship.postValue(emptyList())
+                _ships.postValue(emptyList())
             }
         }
     }
@@ -67,7 +46,7 @@ class ShippingViewModel : ViewModel() {
             try {
                 val response = RetrofitBase().shippingService.getShippingBySelect(account,select)
                 if (response.isSuccessful && response.body() != null) {
-                    _ship2.value = response.body()
+                    _ship.value = response.body()
                 } else {
                     Log.d("check", "getShipBySelect: fail1")
                 }

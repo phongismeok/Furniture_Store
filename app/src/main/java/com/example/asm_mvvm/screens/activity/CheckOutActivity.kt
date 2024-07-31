@@ -72,8 +72,8 @@ fun Title(title: String, type: Int, sizeScreen: String) {
     val shippingViewModel = ShippingViewModel()
     val userViewModel = UserViewModel()
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
-    val shipState = shippingViewModel.ships2.observeAsState()
-    val ships = shipState.value
+    val shipState = shippingViewModel.ship.observeAsState()
+    val ship = shipState.value
     shippingViewModel.getShipAddressBySelect(select = 1, account = account)
     val context = LocalContext.current
     Row(
@@ -131,8 +131,8 @@ fun Title(title: String, type: Int, sizeScreen: String) {
                         1 -> {
                             val intent = Intent(context, ShippingActivity::class.java)
                             context.startActivity(intent)
-                            if (ships != null) {
-                                val id = ships.id
+                            if (ship != null) {
+                                val id = ship.id
                                 intent.putExtra("CLICK", id)
                                 context.startActivity(intent)
                             } else {
@@ -172,7 +172,7 @@ fun ContentShippingAddress(sizeScreen: String) {
     val userViewModel = UserViewModel()
 
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
-    val shipState = shippingViewModel.ships2.observeAsState()
+    val shipState = shippingViewModel.ship.observeAsState()
     val ships = shipState.value
     shippingViewModel.getShipAddressBySelect(1, account)
 
@@ -738,8 +738,8 @@ fun ContentTotal(pricePro: Double, priceShip: Double, sizeScreen: String) {
     val isLoading by cartViewModel.isLoading.observeAsState(true)
     val isFailed by cartViewModel.isFailed.observeAsState(false)
 
-    val shipState = shippingViewModel.ships2.observeAsState()
-    val ships = shipState.value
+    val shipState = shippingViewModel.ship.observeAsState()
+    val ship = shipState.value
 
     val cartState = cartViewModel.carts.observeAsState(initial = emptyList())
     val carts = cartState.value
@@ -819,7 +819,7 @@ fun ContentTotal(pricePro: Double, priceShip: Double, sizeScreen: String) {
                 )
                 .show()
         } else {
-            if (ships == null) {
+            if (ship == null) {
                 Toast
                     .makeText(
                         context,

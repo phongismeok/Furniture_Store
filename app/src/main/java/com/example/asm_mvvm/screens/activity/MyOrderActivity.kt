@@ -67,8 +67,9 @@ fun ScreenMyOrder(sizeScreen: String) {
     val orderViewModel = OrderViewModel()
     val userViewModel = UserViewModel()
 
-    val isLoading by remember { mutableStateOf(orderViewModel.isLoading) }
-    val isFailed by remember { mutableStateOf(orderViewModel.isFailed) }
+    val isLoading by orderViewModel.isLoading.observeAsState(true)
+    val isFailed by orderViewModel.isFailed.observeAsState(false)
+
     val selected = remember { mutableStateOf("Processing") }
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
 
@@ -84,7 +85,13 @@ fun ScreenMyOrder(sizeScreen: String) {
         ListOptionOrder(selected = selected, sizeScreen = sizeScreen)
 
         if (isLoading) {
-            CircularProgressIndicator()
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator()
+            }
         } else if (isFailed) {
             Column(
                 modifier = Modifier.fillMaxSize(),

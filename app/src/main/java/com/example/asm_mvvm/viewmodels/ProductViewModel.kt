@@ -1,8 +1,5 @@
 package com.example.asm_mvvm.viewmodels
 
-import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,30 +9,34 @@ import com.example.asm_mvvm.retrofit.RetrofitBase
 import kotlinx.coroutines.launch
 
 class ProductViewModel : ViewModel() {
-    private val _product = MutableLiveData<List<Product>>()
-    val products: LiveData<List<Product>> = _product
+    private val _products = MutableLiveData<List<Product>>()
+    val products: LiveData<List<Product>> = _products
 
-    private val _product2 = MutableLiveData<Product?>()
-    val product: LiveData<Product?> = _product2
+    private val _product = MutableLiveData<Product?>()
+    val product: LiveData<Product?> = _product
 
-    init {
-//        getProduct()
-    }
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
+    private val _isFailed = MutableLiveData<Boolean>()
+    val isFailed: LiveData<Boolean> get() = _isFailed
 
     fun getProduct() {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().productService.getListPro()
                 if (response.isSuccessful) {
-                    _product.postValue(response.body()?.map { it.toProduct() })
-                    Log.d("check", "getProduct: ok")
+                    _products.postValue(response.body()?.map { it.toProduct() })
+                    _isFailed.value = false
                 } else {
-                    _product.postValue(emptyList())
-                    Log.d("check", "getProduct: fail1")
+                    _products.postValue(emptyList())
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
-                _product.postValue(emptyList())
-                Log.d("check", "getProduct: $e")
+                _products.postValue(emptyList())
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -44,16 +45,18 @@ class ProductViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().productService.getProductsByType(type)
-                Log.d("TAG", "getProductsByType: $response")
-
                 if (response.isSuccessful) {
-                    _product.postValue(response.body()?.map { it.toProduct() })
+                    _products.postValue(response.body()?.map { it.toProduct() })
+                    _isFailed.value = false
                 } else {
-                    _product.postValue(emptyList())
+                    _products.postValue(emptyList())
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "getProductsByType: " + e.message)
-                _product.postValue(emptyList())
+                _products.postValue(emptyList())
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -62,16 +65,18 @@ class ProductViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().productService.getProductsByTypeProduct(type)
-                Log.d("TAG", "getProductsByTypePro: $response")
-
                 if (response.isSuccessful) {
-                    _product.postValue(response.body()?.map { it.toProduct() })
+                    _products.postValue(response.body()?.map { it.toProduct() })
+                    _isFailed.value = false
                 } else {
-                    _product.postValue(emptyList())
+                    _products.postValue(emptyList())
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "getProductsByTypePro: " + e.message)
-                _product.postValue(emptyList())
+                _products.postValue(emptyList())
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -80,10 +85,13 @@ class ProductViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val res = RetrofitBase().productService.getProductById(id)
-                _product2.postValue(res.toProduct())
+                _product.postValue(res.toProduct())
+                _isFailed.value = false
             } catch (e: Exception) {
-                Log.e("TAG", "getProductById: " + e.message)
-                _product2.postValue(null)
+                _product.postValue(null)
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -93,15 +101,17 @@ class ProductViewModel : ViewModel() {
             try {
                 val response = RetrofitBase().productService.searchProduct(key)
                 if (response.isSuccessful) {
-                    _product.postValue(response.body()?.map { it.toProduct() })
-                    Log.d("check", "searchPro: ok")
+                    _products.postValue(response.body()?.map { it.toProduct() })
+                    _isFailed.value = false
                 } else {
-                    _product.postValue(emptyList())
-                    Log.d("check", "searchPro: fail1")
+                    _products.postValue(emptyList())
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
-                _product.postValue(emptyList())
-                Log.d("check", "searchPro: $e")
+                _products.postValue(emptyList())
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }
