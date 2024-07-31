@@ -48,13 +48,16 @@ import com.example.asm_mvvm.R
 import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.request.NotificationRequest
 import com.example.asm_mvvm.request.OrderRequest
+import com.example.asm_mvvm.request.PushNotificationRequest
 import com.example.asm_mvvm.ui.theme.MyButton
 import com.example.asm_mvvm.ui.theme.MyToolbar3
 import com.example.asm_mvvm.viewmodels.CartViewModel
 import com.example.asm_mvvm.viewmodels.NotificationViewModel
 import com.example.asm_mvvm.viewmodels.OrderViewModel
+import com.example.asm_mvvm.viewmodels.PushNotificationViewModel
 import com.example.asm_mvvm.viewmodels.ShippingViewModel
 import com.example.asm_mvvm.viewmodels.UserViewModel
+import com.google.firebase.messaging.FirebaseMessaging
 
 class CheckOutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -732,6 +735,7 @@ fun ContentTotal(pricePro: Double, priceShip: Double, sizeScreen: String) {
     val cartViewModel = CartViewModel()
     val userViewModel = UserViewModel()
     val orderViewModel = OrderViewModel()
+    val pushNotificationViewModel = PushNotificationViewModel()
 
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
 
@@ -856,6 +860,18 @@ fun ContentTotal(pricePro: Double, priceShip: Double, sizeScreen: String) {
                             state = "Processing",
                             account = account
                         )
+
+                        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val token = task.result
+                                val pushBody = PushNotificationRequest(
+                                    token = token,
+                                    title = "Đặt hàng thành công",
+                                    body = "đơn hàng đang được xử lý"
+                                )
+                                pushNotificationViewModel.sendNotification(pushBody)
+                            }
+                        }
 
                         notificationViewModel.addNotification(account, notificationBody)
                         orderViewModel.addOrder(account, orderBody)

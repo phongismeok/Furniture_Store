@@ -10,7 +10,12 @@ const favoritesController = require('../controller/favoritesController');
 const paymentController = require('../controller/paymentController');
 const orderController = require('../controller/orderController');
 const notificationController = require('../controller/notificationController');
+const pushNotificationController = require('../controller/pushNotificationController');
 const commentController = require('../controller/commentController');
+
+
+// push notification firebase
+router.post('/send-notification',pushNotificationController.sendNotification)
 
 // product
 router.get('/get-list-products', productController.getAllProduct);

@@ -60,6 +60,9 @@ dependencies {
     implementation (libs.lottie.compose)
     implementation (libs.firebase.auth)
     implementation(platform(libs.firebase.bom))
+    implementation (libs.firebase.messaging.ktx)
+    implementation (libs.firebase.analytics)
+
     implementation (libs.androidx.datastore.preferences)
     implementation (libs.coil.compose.v210)
     implementation (libs.coil.kt.coil.gif)
