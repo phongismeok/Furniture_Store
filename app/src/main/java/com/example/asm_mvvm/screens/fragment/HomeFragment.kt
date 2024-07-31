@@ -353,13 +353,13 @@ fun DialogAddToCart(
     val userViewModel = UserViewModel()
 
 
-    val cartState = cartViewModel.carts2.observeAsState()
+    val cartState = cartViewModel.cart.observeAsState()
     val cart = cartState.value
     val context = LocalContext.current
     SharedPreferencesManager.init(context)
 
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
-    cartViewModel.getCartsByProductId(account, productId)
+    cartViewModel.getCartByProductId(account, productId)
 
     var quantityInput by remember { mutableStateOf("") }
 
@@ -423,7 +423,7 @@ fun DialogAddToCart(
                                             "Thêm vào giỏ hàng thành công",
                                             "Thêm vào giỏ hàng thất bại",
                                             context,
-                                            type = 1
+                                            toastText = true
                                         )
                                     } else {
                                         Toast.makeText(

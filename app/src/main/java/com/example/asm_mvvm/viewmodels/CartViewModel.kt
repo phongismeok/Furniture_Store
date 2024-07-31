@@ -8,50 +8,59 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.asm_mvvm.models.Cart
-import com.example.asm_mvvm.models.Product
 import com.example.asm_mvvm.request.CartRequest
 import com.example.asm_mvvm.response.CartResponse
 import com.example.asm_mvvm.retrofit.RetrofitBase
 import kotlinx.coroutines.launch
-import retrofit2.awaitResponse
 
 class CartViewModel : ViewModel() {
-    private val _cart = MutableLiveData<List<Cart>>()
-    val carts: LiveData<List<Cart>> = _cart
 
-    private val _cart2 = MutableLiveData<CartResponse>()
-    val carts2: LiveData<CartResponse> = _cart2
+    private val _carts = MutableLiveData<List<Cart>>()
+    val carts: LiveData<List<Cart>> = _carts
 
+    private val _cart = MutableLiveData<CartResponse>()
+    val cart: LiveData<CartResponse> = _cart
 
-    fun getCartByAccount(account: String) {
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
+    private val _isFailed = MutableLiveData<Boolean>()
+    val isFailed: LiveData<Boolean> get() = _isFailed
+
+    fun getListCartsByAccount(account: String) {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().cartService.getCartByAccount(account)
-                Log.d("TAG", "getCart: $response")
-
                 if (response.isSuccessful) {
-                    _cart.postValue(response.body()?.map { it.toCart() })
+                    _carts.postValue(response.body()?.map { it.toCart() })
+                    _isFailed.value = false
                 } else {
-                    _cart.postValue(emptyList())
+                    _carts.postValue(emptyList())
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "getCart: " + e.message)
-                _cart.postValue(emptyList())
+                _carts.postValue(emptyList())
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
-    fun getCartsByProductId(account: String,id: String) {
+    fun getCartByProductId(account: String, id: String) {
         viewModelScope.launch {
             try {
-                val response = RetrofitBase().cartService.getCartByProductId(account,id)
+                val response = RetrofitBase().cartService.getCartByProductId(account, id)
                 if (response.isSuccessful && response.body() != null) {
-                    _cart2.value = response.body()
+                    _cart.value = response.body()
+                    _isFailed.value = false
                 } else {
-                    Log.d("check", "getFvByIdPro: fail1")
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
-//                Log.e("TAG", "getCartByPrdId: " + e.message)
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -64,14 +73,19 @@ class CartViewModel : ViewModel() {
         context: Context
     ) {
         viewModelScope.launch {
-            cartRequest.id =null
-            val response = RetrofitBase().cartService.addProductToCart(cartRequest)
-            if (response.isSuccessful) {
-                getCartByAccount(account)
-                Toast.makeText(context, successfulNotification, Toast.LENGTH_SHORT).show()
-            }else{
-                Toast.makeText(context, failureNotification, Toast.LENGTH_SHORT).show()
+            try {
+                cartRequest.id = null
+                val response = RetrofitBase().cartService.addProductToCart(cartRequest)
+                if (response.isSuccessful) {
+                    getListCartsByAccount(account)
+                    Toast.makeText(context, successfulNotification, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, failureNotification, Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("TAG", "add error: " + e.message)
             }
+
         }
     }
 
@@ -82,7 +96,7 @@ class CartViewModel : ViewModel() {
         successfulNotification: String,
         failureNotification: String,
         context: Context,
-        type: Int
+        toastText: Boolean
     ) {
         viewModelScope.launch {
             try {
@@ -90,12 +104,12 @@ class CartViewModel : ViewModel() {
                     RetrofitBase().cartService.updateQuantityCart(id, quantity)
                 Log.d("TAG", "UpdateQuantity: $response")
                 if (response.isSuccessful) {
-                    getCartByAccount(account)
-                    if(type==1){
+                    getListCartsByAccount(account)
+                    if (toastText) {
                         Toast.makeText(context, successfulNotification, Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    if (type == 1) {
+                    if (toastText) {
                         Toast.makeText(context, failureNotification, Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -105,17 +119,17 @@ class CartViewModel : ViewModel() {
         }
     }
 
-    fun deleteCart(id: String,account: String,context: Context,type: Int) {
+    fun deleteCart(id: String, account: String, context: Context, toastText: Boolean) {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().cartService.deleteCart(id)
                 if (response.isSuccessful) {
-                    getCartByAccount(account)
-                    if (type == 1){
+                    getListCartsByAccount(account)
+                    if (toastText) {
                         Toast.makeText(context, "Xoá thành công", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    if (type==1){
+                    if (toastText) {
                         Toast.makeText(context, "Xóa thất bại", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -124,7 +138,5 @@ class CartViewModel : ViewModel() {
             }
         }
     }
-
-
 
 }

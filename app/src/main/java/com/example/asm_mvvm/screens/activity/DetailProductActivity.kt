@@ -346,7 +346,7 @@ fun TransactionContent(
 
     val cartViewModel = CartViewModel()
 
-    val cartState = cartViewModel.carts2.observeAsState()
+    val cartState = cartViewModel.cart.observeAsState()
     val cart = cartState.value
     val context = LocalContext.current
 
@@ -359,7 +359,10 @@ fun TransactionContent(
     SharedPreferencesManager.init(context)
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
 
-    cartViewModel.getCartsByProductId(account, id)
+    val isLoadingCart by cartViewModel.isLoading.observeAsState(true)
+    val isFailedCart by cartViewModel.isFailed.observeAsState(false)
+
+    cartViewModel.getCartByProductId(account, id)
     favoritesViewModel.getFavoritesByProductId(account, id)
 
     var bienDem by rememberSaveable {
@@ -784,45 +787,58 @@ fun TransactionContent(
                 }
 
                 MyButtonCustom1(title = "Add to cart", onClick = {
-                    if (cart != null) {
-                        val quantityBefore = cart.quantity
-                        val quantitySuggest = 99 - quantityBefore
-                        if (bienDem + quantityBefore < 100) {
-                            cartViewModel.updateQuantityCart(
-                                cart.id,
-                                bienDem + quantityBefore,
-                                account = account,
+                    if (isLoadingCart) {
+                        Toast.makeText(
+                            context,
+                            "Vui lòng đợi 1 chút",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else if (isFailedCart) {
+                        Toast.makeText(
+                            context,
+                            "Đã có lỗi xảy ra",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        if (cart != null) {
+                            val quantityBefore = cart.quantity
+                            val quantitySuggest = 99 - quantityBefore
+                            if (bienDem + quantityBefore < 100) {
+                                cartViewModel.updateQuantityCart(
+                                    cart.id,
+                                    bienDem + quantityBefore,
+                                    account = account,
+                                    "Thêm vào giỏ hàng thành công",
+                                    "Thêm vào giỏ hàng thất bại",
+                                    context,
+                                    toastText = true
+                                )
+                            } else if (bienDem + quantityBefore >= 100) {
+                                Toast.makeText(
+                                    context,
+                                    "Bạn chỉ có thể mua thêm $quantitySuggest sản phẩm này",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } else {
+                            val cartBody = CartRequest(
+                                productId = id,
+                                productName = name,
+                                quantity = bienDem,
+                                image = image,
+                                price = price,
+                                account = account
+                            )
+                            cartViewModel.addProductToCart(
+                                account,
+                                cartBody,
                                 "Thêm vào giỏ hàng thành công",
                                 "Thêm vào giỏ hàng thất bại",
-                                context,
-                                type = 1
+                                context
                             )
-                        } else if (bienDem + quantityBefore >= 100) {
-                            Toast.makeText(
-                                context,
-                                "Bạn chỉ có thể mua thêm $quantitySuggest sản phẩm này",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         }
-                    } else {
-                        val cartBody = CartRequest(
-                            productId = id,
-                            productName = name,
-                            quantity = bienDem,
-                            image = image,
-                            price = price,
-                            account = account
-                        )
-                        cartViewModel.addProductToCart(
-                            account,
-                            cartBody,
-                            "Thêm vào giỏ hàng thành công",
-                            "Thêm vào giỏ hàng thất bại",
-                            context
-                        )
                     }
                 }, mauChu = Color.White, mauNen = Color.Black, type = type)
-
             }
         }
 

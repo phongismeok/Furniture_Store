@@ -1,7 +1,6 @@
 package com.example.asm_mvvm.viewmodels
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.asm_mvvm.R
 import com.example.asm_mvvm.models.Order
 import com.example.asm_mvvm.request.OrderRequest
 import com.example.asm_mvvm.retrofit.RetrofitBase
@@ -26,18 +26,21 @@ class OrderViewModel : ViewModel() {
         account: String
     ) {
         viewModelScope.launch {
+            isLoading = true
             try {
                 val response = RetrofitBase().orderService.getOrderByAccount(account)
                 if (response.isSuccessful) {
                     _order.postValue(response.body()?.map { it.toOrder() })
-                    isLoading = true
+                    isFailed = false
                 } else {
                     _order.postValue(emptyList())
-                    isLoading = true
+                    isFailed = true
                 }
             } catch (e: Exception) {
                 _order.postValue(emptyList())
                 isFailed = true
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -71,14 +74,22 @@ class OrderViewModel : ViewModel() {
         orderRequest: OrderRequest
     ) {
         viewModelScope.launch {
-            orderRequest.id = null
-
-            val response = RetrofitBase().orderService.addOrder(orderRequest)
-            if (response.isSuccessful) {
-                getOrderByAccount(account)
-            } else {
-                Log.d("fixloi1", "addOrder: loi")
+            isLoading = true
+            try {
+                orderRequest.id = null
+                val response = RetrofitBase().orderService.addOrder(orderRequest)
+                if (response.isSuccessful) {
+                    getOrderByAccount(account)
+                    isFailed = false
+                } else {
+                    isFailed = true
+                }
+            } catch (_: Exception) {
+                isFailed = true
+            } finally {
+                isLoading = false
             }
+
         }
     }
 
@@ -86,43 +97,48 @@ class OrderViewModel : ViewModel() {
         id: String,
         state: String,
         stateHt: String,
-        successfulNotification: String,
-        failureNotification: String,
+        successfulNotification: Int,
+        failureNotification: Int,
         context: Context,
         account: String
     ) {
         viewModelScope.launch {
+            isLoading = true
             try {
-                val response =
-                    RetrofitBase().orderService.updateStateOrder(id, state)
-                Log.d("TAG", "UpdateOrder: $response")
+                val response = RetrofitBase().orderService.updateStateOrder(id, state)
                 if (response.isSuccessful) {
                     getOrderByState(account, stateHt)
                     Toast.makeText(context, successfulNotification, Toast.LENGTH_SHORT).show()
+                    isFailed = false
                 } else {
                     Toast.makeText(context, failureNotification, Toast.LENGTH_SHORT).show()
+                    isFailed = true
                 }
-
-
             } catch (e: Exception) {
-                Log.e("TAG", "UpdateOrder error: " + e.message)
+                isFailed = true
+            } finally {
+                isLoading = false
             }
         }
     }
 
-
     fun deleteOrder(id: String, account: String, context: Context) {
         viewModelScope.launch {
             try {
+                isLoading = true
                 val response = RetrofitBase().orderService.deleteOrder(id)
                 if (response.isSuccessful) {
                     getOrderByState(account, "Canceled")
-                    Toast.makeText(context, "xoá đơn hàng thành công", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.delete_order_success_en , Toast.LENGTH_SHORT).show()
+                    isFailed = false
                 } else {
-                    Toast.makeText(context, "xoá đơn hàng thất bại", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.delete_order_fail_en, Toast.LENGTH_SHORT).show()
+                    isFailed = true
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "DeleteOrder error: " + e.message)
+                isFailed = true
+            } finally {
+                isLoading = false
             }
         }
     }

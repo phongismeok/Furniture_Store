@@ -1,3 +1,33 @@
 <resources>
+
     <string name="app_name">Furniture Store</string>
+<!--    text size screen-->
+    <string name="size_screen_large_vn">Lớn</string>
+    <string name="size_screen_fairly_vn">Khá</string>
+    <string name="size_screen_medium_vn">Trung bình</string>
+    <string name="size_screen_smail_vn">Nhỏ</string>
+<!--    text type my order screen-->
+    <string name="type_processing_vn">Đang xử lý</string>
+    <string name="type_delivered_vn">Đã giao hàng</string>
+    <string name="type_canceled_vn">Đã huỷ</string>
+<!--    text toast my order screen-->
+    <string name="update_order_success_vn">Hủy đơn hàng thành công</string>
+    <string name="update_order_fail_vn">Hủy đơn hàng thất bại</string>
+    <string name="delete_order_success_vn">Xóa đơn hàng thành công</string>
+    <string name="delete_order_fail_vn">Xoá đơn hàng thất bại</string>
+<!--    text other in button, and content my order screen-->
+    <string name="text_button_cancel_vn">Huỷ</string>
+    <string name="text_empty_order_vn">Hiện tại chưa có đơn hàng nào</string>
+
+<!--    text general-->
+    <string name="text_error_vn">Đã có lỗi xảy ra, hãy quay lại sau</string>
+
+<!--    text name screen-->
+    <string name="name_my_order_screen_vn">Đơn hàng của tôi</string>
+
+    <string name="update_order_success_en">The order has been successfully canceled</string>
+    <string name="update_order_fail_en">Order cancellation failed</string>
+    <string name="delete_order_success_en">The order has been successfully deleted</string>
+    <string name="delete_order_fail_en">The order cannot be deleted</string>
+
 </resources>

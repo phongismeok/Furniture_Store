@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.asm_mvvm.R
 import com.example.asm_mvvm.SharedPreferencesManager
 import com.example.asm_mvvm.ui.theme.HorizontalLine
 import com.example.asm_mvvm.ui.theme.MyToolbar3
@@ -131,11 +132,29 @@ fun ScreenMyOrder(sizeScreen: String) {
 }
 
 @Composable
-fun ListOptionOrder(sizeScreen: String,selected: MutableState<String>) {
+fun ListOptionOrder(sizeScreen: String, selected: MutableState<String>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
+            .height(
+                when (sizeScreen) {
+                    "large" -> {
+                        60.dp
+                    }
+
+                    "fairly" -> {
+                        55.dp
+                    }
+
+                    "medium" -> {
+                        50.dp
+                    }
+
+                    else -> {
+                        45.dp
+                    }
+                }
+            )
             .padding(top = 10.dp),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
@@ -267,10 +286,11 @@ fun ContentOrder(
     selected: MutableState<String>,
     account: String,
     orderViewModel: OrderViewModel,
-    sizeScreen: String
+    sizeScreen: String,
 ) {
     val context = LocalContext.current
     val totalPrice = quantity.toDouble() * price
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -438,24 +458,26 @@ fun ContentOrder(
                     modifier = Modifier.fillMaxHeight()
                 ) {
                     Row(modifier = Modifier.align(Alignment.End)) {
-                        Text(text = "quantity:", fontSize =
-                        when (sizeScreen) {
-                            "large" -> {
-                                20.sp
-                            }
+                        Text(
+                            text = "quantity:", fontSize =
+                            when (sizeScreen) {
+                                "large" -> {
+                                    20.sp
+                                }
 
-                            "fairly" -> {
-                                18.sp
-                            }
+                                "fairly" -> {
+                                    18.sp
+                                }
 
-                            "medium" -> {
-                                16.sp
-                            }
+                                "medium" -> {
+                                    16.sp
+                                }
 
-                            else -> {
-                                15.sp
+                                else -> {
+                                    15.sp
+                                }
                             }
-                        })
+                        )
                         Text(
                             text = " $quantity",
                             fontSize =
@@ -480,24 +502,26 @@ fun ContentOrder(
                         )
                     }
                     Row {
-                        Text(text = "total amount:", fontSize =
-                        when (sizeScreen) {
-                            "large" -> {
-                                20.sp
-                            }
+                        Text(
+                            text = "total amount:", fontSize =
+                            when (sizeScreen) {
+                                "large" -> {
+                                    20.sp
+                                }
 
-                            "fairly" -> {
-                                18.sp
-                            }
+                                "fairly" -> {
+                                    18.sp
+                                }
 
-                            "medium" -> {
-                                16.sp
-                            }
+                                "medium" -> {
+                                    16.sp
+                                }
 
-                            else -> {
-                                15.sp
+                                else -> {
+                                    15.sp
+                                }
                             }
-                        })
+                        )
                         Text(
                             text = " $totalPrice",
                             fontSize =
@@ -534,8 +558,8 @@ fun ContentOrder(
                                     idOrder,
                                     "Canceled",
                                     selected.value,
-                                    "Huỷ đơn hàng thành công",
-                                    "Huỷ đơn hàng thất bại",
+                                    R.string.update_order_success_en,
+                                    R.string.update_order_fail_en,
                                     context,
                                     account
                                 )
@@ -548,31 +572,32 @@ fun ContentOrder(
                         ),
                         modifier = Modifier.align(Alignment.End)
                     ) {
-                        Text(text = "Cancel", fontSize =
-                        when (sizeScreen) {
-                            "large" -> {
-                                15.sp
-                            }
+                        Text(
+                            text = "Cancel", fontSize =
+                            when (sizeScreen) {
+                                "large" -> {
+                                    15.sp
+                                }
 
-                            "fairly" -> {
-                                14.sp
-                            }
+                                "fairly" -> {
+                                    14.sp
+                                }
 
-                            "medium" -> {
-                                13.sp
-                            }
+                                "medium" -> {
+                                    13.sp
+                                }
 
-                            else -> {
-                                12.sp
+                                else -> {
+                                    12.sp
+                                }
                             }
-                        })
+                        )
                     }
                 }
             }
         }
     }
 }
-
 
 
 @RequiresApi(Build.VERSION_CODES.P)

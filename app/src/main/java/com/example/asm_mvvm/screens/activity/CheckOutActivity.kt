@@ -32,6 +32,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -728,19 +729,22 @@ fun ContentTotal(pricePro: Double, priceShip: Double, sizeScreen: String) {
 
     val notificationViewModel = NotificationViewModel()
     val shippingViewModel = ShippingViewModel()
-    val carViewModel = CartViewModel()
+    val cartViewModel = CartViewModel()
     val userViewModel = UserViewModel()
     val orderViewModel = OrderViewModel()
 
     val account = userViewModel.getEmailFromSharedPreferences() ?: ""
 
+    val isLoading by cartViewModel.isLoading.observeAsState(true)
+    val isFailed by cartViewModel.isFailed.observeAsState(false)
+
     val shipState = shippingViewModel.ships2.observeAsState()
     val ships = shipState.value
 
-    val cartState = carViewModel.carts.observeAsState(initial = emptyList())
+    val cartState = cartViewModel.carts.observeAsState(initial = emptyList())
     val carts = cartState.value
 
-    carViewModel.getCartByAccount(account)
+    cartViewModel.getListCartsByAccount(account)
     shippingViewModel.getShipAddressBySelect(1, account)
     Card(
         shape = RoundedCornerShape(5.dp), modifier = Modifier
@@ -796,56 +800,74 @@ fun ContentTotal(pricePro: Double, priceShip: Double, sizeScreen: String) {
             DeMuc3(tittle = "Total:", price = "$ $priceAll", sizeScreen = sizeScreen)
         }
     }
+
     MyButton(title = "SUBMIT ORDER", onClick = {
-        if (ships == null) {
+        if (isLoading) {
             Toast
                 .makeText(
                     context,
-                    "Bạn chưa chọn địa chỉ nhận hàng",
+                    "hãy thao tác chậm lại",
+                    Toast.LENGTH_SHORT
+                )
+                .show()
+        } else if (isFailed) {
+            Toast
+                .makeText(
+                    context,
+                    "Đã có lỗi xảy ra",
                     Toast.LENGTH_SHORT
                 )
                 .show()
         } else {
-            if (pricePro == 0.0) {
+            if (ships == null) {
                 Toast
                     .makeText(
                         context,
-                        "Bạn chưa mua gì",
+                        "Bạn chưa chọn địa chỉ nhận hàng",
                         Toast.LENGTH_SHORT
                     )
                     .show()
             } else {
-                for (cart in carts) {
-                    val priceOnePro = cart.price * cart.quantity.toDouble()
-                    val notificationBody = NotificationRequest(
-                        title = "Đặt hàng thành công",
-                        content = "bạn đã mua ${cart.quantity} ${cart.productName} với giá $priceOnePro",
-                        state = 1,
-                        image = cart.image,
-                        account = account
-                    )
+                if (pricePro == 0.0) {
+                    Toast
+                        .makeText(
+                            context,
+                            "Bạn chưa mua gì",
+                            Toast.LENGTH_SHORT
+                        )
+                        .show()
+                } else {
+                    for (cart in carts) {
+                        val priceOnePro = cart.price * cart.quantity.toDouble()
+                        val notificationBody = NotificationRequest(
+                            title = "Đặt hàng thành công",
+                            content = "bạn đã mua ${cart.quantity} ${cart.productName} với giá $priceOnePro",
+                            state = 1,
+                            image = cart.image,
+                            account = account
+                        )
 
-                    val orderBody = OrderRequest(
-                        productId = cart.productId,
-                        productName = cart.productName,
-                        image = cart.image,
-                        quantity = cart.quantity,
-                        price = cart.price,
-                        state = "Processing",
-                        account = account
-                    )
+                        val orderBody = OrderRequest(
+                            productId = cart.productId,
+                            productName = cart.productName,
+                            image = cart.image,
+                            quantity = cart.quantity,
+                            price = cart.price,
+                            state = "Processing",
+                            account = account
+                        )
 
-                    notificationViewModel.addNotification(account, notificationBody)
-                    orderViewModel.addOrder(account,orderBody)
-                    carViewModel.deleteCart(cart.id, account, context, 0)
+                        notificationViewModel.addNotification(account, notificationBody)
+                        orderViewModel.addOrder(account, orderBody)
+                        cartViewModel.deleteCart(cart.id, account, context, false)
+                    }
+
+                    val intent = Intent(context, PaymentSuccessActivity::class.java)
+                    context.startActivity(intent)
                 }
 
-                val intent = Intent(context, PaymentSuccessActivity::class.java)
-                context.startActivity(intent)
             }
-
         }
-
     }, mauChu = Color.White, mauNen = Color.Black, type = sizeScreen)
 }
 
