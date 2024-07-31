@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -64,7 +65,7 @@ class ShippingActivity : AppCompatActivity() {
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ListShip(id: String,sizeScreen: String) {
+fun ListShip(id: String, sizeScreen: String) {
     val shippingViewModel = ShippingViewModel()
     val userViewModel = UserViewModel()
 
@@ -74,6 +75,9 @@ fun ListShip(id: String,sizeScreen: String) {
     val ships = shipState.value
     val context = LocalContext.current
 
+    val isLoading by shippingViewModel.isLoading.observeAsState(true)
+    val isFailed by shippingViewModel.isFailed.observeAsState(false)
+
     LaunchedEffect(account) {
         shippingViewModel.getShipAddressByAccount(account)
     }
@@ -82,8 +86,24 @@ fun ListShip(id: String,sizeScreen: String) {
     var dataOld by remember { mutableStateOf(id) }
     var isChecked by remember { mutableStateOf(false) }
 
-    if (ships.isEmpty()) {
-        if (id == "no") {
+    if (isLoading) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CircularProgressIndicator()
+        }
+    } else if (isFailed) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Error", fontSize = 22.sp)
+        }
+    } else {
+        if (ships.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -92,146 +112,143 @@ fun ListShip(id: String,sizeScreen: String) {
                 Text(text = "hãy thêm địa chỉ nhận hàng nhé", fontSize = 22.sp)
             }
         } else {
-            AnimationLoading()
-        }
+            LazyColumn {
+                items(ships.size) { index ->
 
-    } else {
-        LazyColumn {
-            items(ships.size) { index ->
-
-                isChecked = if (id == ships[index].id && dataClick == "") {
-                    true
-                } else {
-                    dataClick == ships[index].id
-                }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    //
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = isChecked,
-                            onCheckedChange = {
-                                dataClick = ships[index].id
-                                shippingViewModel.updateSelectShipping(
-                                    ships[index].id,
-                                    1,
-                                    "Thay đổi địa chỉ thành công",
-                                    "Thay đổi địa chỉ thất bại",
-                                    context,
-                                    1
-                                )
-
-                                shippingViewModel.updateSelectShipping(
-                                    dataOld,
-                                    0,
-                                    "Thay đổi địa chỉ thành công",
-                                    "Thay đổi địa chỉ thất bại",
-                                    context,
-                                    0
-                                )
-
-                                dataOld = ships[index].id
-
-                            }
-                        )
-                        Text(
-                            text = "Use as the shipping address",
-                            fontSize = 20.sp,
-                            color = Color.Black
-                        )
+                    isChecked = if (id == ships[index].id && dataClick == "") {
+                        true
+                    } else {
+                        dataClick == ships[index].id
                     }
-                    //
-                    Card(
+
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxSize()
                             .padding(10.dp),
-                        shape = RoundedCornerShape(15.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor =
-                            Color.White
-                        ),
-                        elevation = CardDefaults.cardElevation(
-                            defaultElevation =
-                            3.dp
-                        ),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        TitleShip(tittle = ships[index].name, sizeScreen = sizeScreen)
-                        Divider(
+                        //
+                        Row(
                             modifier = Modifier
-                                .height(1.dp)
-                                .fillMaxWidth()
-                        )
-                        Text(
-                            text = ships[index].address,
-                            fontSize =
-                            when (sizeScreen) {
-                                "large" -> {
-                                    20.sp
-                                }
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = isChecked,
+                                onCheckedChange = {
+                                    dataClick = ships[index].id
+                                    shippingViewModel.updateSelectShipping(
+                                        ships[index].id,
+                                        1,
+                                        "Thay đổi địa chỉ thành công",
+                                        "Thay đổi địa chỉ thất bại",
+                                        context,
+                                        1
+                                    )
 
-                                "fairly" -> {
-                                    18.sp
-                                }
+                                    shippingViewModel.updateSelectShipping(
+                                        dataOld,
+                                        0,
+                                        "Thay đổi địa chỉ thành công",
+                                        "Thay đổi địa chỉ thất bại",
+                                        context,
+                                        0
+                                    )
 
-                                "medium" -> {
-                                    16.sp
-                                }
+                                    dataOld = ships[index].id
 
-                                else -> {
-                                    15.sp
                                 }
-                            },
-                            modifier = Modifier.padding(
-                                start = 15.dp,
-                                end = 15.dp,
-                                top = 5.dp,
-                                bottom = 5.dp
                             )
-                        )
-                        Divider(
+                            Text(
+                                text = "Use as the shipping address",
+                                fontSize = 20.sp,
+                                color = Color.Black
+                            )
+                        }
+                        //
+                        Card(
                             modifier = Modifier
-                                .height(1.dp)
                                 .fillMaxWidth()
-                        )
-                        Text(
-                            text = ships[index].addressDetail,
-                            fontSize =
-                            when (sizeScreen) {
-                                "large" -> {
-                                    19.sp
-                                }
-
-                                "fairly" -> {
-                                    17.sp
-                                }
-
-                                "medium" -> {
-                                    15.sp
-                                }
-
-                                else -> {
-                                    14.sp
-                                }
-                            },
-                            modifier = Modifier.padding(
-                                start = 15.dp,
-                                end = 15.dp,
-                                top = 5.dp,
-                                bottom = 5.dp
+                                .padding(10.dp),
+                            shape = RoundedCornerShape(15.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor =
+                                Color.White
+                            ),
+                            elevation = CardDefaults.cardElevation(
+                                defaultElevation =
+                                3.dp
+                            ),
+                        ) {
+                            TitleShip(tittle = ships[index].name, sizeScreen = sizeScreen)
+                            Divider(
+                                modifier = Modifier
+                                    .height(1.dp)
+                                    .fillMaxWidth()
                             )
-                        )
+                            Text(
+                                text = ships[index].address,
+                                fontSize =
+                                when (sizeScreen) {
+                                    "large" -> {
+                                        20.sp
+                                    }
+
+                                    "fairly" -> {
+                                        18.sp
+                                    }
+
+                                    "medium" -> {
+                                        16.sp
+                                    }
+
+                                    else -> {
+                                        15.sp
+                                    }
+                                },
+                                modifier = Modifier.padding(
+                                    start = 15.dp,
+                                    end = 15.dp,
+                                    top = 5.dp,
+                                    bottom = 5.dp
+                                )
+                            )
+                            Divider(
+                                modifier = Modifier
+                                    .height(1.dp)
+                                    .fillMaxWidth()
+                            )
+                            Text(
+                                text = ships[index].addressDetail,
+                                fontSize =
+                                when (sizeScreen) {
+                                    "large" -> {
+                                        19.sp
+                                    }
+
+                                    "fairly" -> {
+                                        17.sp
+                                    }
+
+                                    "medium" -> {
+                                        15.sp
+                                    }
+
+                                    else -> {
+                                        14.sp
+                                    }
+                                },
+                                modifier = Modifier.padding(
+                                    start = 15.dp,
+                                    end = 15.dp,
+                                    top = 5.dp,
+                                    bottom = 5.dp
+                                )
+                            )
+                        }
+
                     }
-
                 }
             }
         }
@@ -239,7 +256,7 @@ fun ListShip(id: String,sizeScreen: String) {
 }
 
 @Composable
-fun TitleShip(tittle: String,sizeScreen: String) {
+fun TitleShip(tittle: String, sizeScreen: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -311,12 +328,12 @@ fun ClickBackShip(price: String) {
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun ScreenShip (sizeScreen:String,priceNhan:String,getId:String) {
+fun ScreenShip(sizeScreen: String, priceNhan: String, getId: String) {
     val context = LocalContext.current
     Column(modifier = Modifier.fillMaxSize()) {
-        MyToolbar3(title = "Shipping address","")
+        MyToolbar3(title = "Shipping address", "")
         Box(modifier = Modifier.fillMaxSize()) {
-            ListShip(id = getId,sizeScreen = sizeScreen)
+            ListShip(id = getId, sizeScreen = sizeScreen)
             Box(
                 contentAlignment = Alignment.BottomEnd, modifier = Modifier
                     .padding(end = 20.dp, bottom = 70.dp)
@@ -335,7 +352,7 @@ fun ScreenShip (sizeScreen:String,priceNhan:String,getId:String) {
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
-fun SizeShippingScreen(price:String,id:String) {
+fun SizeShippingScreen(price: String, id: String) {
     val context = LocalContext.current
     val displayMetrics: DisplayMetrics = context.resources.displayMetrics
     val screenHeightPx = displayMetrics.heightPixels
@@ -345,16 +362,16 @@ fun SizeShippingScreen(price:String,id:String) {
 
     if (screenHeightDp > 890) {
         // large
-        ScreenShip(sizeScreen = "large",price,id)
+        ScreenShip(sizeScreen = "large", price, id)
     } else if (screenHeightDp > 800) {
         // fairly
-        ScreenShip(sizeScreen = "fairly",price,id)
+        ScreenShip(sizeScreen = "fairly", price, id)
     } else if (screenHeightDp > 714) {
         // medium
-        ScreenShip(sizeScreen = "medium",price,id)
+        ScreenShip(sizeScreen = "medium", price, id)
     } else {
         // smail
-        ScreenShip(sizeScreen = "smail",price,id)
+        ScreenShip(sizeScreen = "smail", price, id)
     }
 }
 

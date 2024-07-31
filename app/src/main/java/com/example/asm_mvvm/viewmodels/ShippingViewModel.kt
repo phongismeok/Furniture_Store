@@ -23,20 +23,28 @@ class ShippingViewModel : ViewModel() {
     private val _ship = MutableLiveData<ShippingResponse>()
     val ship: LiveData<ShippingResponse> = _ship
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
+    private val _isFailed = MutableLiveData<Boolean>()
+    val isFailed: LiveData<Boolean> get() = _isFailed
+
     fun getShipAddressByAccount(account: String) {
         viewModelScope.launch {
             try {
                 val response = RetrofitBase().shippingService.getShippingByAccount(account)
-                Log.d("TAG", "getShip: $response")
-
                 if (response.isSuccessful) {
                     _ships.postValue(response.body()?.map { it.toShip() })
+                    _isFailed.value = false
                 } else {
                     _ships.postValue(emptyList())
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
-                Log.e("TAG", "getShip: " + e.message)
                 _ships.postValue(emptyList())
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }
@@ -47,11 +55,14 @@ class ShippingViewModel : ViewModel() {
                 val response = RetrofitBase().shippingService.getShippingBySelect(account,select)
                 if (response.isSuccessful && response.body() != null) {
                     _ship.value = response.body()
+                    _isFailed.value = false
                 } else {
-                    Log.d("check", "getShipBySelect: fail1")
+                    _isFailed.value = true
                 }
             } catch (e: Exception) {
-                Log.d("check", "getShipBySelect: fail1 $e" )
+                _isFailed.value = true
+            } finally {
+                _isLoading.value = false
             }
         }
     }

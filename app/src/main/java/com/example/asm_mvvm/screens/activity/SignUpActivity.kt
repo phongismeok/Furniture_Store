@@ -455,7 +455,7 @@ fun ScreenSignUp(type: String) {
         MyButton(
             title = "Sign Up",
             onClick = {
-                userViewModel.signUp(email.value, password.value) { success ->
+                userViewModel.signUp(email.value, password.value,username.value) { success ->
                     if (success) {
                         Toast.makeText(context,"Sign up success", Toast.LENGTH_SHORT).show()
                     } else {

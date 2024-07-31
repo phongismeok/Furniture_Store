@@ -6,6 +6,7 @@ import android.util.DisplayMetrics
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -112,7 +114,16 @@ fun ScreenMyOrder(sizeScreen: String) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(text = "Hiện tại chưa có đơn hàng nào", fontSize = 22.sp)
+                        Image(
+                            painter = painterResource(id = R.drawable.no_order),
+                            contentDescription = "",
+                            modifier = Modifier.size(150.dp)
+                        )
+                        Text(
+                            text = "Hiện tại chưa có đơn hàng nào",
+                            fontSize = 22.sp,
+                            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 30.dp)
+                        )
                     }
                 } else {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {

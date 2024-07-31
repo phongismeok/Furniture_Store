@@ -187,10 +187,9 @@ fun ListFavorites(dataSearch: String, type: String) {
             }
         } else {
             LazyColumn(
-                contentPadding = PaddingValues(8.dp),
+                contentPadding = PaddingValues(top = 5.dp),
                 modifier = Modifier
-                    .padding(top = 10.dp)
-                    .fillMaxHeight()
+                    .fillMaxSize()
             ) {
                 items(favorites.size) { index ->
                     if (showDialog) {

@@ -43,6 +43,7 @@ import com.example.asm_mvvm.screens.activity.MyReviewActivity
 import com.example.asm_mvvm.screens.activity.SettingActivity
 import com.example.asm_mvvm.screens.activity.ShippingActivity
 import com.example.asm_mvvm.ui.theme.MyToolbar2
+import com.example.asm_mvvm.viewmodels.ShippingViewModel
 import com.example.asm_mvvm.viewmodels.UserViewModel
 
 @Composable
@@ -75,6 +76,12 @@ fun ScreenProfile(type: String) {
     val context = LocalContext.current
     SharedPreferencesManager.init(context)
     val userViewModel = UserViewModel()
+    val shippingViewModel = ShippingViewModel()
+    val account = userViewModel.getEmailFromSharedPreferences() ?: ""
+
+    val shipState = shippingViewModel.ship.observeAsState()
+    val ship = shipState.value
+    shippingViewModel.getShipAddressBySelect(select = 1, account = account)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -88,6 +95,14 @@ fun ScreenProfile(type: String) {
         }
         MyOptions(tittle = "Shipping Addresses", content = "haha", type = type) {
             val intent = Intent(context, ShippingActivity::class.java)
+            if (ship != null) {
+                val id = ship.id
+                intent.putExtra("CLICK", id)
+                context.startActivity(intent)
+            } else {
+                intent.putExtra("CLICK", "no")
+                context.startActivity(intent)
+            }
             context.startActivity(intent)
         }
         MyOptions(tittle = "Payment Method", content = "haha", type = type) {
@@ -134,7 +149,7 @@ fun MyInfo(userViewModel: UserViewModel, type: String) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     AsyncImage(
-                        model = it[0].avatar,
+                        model = it.avatar,
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier
@@ -143,7 +158,7 @@ fun MyInfo(userViewModel: UserViewModel, type: String) {
                     )
                     Column(modifier = Modifier.padding(start = 15.dp)) {
                         Text(
-                            text = it[0].username, fontSize =
+                            text = it.username, fontSize =
                             when (type) {
                                 "large" -> {
                                     20.sp
@@ -163,7 +178,7 @@ fun MyInfo(userViewModel: UserViewModel, type: String) {
                             }, fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = it[0].name, fontSize =
+                            text = it.name, fontSize =
                             when (type) {
                                 "large" -> {
                                     21.sp

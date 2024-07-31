@@ -109,7 +109,7 @@ fun ListNotification(dataSearch: String, type: String) {
             Text(text = "Error", fontSize = 22.sp)
         }
     }else{
-        LazyColumn {
+        LazyColumn(modifier = Modifier.padding(10.dp)) {
             items(notifications.size) { index ->
                 ContentNotification(
                     image = notifications[index].image,

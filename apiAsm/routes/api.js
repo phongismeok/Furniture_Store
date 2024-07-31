@@ -25,6 +25,7 @@ router.get('/get-list-types',typeController.getAllType)
 // user
 router.get('/get-list-users',userController.getAllUser)
 router.get('/get-user-by-username/:username',userController.getUserByUserName)
+router.post('/add-user',userController.addUser)
 
 // cart
 router.get('/get-list-cart-by-account/:account',cartController.getAllCartByAccount)
