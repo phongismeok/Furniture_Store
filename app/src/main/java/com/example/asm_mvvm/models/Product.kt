@@ -11,4 +11,5 @@ data class Product(
     val image3: String,
     val type: Int,
     val typeProduct: String,
+    val rate: String
 )

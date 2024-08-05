@@ -17,12 +17,6 @@ interface FavoritesService {
     @GET("get-list-favorites-by-account/{account}")
     suspend fun getFavoritesByAccount(@Path("account") account: String): Response<List<FavoritesResponse>>
 
-    @GET("get-favorites-by-account-id")
-    suspend fun getFavoritesByAccountAndId(
-        @Query("account") account: String,
-        @Query("id") id: String
-    ): Response<List<FavoritesResponse>>
-
     @GET("get-favorite-by-productId/{account}/{productId}")
     suspend fun getFavoriteByProductId(
         @Path("account") account: String,

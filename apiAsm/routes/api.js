@@ -79,4 +79,10 @@ router.post('/add-order',orderController.addOrder)
 router.put('/update-state-order',orderController.updateStateOrder);
 router.delete('/delete-order/:id',orderController.deleteOrder)
 
+//comment
+router.get('/get-list-comment-by-account/:account',commentController.getAllCommentByAccount);
+router.get('/get-list-comment-by-productId/:productId',commentController.getAllCommentByProductId);
+router.post('/add-comment',commentController.addComment)
+router.delete('/delete-comment/:id',commentController.deleteComment)
+
 module.exports = router;

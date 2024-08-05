@@ -331,7 +331,7 @@ fun ClickBackShip(price: String) {
 fun ScreenShip(sizeScreen: String, priceNhan: String, getId: String) {
     val context = LocalContext.current
     Column(modifier = Modifier.fillMaxSize()) {
-        MyToolbar3(title = "Shipping address", "")
+        MyToolbar3(title = "Shipping address", sizeScreen)
         Box(modifier = Modifier.fillMaxSize()) {
             ListShip(id = getId, sizeScreen = sizeScreen)
             Box(

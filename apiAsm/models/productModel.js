@@ -9,7 +9,8 @@ const Products = new Scheme({
         image2: {type: String, required: true},
         image3: {type: String, required: true},
         type: {type: Number, required: true},
-        typeProduct: {type: String, required: true}
+        typeProduct: {type: String, required: true},
+        rate : {type: String, default: "no rate"}
     }, {
         timestamps: false
     }

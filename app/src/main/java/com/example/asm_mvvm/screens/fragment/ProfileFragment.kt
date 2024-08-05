@@ -1,5 +1,6 @@
 package com.example.asm_mvvm.screens.fragment
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.util.DisplayMetrics
 import android.widget.Toast
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -89,11 +91,11 @@ fun ScreenProfile(type: String) {
     ) {
         MyToolbar2(title = "Profile", sizeScreen = type)
         MyInfo(userViewModel = userViewModel, type = type)
-        MyOptions(tittle = "My orders", content = "haha", type = type) {
+        MyOptions(tittle = "My orders", type = type) {
             val intent = Intent(context, MyOrderActivity::class.java)
             context.startActivity(intent)
         }
-        MyOptions(tittle = "Shipping Addresses", content = "haha", type = type) {
+        MyOptions(tittle = "Shipping Addresses", type = type) {
             val intent = Intent(context, ShippingActivity::class.java)
             if (ship != null) {
                 val id = ship.id
@@ -105,7 +107,7 @@ fun ScreenProfile(type: String) {
             }
             context.startActivity(intent)
         }
-        MyOptions(tittle = "Payment Method", content = "haha", type = type) {
+        MyOptions(tittle = "Payment Method", type = type) {
             Toast
                 .makeText(
                     context,
@@ -114,20 +116,24 @@ fun ScreenProfile(type: String) {
                 )
                 .show()
         }
-        MyOptions(tittle = "My reviews", content = "haha", type = type) {
+        MyOptions(tittle = "My reviews", type = type) {
             val intent = Intent(context, MyReviewActivity::class.java)
             context.startActivity(intent)
         }
-        MyOptions(tittle = "Setting", content = "haha", type = type) {
+        MyOptions(tittle = "Setting", type = type) {
             val intent = Intent(context, SettingActivity::class.java)
             context.startActivity(intent)
         }
     }
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun MyInfo(userViewModel: UserViewModel, type: String) {
     val account = userViewModel.getEmailFromSharedPreferences()
+
+    val isLoading by userViewModel.isLoading.observeAsState(true)
+    val isFailed by userViewModel.isFailed.observeAsState(false)
 
     Row(
         modifier = Modifier
@@ -136,20 +142,31 @@ fun MyInfo(userViewModel: UserViewModel, type: String) {
     ) {
         if (account != null) {
             val user by userViewModel.user.observeAsState()
-
-            LaunchedEffect(account) {
                 if (account != "") {
                     userViewModel.getUserByUsername(account)
                 }
-            }
-            user?.let {
+            if (isLoading){
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }else if(isFailed){
+                Column (modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
+                    Text("Error", fontSize = 22.sp)
+                }
+            }else{
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     AsyncImage(
-                        model = it.avatar,
+                        model = user?.avatar,
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds,
                         modifier = Modifier
@@ -158,7 +175,7 @@ fun MyInfo(userViewModel: UserViewModel, type: String) {
                     )
                     Column(modifier = Modifier.padding(start = 15.dp)) {
                         Text(
-                            text = it.username, fontSize =
+                            text = user?.username ?: "", fontSize =
                             when (type) {
                                 "large" -> {
                                     20.sp
@@ -177,37 +194,29 @@ fun MyInfo(userViewModel: UserViewModel, type: String) {
                                 }
                             }, fontWeight = FontWeight.Bold
                         )
-                        Text(
-                            text = it.name, fontSize =
-                            when (type) {
-                                "large" -> {
-                                    21.sp
-                                }
+                        user?.name?.let {
+                            Text(
+                                text = it, fontSize =
+                                when (type) {
+                                    "large" -> {
+                                        21.sp
+                                    }
 
-                                "fairly" -> {
-                                    20.sp
-                                }
+                                    "fairly" -> {
+                                        20.sp
+                                    }
 
-                                "medium" -> {
-                                    19.sp
-                                }
+                                    "medium" -> {
+                                        19.sp
+                                    }
 
-                                else -> {
-                                    18.sp
+                                    else -> {
+                                        18.sp
+                                    }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
-                }
-            } ?: run {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text("Loading...", fontSize = 22.sp)
                 }
             }
         }
@@ -216,7 +225,7 @@ fun MyInfo(userViewModel: UserViewModel, type: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyOptions(type: String, tittle: String, content: String, onClick: () -> Unit) {
+fun MyOptions(type: String, tittle: String, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor =
@@ -283,7 +292,6 @@ fun MyOptions(type: String, tittle: String, content: String, onClick: () -> Unit
                     fontWeight = FontWeight(550),
                     color = Color.Black
                 )
-                Text(text = content, modifier = Modifier.padding(top = 5.dp))
             }
             Box {
                 Icon(

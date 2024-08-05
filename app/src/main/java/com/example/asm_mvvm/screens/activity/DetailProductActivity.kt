@@ -1,5 +1,6 @@
 package com.example.asm_mvvm.screens.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -60,6 +61,7 @@ import com.example.asm_mvvm.request.CartRequest
 import com.example.asm_mvvm.request.FavoritesRequest
 import com.example.asm_mvvm.ui.theme.MyButtonCustom1
 import com.example.asm_mvvm.viewmodels.CartViewModel
+import com.example.asm_mvvm.viewmodels.CommentViewModel
 import com.example.asm_mvvm.viewmodels.FavoritesViewModel
 import com.example.asm_mvvm.viewmodels.ProductViewModel
 import com.example.asm_mvvm.viewmodels.UserViewModel
@@ -331,6 +333,7 @@ fun TransactionImage(image1: String, image2: String, image3: String, screen: Str
     }
 }
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionContent(
@@ -361,6 +364,22 @@ fun TransactionContent(
 
     cartViewModel.getCartByProductId(account, id)
     favoritesViewModel.getFavoritesByProductId(account, id)
+
+    val commentViewModel = CommentViewModel()
+
+    val isLoading by commentViewModel.isLoading.observeAsState(true)
+    val isFailed by commentViewModel.isFailed.observeAsState(false)
+
+    val commentState = commentViewModel.comments.observeAsState(initial = emptyList())
+    val comment = commentState.value
+
+    commentViewModel.getCommentByProductId(id)
+    var rateAll = 0.0
+
+    val rateSize = comment.size
+    for (cmt in comment){
+        rateAll += cmt.rate
+    }
 
     var bienDem by rememberSaveable {
         mutableIntStateOf(1)
@@ -619,27 +638,41 @@ fun TransactionContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Card(onClick = {
+                val intent = Intent(context,RatingActivity::class.java)
+                intent.putExtra("IDPRODETAIL",id)
 
+                context.startActivity(intent)
             }, colors = CardDefaults.cardColors(containerColor = Color.White)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(30.dp),
-                        tint = Color(0xFFF57C00)
-                    )
-                    Text(
-                        text = "4.5",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 5.dp)
-                    )
+                if(isLoading){
+                    Text(text = "Loading...")
+                }else if(isFailed){
+                    Text(text = "Error")
+                }else{
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.Star,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .size(30.dp),
+                            tint = Color(0xFFF57C00)
+                        )
+                        Text(
+                            text = if(rateSize == 0){
+                                "..."
+                            }else{
+                                String.format("%.1f", rateAll / rateSize)
+                            },
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 5.dp)
+                        )
+                    }
                 }
+
             }
 
             Text(
-                text = "(50 reviews)",
+                text = "($rateSize reviews)",
                 fontSize = 17.sp,
                 modifier = Modifier.padding(start = 10.dp)
             )

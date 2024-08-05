@@ -13,6 +13,7 @@ data class ProductResponse(
     @SerializedName("image3") val image3: String,
     @SerializedName("type") val type: Int,
     @SerializedName("typeProduct") val typeProduct: String,
+    @SerializedName("rate") val rate: String
 ) {
     fun toProduct(): Product {
         return Product(
@@ -24,7 +25,8 @@ data class ProductResponse(
             image2 = this.image2,
             image3 = this.image3,
             type = this.type,
-            typeProduct = this.typeProduct
+            typeProduct = this.typeProduct,
+            rate = this.rate
         )
     }
 }

@@ -12,7 +12,7 @@ import java.net.NetworkInterface
 import java.util.Collections
 
 class RetrofitBase {
-    private val baseUrl = "http://192.168.0.119:3000/api/"
+    private val baseUrl = "http://192.168.0.103:3000/api/"
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
@@ -45,5 +45,8 @@ class RetrofitBase {
     }
     val pushNotificationService: PushNotificationService by lazy {
         retrofit.create(PushNotificationService::class.java)
+    }
+    val commentService: CommentService by lazy {
+        retrofit.create(CommentService::class.java)
     }
 }
